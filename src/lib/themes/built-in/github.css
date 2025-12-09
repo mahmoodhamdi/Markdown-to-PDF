@@ -1,0 +1,145 @@
+/* GitHub Theme */
+.theme-github {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+  font-size: 16px;
+  line-height: 1.6;
+  color: #24292e;
+  background-color: #ffffff;
+}
+
+.theme-github h1,
+.theme-github h2,
+.theme-github h3,
+.theme-github h4,
+.theme-github h5,
+.theme-github h6 {
+  margin-top: 24px;
+  margin-bottom: 16px;
+  font-weight: 600;
+  line-height: 1.25;
+  color: #24292e;
+}
+
+.theme-github h1 {
+  font-size: 2em;
+  padding-bottom: 0.3em;
+  border-bottom: 1px solid #eaecef;
+}
+
+.theme-github h2 {
+  font-size: 1.5em;
+  padding-bottom: 0.3em;
+  border-bottom: 1px solid #eaecef;
+}
+
+.theme-github h3 {
+  font-size: 1.25em;
+}
+
+.theme-github h4 {
+  font-size: 1em;
+}
+
+.theme-github h5 {
+  font-size: 0.875em;
+}
+
+.theme-github h6 {
+  font-size: 0.85em;
+  color: #6a737d;
+}
+
+.theme-github p {
+  margin-top: 0;
+  margin-bottom: 16px;
+}
+
+.theme-github a {
+  color: #0366d6;
+  text-decoration: none;
+}
+
+.theme-github a:hover {
+  text-decoration: underline;
+}
+
+.theme-github code {
+  padding: 0.2em 0.4em;
+  margin: 0;
+  font-size: 85%;
+  background-color: rgba(27, 31, 35, 0.05);
+  border-radius: 6px;
+  font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+}
+
+.theme-github pre {
+  padding: 16px;
+  overflow: auto;
+  font-size: 85%;
+  line-height: 1.45;
+  background-color: #f6f8fa;
+  border-radius: 6px;
+  margin-bottom: 16px;
+}
+
+.theme-github pre code {
+  padding: 0;
+  margin: 0;
+  background-color: transparent;
+  border: 0;
+  font-size: 100%;
+}
+
+.theme-github blockquote {
+  margin: 0 0 16px 0;
+  padding: 0 1em;
+  color: #6a737d;
+  border-left: 0.25em solid #dfe2e5;
+}
+
+.theme-github ul,
+.theme-github ol {
+  margin-top: 0;
+  margin-bottom: 16px;
+  padding-left: 2em;
+}
+
+.theme-github li + li {
+  margin-top: 0.25em;
+}
+
+.theme-github table {
+  border-collapse: collapse;
+  border-spacing: 0;
+  margin-bottom: 16px;
+  width: 100%;
+}
+
+.theme-github table th,
+.theme-github table td {
+  padding: 6px 13px;
+  border: 1px solid #dfe2e5;
+}
+
+.theme-github table th {
+  font-weight: 600;
+  background-color: #f6f8fa;
+}
+
+.theme-github table tr:nth-child(2n) {
+  background-color: #f6f8fa;
+}
+
+.theme-github hr {
+  height: 0.25em;
+  padding: 0;
+  margin: 24px 0;
+  background-color: #e1e4e8;
+  border: 0;
+}
+
+.theme-github img {
+  max-width: 100%;
+  box-sizing: content-box;
+  background-color: #ffffff;
+}
