@@ -22,7 +22,14 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    return new NextResponse(result.data, {
+    // Convert to Uint8Array for Response compatibility
+    const pdfData = Buffer.isBuffer(result.data)
+      ? Uint8Array.from(result.data)
+      : typeof result.data === 'string'
+        ? new TextEncoder().encode(result.data)
+        : result.data;
+
+    return new Response(pdfData as BlobPart, {
       headers: {
         'Content-Type': 'application/pdf',
         'Content-Disposition': 'attachment; filename="document.pdf"',
