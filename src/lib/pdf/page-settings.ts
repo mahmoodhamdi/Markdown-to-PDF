@@ -1,4 +1,5 @@
 import { PageSettings, PageSize, Orientation, PageMargins } from '@/types';
+import type { PaperFormat } from 'puppeteer';
 
 export const pageSizes: Record<PageSize, { width: number; height: number }> = {
   a4: { width: 210, height: 297 },
@@ -58,7 +59,7 @@ export function getPageDimensions(
 }
 
 export function generatePuppeteerPageSettings(settings: PageSettings): {
-  format?: string;
+  format?: PaperFormat;
   width?: string;
   height?: string;
   landscape: boolean;
@@ -93,7 +94,14 @@ export function generatePuppeteerPageSettings(settings: PageSettings): {
     result.width = `${width}mm`;
     result.height = `${height}mm`;
   } else {
-    result.format = settings.pageSize.toUpperCase();
+    // Map page sizes to Puppeteer PaperFormat
+    const formatMap: Record<string, PaperFormat> = {
+      a4: 'a4',
+      letter: 'letter',
+      legal: 'legal',
+      a3: 'a3',
+    };
+    result.format = formatMap[settings.pageSize] || 'a4';
   }
 
   // Generate header template
