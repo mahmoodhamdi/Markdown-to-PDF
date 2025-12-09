@@ -42,6 +42,5 @@ next-env.d.ts
 *.swp
 *.swo
 
-# screenshots (keep the directory but ignore contents)
-/screenshots/*
-!/screenshots/.gitkeep
+# screenshots - keep app screenshots for README
+!/screenshots/*.png
