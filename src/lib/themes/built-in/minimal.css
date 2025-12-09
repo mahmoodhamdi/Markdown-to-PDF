@@ -1,0 +1,154 @@
+/* Minimal Theme */
+.theme-minimal {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  font-size: 16px;
+  line-height: 1.8;
+  color: #333333;
+  background-color: #ffffff;
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 40px 20px;
+}
+
+.theme-minimal h1,
+.theme-minimal h2,
+.theme-minimal h3,
+.theme-minimal h4,
+.theme-minimal h5,
+.theme-minimal h6 {
+  font-weight: 600;
+  color: #111111;
+  margin-top: 2em;
+  margin-bottom: 0.5em;
+  line-height: 1.3;
+}
+
+.theme-minimal h1 {
+  font-size: 2.5em;
+  margin-top: 0;
+  font-weight: 700;
+}
+
+.theme-minimal h2 {
+  font-size: 1.75em;
+}
+
+.theme-minimal h3 {
+  font-size: 1.375em;
+}
+
+.theme-minimal h4 {
+  font-size: 1.125em;
+}
+
+.theme-minimal h5,
+.theme-minimal h6 {
+  font-size: 1em;
+}
+
+.theme-minimal p {
+  margin-top: 0;
+  margin-bottom: 1.5em;
+}
+
+.theme-minimal a {
+  color: #0066cc;
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+  transition: border-color 0.2s ease;
+}
+
+.theme-minimal a:hover {
+  border-bottom-color: #0066cc;
+}
+
+.theme-minimal code {
+  font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+  font-size: 0.9em;
+  background-color: #f7f7f7;
+  padding: 0.2em 0.4em;
+  border-radius: 4px;
+}
+
+.theme-minimal pre {
+  font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+  font-size: 0.875em;
+  background-color: #f7f7f7;
+  padding: 1.5em;
+  margin: 1.5em 0;
+  border-radius: 8px;
+  overflow-x: auto;
+  line-height: 1.6;
+}
+
+.theme-minimal pre code {
+  padding: 0;
+  background-color: transparent;
+}
+
+.theme-minimal blockquote {
+  margin: 1.5em 0;
+  padding: 0.5em 0 0.5em 1.5em;
+  border-left: 3px solid #e0e0e0;
+  color: #666666;
+  font-style: italic;
+}
+
+.theme-minimal ul,
+.theme-minimal ol {
+  margin: 1.5em 0;
+  padding-left: 1.5em;
+}
+
+.theme-minimal li {
+  margin-bottom: 0.5em;
+}
+
+.theme-minimal li > ul,
+.theme-minimal li > ol {
+  margin-top: 0.5em;
+  margin-bottom: 0;
+}
+
+.theme-minimal table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1.5em 0;
+}
+
+.theme-minimal table th,
+.theme-minimal table td {
+  padding: 0.75em 1em;
+  text-align: left;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.theme-minimal table th {
+  font-weight: 600;
+  color: #111111;
+}
+
+.theme-minimal table tr:last-child td {
+  border-bottom: none;
+}
+
+.theme-minimal hr {
+  border: none;
+  height: 1px;
+  background-color: #e0e0e0;
+  margin: 3em 0;
+}
+
+.theme-minimal img {
+  max-width: 100%;
+  border-radius: 8px;
+  margin: 1.5em 0;
+}
+
+.theme-minimal strong {
+  font-weight: 600;
+}
+
+.theme-minimal em {
+  font-style: italic;
+}
