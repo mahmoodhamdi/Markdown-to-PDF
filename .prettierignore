@@ -1,0 +1,35 @@
+# Dependencies
+node_modules/
+
+# Build outputs
+.next/
+out/
+dist/
+build/
+
+# Coverage
+coverage/
+
+# Cache
+.cache/
+.turbo/
+
+# Config files that should not be formatted
+*.config.js
+*.config.ts
+*.config.mjs
+
+# Package manager
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# Auto-generated files
+*.min.js
+*.min.css
+
+# Other
+.git/
+.vscode/
+.idea/
+*.md
