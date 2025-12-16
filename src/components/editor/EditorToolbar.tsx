@@ -42,22 +42,26 @@ interface ToolbarAction {
 
 export function EditorToolbar() {
   const t = useTranslations('editor.toolbar');
-  const { content, setContent, viewMode, setViewMode, toggleFullscreen, showToc, toggleToc } =
-    useEditorStore();
+  const {
+    viewMode,
+    setViewMode,
+    toggleFullscreen,
+    showToc,
+    toggleToc,
+    insertAtCursor: storeInsertAtCursor,
+    wrapSelection: storeWrapSelection,
+  } = useEditorStore();
 
   const insertAtCursor = (before: string, after: string = '') => {
-    // For now, just append at the end
-    // In a real implementation, we'd need to track cursor position
-    setContent(content + before + after);
+    storeInsertAtCursor(before + after);
   };
 
   const wrapSelection = (before: string, after: string = before) => {
-    // Simplified: just append
-    setContent(content + before + after);
+    storeWrapSelection(before, after);
   };
 
   const insertMarkdown = (text: string) => {
-    setContent(content + '\n' + text);
+    storeInsertAtCursor('\n' + text);
   };
 
   const toolbarGroups: ToolbarAction[][] = [
