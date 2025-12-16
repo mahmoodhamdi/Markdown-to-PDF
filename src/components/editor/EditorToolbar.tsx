@@ -15,7 +15,7 @@ import {
   Code,
   FileCode2,
   Link,
-  Image,
+  Image as ImageIcon,
   Table,
   Minus,
   Columns,

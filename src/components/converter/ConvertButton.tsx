@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { Download, Loader2, FileText, FileCode } from 'lucide-react';
+import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import {
   Select,
@@ -19,6 +20,7 @@ type ExportFormat = 'pdf' | 'html';
 
 export function ConvertButton() {
   const t = useTranslations('converter');
+  const tErrors = useTranslations('errors');
   const [isConverting, setIsConverting] = useState(false);
   const [format, setFormat] = useState<ExportFormat>('pdf');
   const { content } = useEditorStore();
@@ -26,7 +28,10 @@ export function ConvertButton() {
   const { pageSettings } = useSettingsStore();
 
   const handleConvert = async () => {
-    if (!content.trim()) return;
+    if (!content.trim()) {
+      toast.error(tErrors('emptyContent'));
+      return;
+    }
 
     setIsConverting(true);
 
@@ -46,8 +51,14 @@ export function ConvertButton() {
           }),
         });
 
+        if (response.status === 429) {
+          toast.error(tErrors('tooManyRequests'));
+          return;
+        }
+
         if (!response.ok) {
-          throw new Error('Conversion failed');
+          const errorData = await response.json().catch(() => ({}));
+          throw new Error(errorData.error || 'Conversion failed');
         }
 
         const blob = await response.blob();
@@ -59,6 +70,8 @@ export function ConvertButton() {
         a.click();
         document.body.removeChild(a);
         URL.revokeObjectURL(url);
+
+        toast.success(t('conversionSuccess'));
       } else {
         // HTML export
         const response = await fetch('/api/preview', {
@@ -72,8 +85,14 @@ export function ConvertButton() {
           }),
         });
 
+        if (response.status === 429) {
+          toast.error(tErrors('tooManyRequests'));
+          return;
+        }
+
         if (!response.ok) {
-          throw new Error('Preview generation failed');
+          const errorData = await response.json().catch(() => ({}));
+          throw new Error(errorData.error || 'Preview generation failed');
         }
 
         const { html } = await response.json();
@@ -86,9 +105,16 @@ export function ConvertButton() {
         a.click();
         document.body.removeChild(a);
         URL.revokeObjectURL(url);
+
+        toast.success(t('conversionSuccess'));
       }
     } catch (error) {
       console.error('Conversion error:', error);
+      if (error instanceof TypeError && error.message.includes('fetch')) {
+        toast.error(tErrors('networkError'));
+      } else {
+        toast.error(t('conversionFailed'));
+      }
     } finally {
       setIsConverting(false);
     }
