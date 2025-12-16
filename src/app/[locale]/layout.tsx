@@ -6,6 +6,7 @@ import { Locale } from '@/types';
 import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
 import { Toaster } from '@/components/ui/sonner';
+import { ServiceWorkerProvider } from '@/components/ServiceWorkerProvider';
 import '@/app/globals.css';
 
 export function generateStaticParams() {
@@ -33,12 +34,14 @@ export default async function LocaleLayout({
     <html lang={locale} dir={dir} suppressHydrationWarning>
       <body className="min-h-screen bg-background font-sans antialiased">
         <NextIntlClientProvider messages={messages}>
-          <div className="relative flex min-h-screen flex-col">
-            <Header />
-            <main className="flex-1">{children}</main>
-            <Footer />
-          </div>
-          <Toaster />
+          <ServiceWorkerProvider>
+            <div className="relative flex min-h-screen flex-col">
+              <Header />
+              <main className="flex-1">{children}</main>
+              <Footer />
+            </div>
+            <Toaster />
+          </ServiceWorkerProvider>
         </NextIntlClientProvider>
       </body>
     </html>

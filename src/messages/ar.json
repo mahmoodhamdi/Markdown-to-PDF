@@ -23,7 +23,10 @@
     "english": "English",
     "arabic": "العربية",
     "preview": "معاينة",
-    "settings": "الإعدادات"
+    "settings": "الإعدادات",
+    "offline": "أنت غير متصل بالإنترنت. بعض الميزات قد لا تكون متاحة.",
+    "updateAvailable": "يتوفر إصدار جديد!",
+    "refresh": "تحديث"
   },
   "nav": {
     "home": "الرئيسية",

@@ -6,6 +6,7 @@ import {
   generatePuppeteerPageSettings,
   generateWatermarkCss,
 } from './page-settings';
+import { browserPool } from './browser-pool';
 
 export function generateHtmlDocument(
   markdown: string,
@@ -117,21 +118,10 @@ export async function generatePdf(options: ConversionOptions): Promise<Conversio
     },
   };
 
+  let page = null;
   try {
-    // Dynamic import for puppeteer (server-side only)
-    const puppeteer = await import('puppeteer');
-
-    const browser = await puppeteer.default.launch({
-      headless: true,
-      args: [
-        '--no-sandbox',
-        '--disable-setuid-sandbox',
-        '--disable-dev-shm-usage',
-        '--disable-gpu',
-      ],
-    });
-
-    const page = await browser.newPage();
+    // Get page from browser pool (reuses browser instance)
+    page = await browserPool.getPage();
 
     // Generate HTML document
     const htmlContent = generateHtmlDocument(
@@ -174,8 +164,6 @@ export async function generatePdf(options: ConversionOptions): Promise<Conversio
       preferCSSPageSize: false,
     });
 
-    await browser.close();
-
     // Estimate pages (rough calculation)
     const estimatedPages = Math.ceil(pdfBuffer.length / 50000) || 1;
 
@@ -191,9 +179,138 @@ export async function generatePdf(options: ConversionOptions): Promise<Conversio
       success: false,
       error: error instanceof Error ? error.message : 'Unknown error occurred',
     };
+  } finally {
+    // Release page back to pool
+    if (page) {
+      await browserPool.releasePage(page);
+    }
   }
 }
 
 export async function generateHtmlPreview(markdown: string, theme: string = 'github'): Promise<string> {
   return generateHtmlDocument(markdown, theme);
+}
+
+interface BatchConversionItem {
+  id: string;
+  filename: string;
+  markdown: string;
+}
+
+interface BatchConversionResult {
+  id: string;
+  filename: string;
+  success: boolean;
+  data?: string;
+  fileSize?: number;
+  error?: string;
+}
+
+export async function generatePdfBatch(
+  files: BatchConversionItem[],
+  options: Omit<ConversionOptions, 'markdown'>
+): Promise<BatchConversionResult[]> {
+  const { theme = 'github', codeTheme = 'github-light', pageSettings: partialSettings, customCss } = options;
+
+  const pageSettings: PageSettings = {
+    ...defaultPageSettings,
+    ...partialSettings,
+    margins: {
+      ...defaultPageSettings.margins,
+      ...partialSettings?.margins,
+    },
+    headerFooter: {
+      ...defaultPageSettings.headerFooter,
+      ...partialSettings?.headerFooter,
+    },
+    pageNumbers: {
+      ...defaultPageSettings.pageNumbers,
+      ...partialSettings?.pageNumbers,
+    },
+    watermark: {
+      ...defaultPageSettings.watermark,
+      ...partialSettings?.watermark,
+    },
+  };
+
+  const puppeteerSettings = generatePuppeteerPageSettings(pageSettings);
+
+  // Process files in parallel using the browser pool
+  // The pool handles page management efficiently
+  const results = await Promise.all(
+    files.map(async (file): Promise<BatchConversionResult> => {
+      if (!file.markdown || file.markdown.trim() === '') {
+        return {
+          id: file.id,
+          filename: file.filename,
+          success: false,
+          error: 'Content is empty',
+        };
+      }
+
+      let page = null;
+      try {
+        page = await browserPool.getPage();
+
+        const htmlContent = generateHtmlDocument(
+          file.markdown,
+          theme,
+          codeTheme,
+          customCss,
+          pageSettings
+        );
+
+        await page.setContent(htmlContent, {
+          waitUntil: ['networkidle0', 'domcontentloaded'],
+        });
+
+        // Wait for fonts and scripts to load
+        await page.evaluate(() => {
+          return new Promise<void>((resolve) => {
+            if (document.fonts && document.fonts.ready) {
+              document.fonts.ready.then(() => resolve());
+            } else {
+              setTimeout(resolve, 1000);
+            }
+          });
+        });
+
+        // Wait for mermaid to render
+        await page.waitForFunction(
+          () => !document.querySelector('.mermaid:not([data-processed])'),
+          { timeout: 5000 }
+        ).catch(() => {
+          // Ignore timeout, mermaid may not be present
+        });
+
+        const pdfBuffer = await page.pdf({
+          ...puppeteerSettings,
+          printBackground: true,
+          preferCSSPageSize: false,
+        });
+
+        return {
+          id: file.id,
+          filename: file.filename.replace(/\.(md|markdown|txt)$/i, '.pdf'),
+          success: true,
+          data: Buffer.from(pdfBuffer).toString('base64'),
+          fileSize: pdfBuffer.length,
+        };
+      } catch (error) {
+        console.error(`PDF generation error for ${file.filename}:`, error);
+        return {
+          id: file.id,
+          filename: file.filename,
+          success: false,
+          error: error instanceof Error ? error.message : 'Unknown error occurred',
+        };
+      } finally {
+        if (page) {
+          await browserPool.releasePage(page);
+        }
+      }
+    })
+  );
+
+  return results;
 }

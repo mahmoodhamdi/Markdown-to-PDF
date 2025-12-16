@@ -23,7 +23,10 @@
     "english": "English",
     "arabic": "العربية",
     "preview": "Preview",
-    "settings": "Settings"
+    "settings": "Settings",
+    "offline": "You are offline. Some features may not be available.",
+    "updateAvailable": "A new version is available!",
+    "refresh": "Refresh"
   },
   "nav": {
     "home": "Home",
