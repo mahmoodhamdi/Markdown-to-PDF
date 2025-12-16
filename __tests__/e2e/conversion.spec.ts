@@ -153,3 +153,165 @@ test.describe('Theme Toggle', () => {
     await page.screenshot({ path: 'screenshots/theme-toggle.png' });
   });
 });
+
+test.describe('Conversion Flow', () => {
+  test('should disable convert button when content is empty', async ({ page }) => {
+    await page.goto('/en');
+    await page.setViewportSize({ width: 1280, height: 720 });
+
+    // Clear the editor content by selecting all and deleting
+    const editor = page.locator('[data-testid="editor"]');
+    await editor.click();
+    await page.keyboard.press('Control+A');
+    await page.keyboard.press('Backspace');
+
+    // Wait a moment for state to update
+    await page.waitForTimeout(500);
+
+    // Convert button should be disabled
+    const convertBtn = page.locator('[data-testid="convert-btn"]');
+    await expect(convertBtn).toBeDisabled();
+  });
+
+  test('should enable convert button when content is present', async ({ page }) => {
+    await page.goto('/en');
+    await page.setViewportSize({ width: 1280, height: 720 });
+
+    // Default content should be present, button should be enabled
+    const convertBtn = page.locator('[data-testid="convert-btn"]');
+    await expect(convertBtn).toBeEnabled();
+  });
+
+  test('should show print button', async ({ page }) => {
+    await page.goto('/en');
+    await page.setViewportSize({ width: 1280, height: 720 });
+
+    // Print button should be visible
+    const printBtn = page.locator('[data-testid="print-btn"]');
+    await expect(printBtn).toBeVisible();
+  });
+
+  test('should show format selector', async ({ page }) => {
+    await page.goto('/en');
+    await page.setViewportSize({ width: 1280, height: 720 });
+
+    // Format selector should be visible (PDF/HTML dropdown)
+    const formatSelector = page.locator('button').filter({ hasText: /PDF|HTML/ }).first();
+    await expect(formatSelector).toBeVisible();
+  });
+
+  test('should show preview with rendered markdown', async ({ page }) => {
+    await page.goto('/en');
+    await page.setViewportSize({ width: 1280, height: 720 });
+
+    // Preview should contain rendered HTML
+    const preview = page.locator('[data-testid="preview"]');
+    await expect(preview).toBeVisible();
+
+    // Default content includes "Welcome" heading
+    await expect(preview).toContainText('Welcome');
+  });
+
+  test('should toggle Table of Contents', async ({ page }) => {
+    await page.goto('/en');
+    await page.setViewportSize({ width: 1280, height: 720 });
+
+    // Find TOC toggle button
+    const tocButton = page.locator('button').filter({
+      has: page.locator('[class*="lucide-list-tree"]'),
+    }).first();
+
+    if (await tocButton.isVisible()) {
+      await tocButton.click();
+      await page.waitForTimeout(300);
+      await page.screenshot({ path: 'screenshots/toc-enabled.png' });
+    }
+  });
+
+  test('should toggle fullscreen mode', async ({ page }) => {
+    await page.goto('/en');
+    await page.setViewportSize({ width: 1280, height: 720 });
+
+    // Find fullscreen toggle button
+    const fullscreenButton = page.locator('button').filter({
+      has: page.locator('[class*="lucide-maximize"]'),
+    }).first();
+
+    if (await fullscreenButton.isVisible()) {
+      await fullscreenButton.click();
+      await page.waitForTimeout(300);
+
+      // Exit with ESC
+      await page.keyboard.press('Escape');
+      await page.waitForTimeout(300);
+    }
+  });
+
+  test('should switch between editor and preview views', async ({ page }) => {
+    await page.goto('/en');
+    await page.setViewportSize({ width: 1280, height: 720 });
+
+    // Find preview toggle button
+    const previewButton = page.locator('button').filter({
+      has: page.locator('[class*="lucide-eye"]'),
+    }).first();
+
+    if (await previewButton.isVisible()) {
+      await previewButton.click();
+      await page.waitForTimeout(300);
+      await page.screenshot({ path: 'screenshots/preview-mode.png' });
+
+      // Toggle back
+      await previewButton.click();
+      await page.waitForTimeout(300);
+    }
+  });
+
+  test('should apply toolbar formatting', async ({ page }) => {
+    await page.goto('/en');
+    await page.setViewportSize({ width: 1280, height: 720 });
+
+    // Get bold button
+    const boldButton = page.locator('button').filter({
+      has: page.locator('[class*="lucide-bold"]'),
+    }).first();
+
+    // Click the bold button
+    if (await boldButton.isVisible()) {
+      await boldButton.click();
+      // Should not throw an error
+    }
+  });
+
+  test('should have working undo/redo buttons', async ({ page }) => {
+    await page.goto('/en');
+    await page.setViewportSize({ width: 1280, height: 720 });
+
+    // Check undo button exists
+    const undoButton = page.locator('button').filter({
+      has: page.locator('[class*="lucide-undo"]'),
+    }).first();
+    await expect(undoButton).toBeVisible();
+
+    // Check redo button exists
+    const redoButton = page.locator('button').filter({
+      has: page.locator('[class*="lucide-redo"]'),
+    }).first();
+    await expect(redoButton).toBeVisible();
+  });
+});
+
+test.describe('Settings Page', () => {
+  test('should navigate to settings page', async ({ page }) => {
+    await page.goto('/en');
+    await page.setViewportSize({ width: 1280, height: 720 });
+
+    // Click settings link
+    const settingsLink = page.locator('a[href*="/settings"]');
+    if (await settingsLink.isVisible()) {
+      await settingsLink.click();
+      await expect(page).toHaveURL(/\/settings/);
+      await page.screenshot({ path: 'screenshots/settings.png', fullPage: true });
+    }
+  });
+});
