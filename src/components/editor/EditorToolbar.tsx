@@ -22,6 +22,8 @@ import {
   Maximize,
   Eye,
   ListTree,
+  Undo2,
+  Redo2,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
@@ -50,6 +52,8 @@ export function EditorToolbar() {
     toggleToc,
     insertAtCursor: storeInsertAtCursor,
     wrapSelection: storeWrapSelection,
+    undo,
+    redo,
   } = useEditorStore();
 
   const insertAtCursor = (before: string, after: string = '') => {
@@ -65,6 +69,18 @@ export function EditorToolbar() {
   };
 
   const toolbarGroups: ToolbarAction[][] = [
+    [
+      {
+        icon: <Undo2 className="h-4 w-4" />,
+        label: t('undo'),
+        action: () => undo(),
+      },
+      {
+        icon: <Redo2 className="h-4 w-4" />,
+        label: t('redo'),
+        action: () => redo(),
+      },
+    ],
     [
       {
         icon: <Bold className="h-4 w-4" />,

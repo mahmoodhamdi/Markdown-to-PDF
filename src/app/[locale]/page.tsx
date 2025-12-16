@@ -15,7 +15,7 @@ import { cn } from '@/lib/utils';
 export default function HomePage() {
   const t = useTranslations('editor');
   const tPreview = useTranslations('preview');
-  const { viewMode, setViewMode, content, setContent, showToc } = useEditorStore();
+  const { viewMode, setViewMode, content, setContent, showToc, isFullscreen, setIsFullscreen } = useEditorStore();
   const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
@@ -34,6 +34,17 @@ export default function HomePage() {
       setContent(t('placeholder'));
     }
   }, [content, setContent, t]);
+
+  // Handle ESC key to exit fullscreen
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && isFullscreen) {
+        setIsFullscreen(false);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isFullscreen, setIsFullscreen]);
 
   // Mobile view with tabs
   if (isMobile) {
@@ -77,7 +88,14 @@ export default function HomePage() {
 
   // Desktop view
   return (
-    <div className="flex flex-col h-[calc(100vh-3.5rem-4rem)]">
+    <div
+      className={cn(
+        'flex flex-col',
+        isFullscreen
+          ? 'fixed inset-0 z-50 bg-background'
+          : 'h-[calc(100vh-3.5rem-4rem)]'
+      )}
+    >
       <div className="border-b bg-background p-2 flex items-center justify-between">
         <EditorToolbar />
         <ConvertButton />
