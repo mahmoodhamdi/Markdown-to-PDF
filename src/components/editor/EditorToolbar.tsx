@@ -21,6 +21,7 @@ import {
   Columns,
   Maximize,
   Eye,
+  ListTree,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
@@ -41,7 +42,7 @@ interface ToolbarAction {
 
 export function EditorToolbar() {
   const t = useTranslations('editor.toolbar');
-  const { content, setContent, viewMode, setViewMode, toggleFullscreen } =
+  const { content, setContent, viewMode, setViewMode, toggleFullscreen, showToc, toggleToc } =
     useEditorStore();
 
   const insertAtCursor = (before: string, after: string = '') => {
@@ -167,6 +168,11 @@ export function EditorToolbar() {
       action: () => setViewMode(viewMode === 'split' ? 'editor' : 'split'),
     },
     {
+      icon: <ListTree className="h-4 w-4" />,
+      label: t('toc'),
+      action: () => toggleToc(),
+    },
+    {
       icon: <Maximize className="h-4 w-4" />,
       label: t('fullscreen'),
       action: () => toggleFullscreen(),
@@ -214,7 +220,8 @@ export function EditorToolbar() {
                   className={cn(
                     'h-8 w-8',
                     (action.label === t('preview') && viewMode === 'preview') ||
-                      (action.label === t('split') && viewMode === 'split')
+                      (action.label === t('split') && viewMode === 'split') ||
+                      (action.label === t('toc') && showToc)
                       ? 'bg-accent'
                       : ''
                   )}

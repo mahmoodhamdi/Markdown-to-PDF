@@ -14,6 +14,7 @@ describe('Editor Store', () => {
       lastSaved: null,
       saveStatus: 'idle',
       isDirty: false,
+      showToc: false,
     });
   });
 
@@ -133,6 +134,23 @@ describe('Editor Store', () => {
 
       expect(getStore().saveStatus).toBe('error');
       expect(getStore().isDirty).toBe(true); // Should still be dirty after error
+    });
+  });
+
+  describe('table of contents', () => {
+    it('should set showToc', () => {
+      getStore().setShowToc(true);
+      expect(getStore().showToc).toBe(true);
+      getStore().setShowToc(false);
+      expect(getStore().showToc).toBe(false);
+    });
+
+    it('should toggle showToc', () => {
+      expect(getStore().showToc).toBe(false);
+      getStore().toggleToc();
+      expect(getStore().showToc).toBe(true);
+      getStore().toggleToc();
+      expect(getStore().showToc).toBe(false);
     });
   });
 });

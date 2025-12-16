@@ -18,6 +18,10 @@ interface EditorState {
   setSaveStatus: (status: SaveStatus) => void;
   isDirty: boolean;
   setIsDirty: (isDirty: boolean) => void;
+  // TOC state
+  showToc: boolean;
+  setShowToc: (show: boolean) => void;
+  toggleToc: () => void;
 }
 
 export const useEditorStore = create<EditorState>()(
@@ -37,6 +41,10 @@ export const useEditorStore = create<EditorState>()(
       setSaveStatus: (saveStatus) => set({ saveStatus }),
       isDirty: false,
       setIsDirty: (isDirty) => set({ isDirty }),
+      // TOC state
+      showToc: false,
+      setShowToc: (showToc) => set({ showToc }),
+      toggleToc: () => set((state) => ({ showToc: !state.showToc })),
     }),
     {
       name: 'editor-storage',
@@ -44,6 +52,7 @@ export const useEditorStore = create<EditorState>()(
         content: state.content,
         viewMode: state.viewMode,
         lastSaved: state.lastSaved,
+        showToc: state.showToc,
       }),
     }
   )

@@ -58,7 +58,8 @@
       "redo": "Redo (Ctrl+Y)",
       "preview": "Toggle Preview",
       "fullscreen": "Fullscreen",
-      "split": "Split View"
+      "split": "Split View",
+      "toc": "Table of Contents"
     },
     "stats": {
       "words": "Words",
