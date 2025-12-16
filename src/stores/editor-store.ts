@@ -29,6 +29,9 @@ interface EditorState {
   setEditorInstance: (editor: MonacoEditor | null) => void;
   insertAtCursor: (text: string) => void;
   wrapSelection: (before: string, after?: string) => void;
+  // Undo/Redo
+  undo: () => void;
+  redo: () => void;
 }
 
 export const useEditorStore = create<EditorState>()(
@@ -107,6 +110,20 @@ export const useEditorStore = create<EditorState>()(
           editorInstance.setPosition(newPosition);
         }
         editorInstance.focus();
+      },
+      undo: () => {
+        const { editorInstance } = useEditorStore.getState();
+        if (editorInstance) {
+          editorInstance.trigger('keyboard', 'undo', null);
+          editorInstance.focus();
+        }
+      },
+      redo: () => {
+        const { editorInstance } = useEditorStore.getState();
+        if (editorInstance) {
+          editorInstance.trigger('keyboard', 'redo', null);
+          editorInstance.focus();
+        }
       },
     }),
     {

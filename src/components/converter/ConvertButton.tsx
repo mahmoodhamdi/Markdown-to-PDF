@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
-import { Download, Loader2, FileText, FileCode } from 'lucide-react';
+import { Download, Loader2, FileText, FileCode, Printer } from 'lucide-react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import {
@@ -120,6 +120,46 @@ export function ConvertButton() {
     }
   };
 
+  const handlePrint = async () => {
+    if (!content.trim()) {
+      toast.error(tErrors('emptyContent'));
+      return;
+    }
+
+    try {
+      const response = await fetch('/api/preview', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          markdown: content,
+          theme: documentTheme,
+        }),
+      });
+
+      if (!response.ok) {
+        toast.error(t('conversionFailed'));
+        return;
+      }
+
+      const { html } = await response.json();
+
+      // Create a new window for printing
+      const printWindow = window.open('', '_blank');
+      if (printWindow) {
+        printWindow.document.write(html);
+        printWindow.document.close();
+        printWindow.onload = () => {
+          printWindow.print();
+        };
+      }
+    } catch (error) {
+      console.error('Print error:', error);
+      toast.error(tErrors('generic'));
+    }
+  };
+
   return (
     <div className="flex items-center gap-2">
       <Select value={format} onValueChange={(v) => setFormat(v as ExportFormat)}>
@@ -158,6 +198,16 @@ export function ConvertButton() {
             {format === 'pdf' ? t('downloadPdf') : t('downloadHtml')}
           </>
         )}
+      </Button>
+
+      <Button
+        variant="outline"
+        onClick={handlePrint}
+        disabled={!content.trim()}
+        data-testid="print-btn"
+      >
+        <Printer className="h-4 w-4 me-2" />
+        {t('print')}
       </Button>
     </div>
   );
