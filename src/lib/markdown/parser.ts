@@ -5,6 +5,7 @@ import hljs from 'highlight.js';
 import DOMPurify from 'dompurify';
 import { TocItem } from '@/types';
 import { slugify } from '../utils';
+import { sanitizeHtml as serverSanitize } from '../sanitize';
 
 // Configure marked with GFM heading IDs
 marked.use(gfmHeadingId());
@@ -63,11 +64,17 @@ export function parseMarkdown(markdown: string, options: ParseOptions = {}): Par
   let html = marked.parse(markdown, { async: false }) as string;
 
   // Sanitize HTML to prevent XSS
-  if (sanitize && typeof window !== 'undefined') {
-    html = DOMPurify.sanitize(html, {
-      ADD_TAGS: ['input'],
-      ADD_ATTR: ['checked', 'disabled', 'type'],
-    });
+  if (sanitize) {
+    // Always run server-safe sanitization first
+    html = serverSanitize(html);
+
+    // Additionally run DOMPurify on the client for extra security
+    if (typeof window !== 'undefined') {
+      html = DOMPurify.sanitize(html, {
+        ADD_TAGS: ['input'],
+        ADD_ATTR: ['checked', 'disabled', 'type', 'data-math', 'data-processed'],
+      });
+    }
   }
 
   return {

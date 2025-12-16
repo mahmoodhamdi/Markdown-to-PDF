@@ -1,23 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { generatePdf } from '@/lib/pdf/generator';
 import { checkRateLimit, getRateLimitHeaders } from '@/lib/rate-limit';
+import { batchRequestSchema, validateRequest } from '@/lib/validations/api-schemas';
+import { DocumentTheme, CodeTheme, PageSettings } from '@/types';
 
 // Rate limit: 10 batch requests per minute (batch is heavy)
 const RATE_LIMIT = 10;
 const RATE_WINDOW = 60 * 1000;
-
-interface BatchItem {
-  id: string;
-  filename: string;
-  markdown: string;
-}
-
-interface BatchRequest {
-  files: BatchItem[];
-  theme?: string;
-  codeTheme?: string;
-  pageSettings?: object;
-}
 
 export async function POST(request: NextRequest) {
   // Get client IP for rate limiting
@@ -37,30 +26,28 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    const body: BatchRequest = await request.json();
+    const rawBody = await request.json();
 
-    if (!body.files || !Array.isArray(body.files) || body.files.length === 0) {
+    // Validate request body with Zod
+    const validation = validateRequest(batchRequestSchema, rawBody);
+
+    if (!validation.success) {
       return NextResponse.json(
-        { error: 'No files provided' },
+        { error: validation.error },
         { status: 400, headers: rateLimitHeaders }
       );
     }
 
-    if (body.files.length > 20) {
-      return NextResponse.json(
-        { error: 'Maximum 20 files allowed' },
-        { status: 400, headers: rateLimitHeaders }
-      );
-    }
+    const body = validation.data;
 
     const results = await Promise.all(
       body.files.map(async (file) => {
         try {
           const result = await generatePdf({
             markdown: file.markdown,
-            theme: body.theme as import('@/types').DocumentTheme,
-            codeTheme: body.codeTheme as import('@/types').CodeTheme,
-            pageSettings: body.pageSettings as import('@/types').PageSettings,
+            theme: body.theme as DocumentTheme,
+            codeTheme: body.codeTheme as CodeTheme,
+            pageSettings: body.pageSettings as PageSettings,
           });
 
           if (result.success && result.data) {

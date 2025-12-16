@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { generateHtmlPreview } from '@/lib/pdf/generator';
 import { checkRateLimit, getRateLimitHeaders } from '@/lib/rate-limit';
+import { previewRequestSchema, validateRequest } from '@/lib/validations/api-schemas';
 
 // Rate limit: 120 requests per minute (preview is lighter than convert)
 const RATE_LIMIT = 120;
@@ -24,14 +25,19 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    const body = await request.json();
+    const rawBody = await request.json();
 
-    if (!body.markdown || body.markdown.trim() === '') {
+    // Validate request body with Zod
+    const validation = validateRequest(previewRequestSchema, rawBody);
+
+    if (!validation.success) {
       return NextResponse.json(
-        { error: 'Content is empty' },
+        { error: validation.error },
         { status: 400, headers: rateLimitHeaders }
       );
     }
+
+    const body = validation.data;
 
     const html = await generateHtmlPreview(body.markdown, body.theme);
 
