@@ -7,6 +7,7 @@ import { useEditorStore, MonacoEditor } from '@/stores/editor-store';
 import { useSettingsStore } from '@/stores/settings-store';
 import { useThemeStore } from '@/stores/theme-store';
 import { useAutoSave } from '@/hooks/useAutoSave';
+import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
 import { cn } from '@/lib/utils';
 
 interface MarkdownEditorProps {
@@ -20,8 +21,9 @@ export function MarkdownEditor({ className }: MarkdownEditorProps) {
   const { mode } = useThemeStore();
   const [mounted, setMounted] = useState(false);
 
-  // Initialize auto-save
+  // Initialize auto-save and keyboard shortcuts
   useAutoSave();
+  useKeyboardShortcuts();
 
   useEffect(() => {
     setMounted(true);
