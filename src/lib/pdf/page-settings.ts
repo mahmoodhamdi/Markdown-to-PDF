@@ -38,6 +38,14 @@ export const defaultPageSettings: PageSettings = {
   },
 };
 
+/**
+ * Calculates page dimensions based on size and orientation.
+ * @param pageSize - Standard page size or 'custom'
+ * @param orientation - 'portrait' or 'landscape'
+ * @param customWidth - Custom width in mm (only for custom size)
+ * @param customHeight - Custom height in mm (only for custom size)
+ * @returns Page dimensions in mm
+ */
 export function getPageDimensions(
   pageSize: PageSize,
   orientation: Orientation,
@@ -59,6 +67,12 @@ export function getPageDimensions(
   return { width, height };
 }
 
+/**
+ * Converts PageSettings to Puppeteer PDF options.
+ * Handles page size, orientation, margins, headers, footers, and page numbers.
+ * @param settings - Page settings configuration
+ * @returns Puppeteer PDF generation options
+ */
 export function generatePuppeteerPageSettings(settings: PageSettings): {
   format?: PaperFormat;
   width?: string;
@@ -155,6 +169,11 @@ export function generatePuppeteerPageSettings(settings: PageSettings): {
   return result;
 }
 
+/**
+ * Generates CSS for watermark overlay.
+ * @param watermark - Watermark configuration (show, text, opacity)
+ * @returns CSS string for watermark or empty string if disabled
+ */
 export function generateWatermarkCss(watermark: PageSettings['watermark']): string {
   if (!watermark.show || !watermark.text) {
     return '';

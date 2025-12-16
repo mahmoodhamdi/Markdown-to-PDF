@@ -37,6 +37,12 @@ export interface ParseResult {
   toc: TocItem[];
 }
 
+/**
+ * Parses markdown content to HTML with optional sanitization and TOC extraction.
+ * @param markdown - The markdown string to parse
+ * @param options - Parsing options (sanitize, extractToc)
+ * @returns ParseResult containing HTML and table of contents
+ */
 export function parseMarkdown(markdown: string, options: ParseOptions = {}): ParseResult {
   const { sanitize = true, extractToc = true } = options;
 
@@ -83,15 +89,30 @@ export function parseMarkdown(markdown: string, options: ParseOptions = {}): Par
   };
 }
 
+/**
+ * Converts markdown to HTML string.
+ * @param markdown - The markdown string to convert
+ * @returns Sanitized HTML string
+ */
 export function parseMarkdownToHtml(markdown: string): string {
   return parseMarkdown(markdown).html;
 }
 
+/**
+ * Extracts headings from markdown for table of contents.
+ * @param markdown - The markdown string to extract headings from
+ * @returns Array of TocItem objects
+ */
 export function extractHeadings(markdown: string): TocItem[] {
   return parseMarkdown(markdown, { sanitize: false }).toc;
 }
 
-// Process math equations (KaTeX)
+/**
+ * Processes math equations in HTML for KaTeX rendering.
+ * Converts $...$ (inline) and $$...$$ (block) math notation.
+ * @param html - HTML string with math notation
+ * @returns HTML with KaTeX placeholders
+ */
 export function processMath(html: string): string {
   // Block math: $$...$$ (must be processed BEFORE inline math)
   html = html.replace(/\$\$([^$]+)\$\$/g, (_, math) => {
@@ -106,7 +127,11 @@ export function processMath(html: string): string {
   return html;
 }
 
-// Process mermaid diagrams
+/**
+ * Processes mermaid diagram code blocks for rendering.
+ * @param html - HTML string with mermaid code blocks
+ * @returns HTML with mermaid diagram containers
+ */
 export function processMermaid(html: string): string {
   // Look for code blocks with mermaid language
   html = html.replace(
@@ -124,7 +149,11 @@ export function processMermaid(html: string): string {
   return html;
 }
 
-// Process emoji shortcodes
+/**
+ * Converts emoji shortcodes to Unicode emoji characters.
+ * @param html - HTML string with emoji shortcodes (e.g., :smile:)
+ * @returns HTML with Unicode emoji characters
+ */
 export function processEmoji(html: string): string {
   const emojiMap: Record<string, string> = {
     ':smile:': '😊',
@@ -216,7 +245,12 @@ export function processEmoji(html: string): string {
   return html;
 }
 
-// Full parse with all features
+/**
+ * Parses markdown with all features enabled (math, mermaid, emoji).
+ * This is the main entry point for full markdown processing.
+ * @param markdown - The markdown string to parse
+ * @returns ParseResult containing HTML and table of contents
+ */
 export function parseMarkdownFull(markdown: string): ParseResult {
   const result = parseMarkdown(markdown);
 

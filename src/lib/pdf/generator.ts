@@ -8,6 +8,15 @@ import {
 } from './page-settings';
 import { browserPool } from './browser-pool';
 
+/**
+ * Generates a complete HTML document from markdown content with styling.
+ * @param markdown - The markdown content to convert
+ * @param theme - Document theme name (default: 'github')
+ * @param codeTheme - Code syntax highlighting theme (default: 'github-light')
+ * @param customCss - Additional CSS to apply
+ * @param pageSettings - Page layout settings
+ * @returns Complete HTML document string
+ */
 export function generateHtmlDocument(
   markdown: string,
   theme: string = 'github',
@@ -81,6 +90,12 @@ export function generateHtmlDocument(
   `.trim();
 }
 
+/**
+ * Generates a PDF from markdown content using Puppeteer.
+ * Uses browser pooling for efficient resource management.
+ * @param options - Conversion options including markdown, theme, and page settings
+ * @returns Conversion result with PDF buffer or error message
+ */
 export async function generatePdf(options: ConversionOptions): Promise<ConversionResult> {
   const {
     markdown,
@@ -187,6 +202,12 @@ export async function generatePdf(options: ConversionOptions): Promise<Conversio
   }
 }
 
+/**
+ * Generates an HTML preview from markdown content.
+ * @param markdown - The markdown content to preview
+ * @param theme - Document theme name (default: 'github')
+ * @returns HTML document string for preview
+ */
 export async function generateHtmlPreview(markdown: string, theme: string = 'github'): Promise<string> {
   return generateHtmlDocument(markdown, theme);
 }
@@ -206,6 +227,13 @@ interface BatchConversionResult {
   error?: string;
 }
 
+/**
+ * Generates PDFs for multiple files in parallel using browser pooling.
+ * Optimized for batch processing with shared browser resources.
+ * @param files - Array of files to convert, each with id, filename, and markdown
+ * @param options - Shared conversion options (theme, codeTheme, pageSettings)
+ * @returns Array of conversion results with base64-encoded PDF data
+ */
 export async function generatePdfBatch(
   files: BatchConversionItem[],
   options: Omit<ConversionOptions, 'markdown'>
