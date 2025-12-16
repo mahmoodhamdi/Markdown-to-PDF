@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { generatePdf } from '@/lib/pdf/generator';
+import { generatePdfBatch } from '@/lib/pdf/generator';
 import { checkRateLimit, getRateLimitHeaders } from '@/lib/rate-limit';
 import { batchRequestSchema, validateRequest } from '@/lib/validations/api-schemas';
 import { DocumentTheme, CodeTheme, PageSettings } from '@/types';
@@ -40,41 +40,18 @@ export async function POST(request: NextRequest) {
 
     const body = validation.data;
 
-    const results = await Promise.all(
-      body.files.map(async (file) => {
-        try {
-          const result = await generatePdf({
-            markdown: file.markdown,
-            theme: body.theme as DocumentTheme,
-            codeTheme: body.codeTheme as CodeTheme,
-            pageSettings: body.pageSettings as PageSettings,
-          });
-
-          if (result.success && result.data) {
-            return {
-              id: file.id,
-              filename: file.filename.replace(/\.(md|markdown|txt)$/i, '.pdf'),
-              success: true,
-              data: Buffer.from(result.data).toString('base64'),
-              fileSize: result.fileSize,
-            };
-          }
-
-          return {
-            id: file.id,
-            filename: file.filename,
-            success: false,
-            error: result.error || 'Conversion failed',
-          };
-        } catch (error) {
-          return {
-            id: file.id,
-            filename: file.filename,
-            success: false,
-            error: error instanceof Error ? error.message : 'Unknown error',
-          };
-        }
-      })
+    // Use optimized batch processing with browser pool
+    const results = await generatePdfBatch(
+      body.files.map((file) => ({
+        id: file.id,
+        filename: file.filename,
+        markdown: file.markdown,
+      })),
+      {
+        theme: body.theme as DocumentTheme,
+        codeTheme: body.codeTheme as CodeTheme,
+        pageSettings: body.pageSettings as PageSettings,
+      }
     );
 
     const successCount = results.filter((r) => r.success).length;
