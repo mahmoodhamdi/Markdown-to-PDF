@@ -1,4 +1,4 @@
-import { ConversionOptions, ConversionResult, PageSettings } from '@/types';
+import { ConversionOptions, ConversionResult, PageSettings, DocumentTheme, CodeTheme } from '@/types';
 import { parseMarkdownFull } from '../markdown/parser';
 import { getThemeCss, getCodeThemeStylesheet } from '../themes/manager';
 import {
@@ -16,8 +16,8 @@ export function generateHtmlDocument(
   pageSettings: PageSettings = defaultPageSettings
 ): string {
   const { html } = parseMarkdownFull(markdown);
-  const themeCss = getThemeCss(theme as import('@/types').DocumentTheme);
-  const codeThemeUrl = getCodeThemeStylesheet(codeTheme as import('@/types').CodeTheme);
+  const themeCss = getThemeCss(theme as DocumentTheme);
+  const codeThemeUrl = getCodeThemeStylesheet(codeTheme as CodeTheme);
   const watermarkCss = generateWatermarkCss(pageSettings.watermark);
 
   return `
