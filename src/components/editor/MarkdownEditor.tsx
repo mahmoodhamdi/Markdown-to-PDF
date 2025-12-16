@@ -2,12 +2,11 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import { useTranslations } from 'next-intl';
-import Editor from '@monaco-editor/react';
-import { useEditorStore } from '@/stores/editor-store';
+import Editor, { OnMount } from '@monaco-editor/react';
+import { useEditorStore, MonacoEditor } from '@/stores/editor-store';
 import { useSettingsStore } from '@/stores/settings-store';
 import { useThemeStore } from '@/stores/theme-store';
 import { useAutoSave } from '@/hooks/useAutoSave';
-import { SaveStatusIndicator } from './SaveStatusIndicator';
 import { cn } from '@/lib/utils';
 
 interface MarkdownEditorProps {
@@ -16,7 +15,7 @@ interface MarkdownEditorProps {
 
 export function MarkdownEditor({ className }: MarkdownEditorProps) {
   const t = useTranslations('editor');
-  const { content, setContent } = useEditorStore();
+  const { content, setContent, setEditorInstance } = useEditorStore();
   const { editorSettings } = useSettingsStore();
   const { mode } = useThemeStore();
   const [mounted, setMounted] = useState(false);
@@ -26,7 +25,18 @@ export function MarkdownEditor({ className }: MarkdownEditorProps) {
 
   useEffect(() => {
     setMounted(true);
-  }, []);
+    // Clean up editor instance on unmount
+    return () => {
+      setEditorInstance(null);
+    };
+  }, [setEditorInstance]);
+
+  const handleEditorMount: OnMount = useCallback(
+    (editor) => {
+      setEditorInstance(editor as MonacoEditor);
+    },
+    [setEditorInstance]
+  );
 
   const handleEditorChange = useCallback(
     (value: string | undefined) => {
@@ -65,6 +75,7 @@ export function MarkdownEditor({ className }: MarkdownEditorProps) {
         defaultLanguage="markdown"
         value={content}
         onChange={handleEditorChange}
+        onMount={handleEditorMount}
         theme={getEditorTheme()}
         options={{
           fontSize: editorSettings.fontSize,
