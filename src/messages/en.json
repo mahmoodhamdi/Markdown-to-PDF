@@ -65,7 +65,12 @@
       "characters": "Characters",
       "lines": "Lines",
       "readingTime": "Reading time",
-      "minutes": "min"
+      "minutes": "min",
+      "saving": "Saving...",
+      "saved": "Saved",
+      "saveError": "Save failed",
+      "unsaved": "Unsaved changes",
+      "justNow": "Just now"
     },
     "uploadFile": "Upload File",
     "dropFile": "Drop your markdown file here",

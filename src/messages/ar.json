@@ -65,7 +65,12 @@
       "characters": "أحرف",
       "lines": "أسطر",
       "readingTime": "وقت القراءة",
-      "minutes": "دقيقة"
+      "minutes": "دقيقة",
+      "saving": "جاري الحفظ...",
+      "saved": "تم الحفظ",
+      "saveError": "فشل الحفظ",
+      "unsaved": "تغييرات غير محفوظة",
+      "justNow": "الآن"
     },
     "uploadFile": "رفع ملف",
     "dropFile": "أفلت ملف Markdown هنا",

@@ -6,6 +6,8 @@ import Editor from '@monaco-editor/react';
 import { useEditorStore } from '@/stores/editor-store';
 import { useSettingsStore } from '@/stores/settings-store';
 import { useThemeStore } from '@/stores/theme-store';
+import { useAutoSave } from '@/hooks/useAutoSave';
+import { SaveStatusIndicator } from './SaveStatusIndicator';
 import { cn } from '@/lib/utils';
 
 interface MarkdownEditorProps {
@@ -18,6 +20,9 @@ export function MarkdownEditor({ className }: MarkdownEditorProps) {
   const { editorSettings } = useSettingsStore();
   const { mode } = useThemeStore();
   const [mounted, setMounted] = useState(false);
+
+  // Initialize auto-save
+  useAutoSave();
 
   useEffect(() => {
     setMounted(true);
