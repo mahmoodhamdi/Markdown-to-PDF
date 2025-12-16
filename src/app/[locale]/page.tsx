@@ -6,6 +6,7 @@ import { MarkdownEditor } from '@/components/editor/MarkdownEditor';
 import { EditorToolbar } from '@/components/editor/EditorToolbar';
 import { EditorStats } from '@/components/editor/EditorStats';
 import { MarkdownPreview } from '@/components/preview/MarkdownPreview';
+import { TableOfContents } from '@/components/preview/TableOfContents';
 import { ConvertButton } from '@/components/converter/ConvertButton';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useEditorStore } from '@/stores/editor-store';
@@ -14,7 +15,7 @@ import { cn } from '@/lib/utils';
 export default function HomePage() {
   const t = useTranslations('editor');
   const tPreview = useTranslations('preview');
-  const { viewMode, setViewMode, content, setContent } = useEditorStore();
+  const { viewMode, setViewMode, content, setContent, showToc } = useEditorStore();
   const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
@@ -59,8 +60,15 @@ export default function HomePage() {
             </div>
           </TabsContent>
 
-          <TabsContent value="preview" className="flex-1 m-0 data-[state=inactive]:hidden overflow-auto">
-            <MarkdownPreview />
+          <TabsContent value="preview" className="flex-1 m-0 data-[state=inactive]:hidden overflow-auto flex flex-col">
+            {showToc && (
+              <div className="border-b">
+                <TableOfContents className="max-h-48 overflow-y-auto" />
+              </div>
+            )}
+            <div className="flex-1 overflow-auto">
+              <MarkdownPreview />
+            </div>
           </TabsContent>
         </Tabs>
       </div>
@@ -95,11 +103,18 @@ export default function HomePage() {
         {/* Preview Panel */}
         <div
           className={cn(
-            'overflow-hidden transition-all duration-200',
+            'overflow-hidden transition-all duration-200 flex',
             viewMode === 'editor' ? 'w-0' : viewMode === 'split' ? 'w-1/2' : 'w-full'
           )}
         >
-          <MarkdownPreview />
+          {showToc && viewMode !== 'editor' && (
+            <div className="w-64 border-e overflow-y-auto shrink-0">
+              <TableOfContents />
+            </div>
+          )}
+          <div className="flex-1 overflow-hidden">
+            <MarkdownPreview />
+          </div>
         </div>
       </div>
     </div>
