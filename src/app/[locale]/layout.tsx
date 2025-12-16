@@ -5,6 +5,7 @@ import { locales, localeDirection } from '@/i18n/config';
 import { Locale } from '@/types';
 import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
+import { Toaster } from '@/components/ui/sonner';
 import '@/app/globals.css';
 
 export function generateStaticParams() {
@@ -37,6 +38,7 @@ export default async function LocaleLayout({
             <main className="flex-1">{children}</main>
             <Footer />
           </div>
+          <Toaster />
         </NextIntlClientProvider>
       </body>
     </html>

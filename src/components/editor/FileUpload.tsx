@@ -3,11 +3,14 @@
 import { useCallback, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { Upload, File } from 'lucide-react';
+import { toast } from 'sonner';
 import { useEditorStore } from '@/stores/editor-store';
 import { cn } from '@/lib/utils';
 
 export function FileUpload() {
   const t = useTranslations('editor');
+  const tErrors = useTranslations('errors');
+  const tCommon = useTranslations('common');
   const { setContent } = useEditorStore();
   const [isDragging, setIsDragging] = useState(false);
 
@@ -20,18 +23,27 @@ export function FileUpload() {
       const isValid = validTypes.some((ext) => fileName.endsWith(ext));
 
       if (!isValid) {
-        console.error('Invalid file type');
+        toast.error(tErrors('invalidFormat', { formats: '.md, .markdown, .txt' }));
+        return;
+      }
+
+      // Check file size (5MB limit)
+      const maxSize = 5 * 1024 * 1024;
+      if (file.size > maxSize) {
+        toast.error(tErrors('fileTooBig', { max: '5' }));
         return;
       }
 
       try {
         const text = await file.text();
         setContent(text);
+        toast.success(tCommon('success'));
       } catch (error) {
         console.error('Error reading file:', error);
+        toast.error(tErrors('generic'));
       }
     },
-    [setContent]
+    [setContent, tErrors, tCommon]
   );
 
   const handleDragOver = useCallback((e: React.DragEvent) => {

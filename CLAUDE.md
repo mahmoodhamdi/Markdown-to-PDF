@@ -22,6 +22,10 @@ npm run test:e2e         # Run Playwright E2E tests
 npm run test:e2e:ui      # Run E2E tests with UI
 npm run test:coverage    # Coverage report
 
+# Run a single test file
+npx vitest run __tests__/unit/lib/utils.test.ts
+npx vitest run __tests__/unit/lib/utils.test.ts -t "test name"  # Run specific test
+
 # Docker
 docker build -f docker/Dockerfile -t markdown-to-pdf .
 docker-compose -f docker/docker-compose.yml up
@@ -45,6 +49,11 @@ docker-compose -f docker/docker-compose.yml up
 
 All stores use `persist` middleware to save to localStorage.
 
+### Custom Hooks
+
+- `hooks/useAutoSave.ts`: Auto-saves editor content to localStorage with debouncing
+- `hooks/useKeyboardShortcuts.ts`: Global keyboard shortcuts (Ctrl+B bold, Ctrl+I italic, etc.)
+
 ### Internationalization
 
 - Uses `next-intl` with locale routing (`src/i18n/`)
@@ -54,10 +63,10 @@ All stores use `persist` middleware to save to localStorage.
 
 ### API Routes
 
-All routes in `src/app/api/`:
-- `POST /api/convert` - Main PDF conversion endpoint
-- `POST /api/convert/batch` - Batch conversion (multiple files)
-- `POST /api/preview` - HTML preview generation
+All routes in `src/app/api/` with rate limiting and Zod validation (`src/lib/validations/api-schemas.ts`):
+- `POST /api/convert` - Main PDF conversion endpoint (60 req/min)
+- `POST /api/convert/batch` - Batch conversion (10 req/min)
+- `POST /api/preview` - HTML preview generation (120 req/min)
 - `GET /api/themes` - Available themes
 - `GET /api/templates` - Document templates
 - `GET /api/health` - Health check
