@@ -20,6 +20,7 @@ export function Header() {
     { href: '/themes', label: t('themes') },
     { href: '/batch', label: t('batch') },
     { href: '/api-docs', label: t('apiDocs') },
+    { href: '/settings', label: t('settings') },
   ];
 
   return (
