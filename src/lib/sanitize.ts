@@ -70,8 +70,8 @@ const DANGEROUS_ATTRS = [
   'xlink:href',
 ];
 
-// Safe attributes for specific tags
-const SAFE_ATTRS: Record<string, string[]> = {
+// Safe attributes for specific tags (reserved for future allowlist implementation)
+const _SAFE_ATTRS: Record<string, string[]> = {
   a: ['href', 'title', 'target', 'rel'],
   img: ['src', 'alt', 'title', 'width', 'height', 'loading'],
   input: ['type', 'checked', 'disabled'],

@@ -59,7 +59,7 @@ export const useEditorStore = create<EditorState>()(
       editorInstance: null,
       setEditorInstance: (editorInstance) => set({ editorInstance }),
       insertAtCursor: (text) => {
-        const { editorInstance, content, setContent } = useEditorStore.getState();
+        const { editorInstance, content } = useEditorStore.getState();
         if (!editorInstance) {
           // Fallback: append to content
           set({ content: content + text, isDirty: true });

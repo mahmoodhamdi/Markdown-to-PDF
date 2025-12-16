@@ -1,8 +1,7 @@
 'use client';
 
-import { useLocale, useTranslations } from 'next-intl';
+import { useLocale } from 'next-intl';
 import { usePathname, useRouter } from '@/i18n/routing';
-import { Button } from '@/components/ui/button';
 import {
   Select,
   SelectContent,
@@ -15,7 +14,6 @@ import { locales, localeNames } from '@/i18n/config';
 import { Locale } from '@/types';
 
 export function LanguageSwitcher() {
-  const t = useTranslations('common');
   const locale = useLocale();
   const pathname = usePathname();
   const router = useRouter();
@@ -42,7 +40,6 @@ export function LanguageSwitcher() {
 }
 
 export function LanguageSwitcherFull() {
-  const t = useTranslations('common');
   const locale = useLocale();
   const pathname = usePathname();
   const router = useRouter();

@@ -2,9 +2,7 @@
 
 import { useTranslations } from 'next-intl';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
-import { Label } from '@/components/ui/label';
 import {
   Select,
   SelectContent,
@@ -14,7 +12,7 @@ import {
 } from '@/components/ui/select';
 import { useThemeStore } from '@/stores/theme-store';
 import { getAllThemes, codeThemes } from '@/lib/themes/manager';
-import { DocumentTheme, CodeTheme } from '@/types';
+import { CodeTheme } from '@/types';
 import { Check, Palette } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
