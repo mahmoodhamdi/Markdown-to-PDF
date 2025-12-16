@@ -15,7 +15,7 @@ import {
   Code,
   FileCode2,
   Link,
-  Image as ImageIcon,
+  ImageIcon,
   Table,
   Minus,
   Columns,
@@ -156,7 +156,7 @@ export function EditorToolbar() {
         action: () => insertAtCursor('[', '](url)'),
       },
       {
-        icon: <Image className="h-4 w-4" />,
+        icon: <ImageIcon className="h-4 w-4" />,
         label: t('image'),
         action: () => insertAtCursor('![alt](', ')'),
       },

@@ -15,7 +15,7 @@ import { cn } from '@/lib/utils';
 export default function HomePage() {
   const t = useTranslations('editor');
   const tPreview = useTranslations('preview');
-  const { viewMode, setViewMode, content, setContent, showToc, isFullscreen, setIsFullscreen } = useEditorStore();
+  const { viewMode, content, setContent, showToc, isFullscreen, setIsFullscreen } = useEditorStore();
   const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {

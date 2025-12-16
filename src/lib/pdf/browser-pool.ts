@@ -7,7 +7,7 @@ const BROWSER_LAUNCH_ARGS = [
   '--disable-gpu',
 ];
 
-const MAX_PAGES_PER_BROWSER = 10;
+const _MAX_PAGES_PER_BROWSER = 10;
 const BROWSER_IDLE_TIMEOUT = 30000; // 30 seconds
 
 interface BrowserPoolState {

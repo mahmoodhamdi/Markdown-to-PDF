@@ -15,7 +15,7 @@ import {
 } from '@/components/ui/select';
 import { useSettingsStore } from '@/stores/settings-store';
 import { useThemeStore } from '@/stores/theme-store';
-import { ThemeMode, DocumentTheme, PageSize, Orientation } from '@/types';
+import { PageSize, Orientation } from '@/types';
 import { RotateCcw, Monitor, Sun, Moon } from 'lucide-react';
 
 export default function SettingsPage() {

@@ -26,7 +26,7 @@ export function MarkdownPreview({ className, content: propContent }: MarkdownPre
   // Debounce content changes to prevent excessive re-renders during typing
   const debouncedContent = useDebounce(content, DEBOUNCE_DELAY);
 
-  const { html, toc } = useMemo(() => {
+  const { html } = useMemo(() => {
     if (!debouncedContent.trim()) {
       return { html: '', toc: [] };
     }
