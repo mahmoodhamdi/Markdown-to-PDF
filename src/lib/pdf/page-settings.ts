@@ -1,5 +1,6 @@
 import { PageSettings, PageSize, Orientation, PageMargins } from '@/types';
 import type { PaperFormat } from 'puppeteer';
+import { sanitizeWatermarkText } from '@/lib/sanitize';
 
 export const pageSizes: Record<PageSize, { width: number; height: number }> = {
   a4: { width: 210, height: 297 },
@@ -159,6 +160,9 @@ export function generateWatermarkCss(watermark: PageSettings['watermark']): stri
     return '';
   }
 
+  // Sanitize watermark text to prevent CSS injection
+  const sanitizedText = sanitizeWatermarkText(watermark.text);
+
   return `
     @page {
       @bottom-center {
@@ -167,7 +171,7 @@ export function generateWatermarkCss(watermark: PageSettings['watermark']): stri
     }
 
     body::before {
-      content: '${watermark.text}';
+      content: '${sanitizedText}';
       position: fixed;
       top: 50%;
       left: 50%;

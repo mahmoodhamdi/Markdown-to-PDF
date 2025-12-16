@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { generatePdf } from '@/lib/pdf/generator';
-import { ConversionOptions } from '@/types';
 import { checkRateLimit, getRateLimitHeaders } from '@/lib/rate-limit';
+import { convertRequestSchema, validateRequest } from '@/lib/validations/api-schemas';
+import { sanitizeCss } from '@/lib/sanitize';
 
 // Rate limit: 60 requests per minute
 const RATE_LIMIT = 60;
@@ -25,13 +26,23 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    const body: ConversionOptions = await request.json();
+    const rawBody = await request.json();
 
-    if (!body.markdown || body.markdown.trim() === '') {
+    // Validate request body with Zod
+    const validation = validateRequest(convertRequestSchema, rawBody);
+
+    if (!validation.success) {
       return NextResponse.json(
-        { error: 'Content is empty' },
+        { error: validation.error },
         { status: 400, headers: rateLimitHeaders }
       );
+    }
+
+    const body = validation.data;
+
+    // Sanitize custom CSS to prevent injection
+    if (body.customCss) {
+      body.customCss = sanitizeCss(body.customCss);
     }
 
     const result = await generatePdf(body);
