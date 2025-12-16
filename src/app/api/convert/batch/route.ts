@@ -1,5 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { generatePdf } from '@/lib/pdf/generator';
+import { checkRateLimit, getRateLimitHeaders } from '@/lib/rate-limit';
+
+// Rate limit: 10 batch requests per minute (batch is heavy)
+const RATE_LIMIT = 10;
+const RATE_WINDOW = 60 * 1000;
 
 interface BatchItem {
   id: string;
@@ -15,20 +20,36 @@ interface BatchRequest {
 }
 
 export async function POST(request: NextRequest) {
+  // Get client IP for rate limiting
+  const ip = request.headers.get('x-forwarded-for')?.split(',')[0] ||
+    request.headers.get('x-real-ip') ||
+    'anonymous';
+
+  // Check rate limit
+  const rateLimitResult = checkRateLimit(`batch:${ip}`, RATE_LIMIT, RATE_WINDOW);
+  const rateLimitHeaders = getRateLimitHeaders(rateLimitResult);
+
+  if (!rateLimitResult.success) {
+    return NextResponse.json(
+      { error: 'Too many requests. Please try again later.' },
+      { status: 429, headers: rateLimitHeaders }
+    );
+  }
+
   try {
     const body: BatchRequest = await request.json();
 
     if (!body.files || !Array.isArray(body.files) || body.files.length === 0) {
       return NextResponse.json(
         { error: 'No files provided' },
-        { status: 400 }
+        { status: 400, headers: rateLimitHeaders }
       );
     }
 
     if (body.files.length > 20) {
       return NextResponse.json(
         { error: 'Maximum 20 files allowed' },
-        { status: 400 }
+        { status: 400, headers: rateLimitHeaders }
       );
     }
 
@@ -80,12 +101,12 @@ export async function POST(request: NextRequest) {
         success: successCount,
         failed: failedCount,
       },
-    });
+    }, { headers: rateLimitHeaders });
   } catch (error) {
     console.error('Batch convert API error:', error);
     return NextResponse.json(
       { error: 'Internal server error' },
-      { status: 500 }
+      { status: 500, headers: rateLimitHeaders }
     );
   }
 }
