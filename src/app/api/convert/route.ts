@@ -74,6 +74,18 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Apply watermark for free plan users
+    if (planLimits.hasWatermark && planLimits.watermarkText) {
+      body.pageSettings = {
+        ...body.pageSettings,
+        watermark: {
+          show: true,
+          text: planLimits.watermarkText,
+          opacity: 0.08,
+        },
+      };
+    }
+
     const result = await generatePdf(body);
 
     if (!result.success || !result.data) {
