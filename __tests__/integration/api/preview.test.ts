@@ -1,5 +1,30 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { NextRequest } from 'next/server';
+
+// Mock Firebase admin before importing routes
+vi.mock('@/lib/firebase/admin', () => ({
+  adminAuth: {},
+  adminDb: {
+    collection: vi.fn().mockReturnValue({
+      doc: vi.fn().mockReturnValue({
+        get: vi.fn().mockResolvedValue({ exists: false }),
+        update: vi.fn().mockResolvedValue({}),
+        set: vi.fn().mockResolvedValue({}),
+      }),
+    }),
+  },
+}));
+
+// Mock next-auth
+vi.mock('next-auth', () => ({
+  getServerSession: vi.fn().mockResolvedValue(null),
+}));
+
+// Mock auth config
+vi.mock('@/lib/auth/config', () => ({
+  authOptions: {},
+}));
+
 import { POST } from '@/app/api/preview/route';
 
 // Reset rate limit state between tests

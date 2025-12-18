@@ -1,29 +1,28 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { generatePdf } from '@/lib/pdf/generator';
-import { checkRateLimit, getRateLimitHeaders } from '@/lib/rate-limit';
 import { convertRequestSchema, validateRequest } from '@/lib/validations/api-schemas';
 import { sanitizeCss } from '@/lib/sanitize';
-
-// Rate limit: 60 requests per minute
-const RATE_LIMIT = 60;
-const RATE_WINDOW = 60 * 1000;
+import {
+  getRequestContext,
+  checkConversionRateLimit,
+  checkFileSizeLimit,
+  recordConversion,
+  createRateLimitErrorResponse,
+  getPlanLimits,
+} from '@/lib/plans';
 
 export async function POST(request: NextRequest) {
-  // Get client IP for rate limiting
-  const ip = request.headers.get('x-forwarded-for')?.split(',')[0] ||
-    request.headers.get('x-real-ip') ||
-    'anonymous';
+  // Get request context (auth status, user plan, IP)
+  const context = await getRequestContext(request);
 
-  // Check rate limit
-  const rateLimitResult = checkRateLimit(`convert:${ip}`, RATE_LIMIT, RATE_WINDOW);
-  const rateLimitHeaders = getRateLimitHeaders(rateLimitResult);
+  // Check conversion rate limit based on user plan
+  const rateLimitResult = await checkConversionRateLimit(context);
 
   if (!rateLimitResult.success) {
-    return NextResponse.json(
-      { error: 'Too many requests. Please try again later.' },
-      { status: 429, headers: rateLimitHeaders }
-    );
+    return createRateLimitErrorResponse(rateLimitResult);
   }
+
+  const rateLimitHeaders = rateLimitResult.headers;
 
   try {
     const rawBody = await request.json();
@@ -40,9 +39,39 @@ export async function POST(request: NextRequest) {
 
     const body = validation.data;
 
-    // Sanitize custom CSS to prevent injection
+    // Check file size limit based on plan
+    const contentSize = new TextEncoder().encode(body.markdown).length;
+    const fileSizeCheck = checkFileSizeLimit(contentSize, context);
+
+    if (!fileSizeCheck.success) {
+      return createRateLimitErrorResponse(fileSizeCheck);
+    }
+
+    // Get plan limits for feature gating
+    const planLimits = getPlanLimits(context.userPlan);
+
+    // Check if custom CSS is allowed for the user's plan
     if (body.customCss) {
-      body.customCss = sanitizeCss(body.customCss);
+      if (!planLimits.customCssAllowed && !context.isAuthenticated) {
+        return NextResponse.json(
+          { error: 'Custom CSS requires a Pro plan or higher. Please upgrade to use this feature.' },
+          { status: 403, headers: rateLimitHeaders }
+        );
+      }
+      if (planLimits.customCssAllowed) {
+        body.customCss = sanitizeCss(body.customCss);
+      } else {
+        // Remove custom CSS for plans that don't support it
+        delete body.customCss;
+      }
+    }
+
+    // Check if the requested theme is available for the user's plan
+    if (body.theme && !planLimits.availableThemes.includes(body.theme)) {
+      return NextResponse.json(
+        { error: `Theme "${body.theme}" is not available for your plan. Available themes: ${planLimits.availableThemes.join(', ')}` },
+        { status: 403, headers: rateLimitHeaders }
+      );
     }
 
     const result = await generatePdf(body);
@@ -53,6 +82,9 @@ export async function POST(request: NextRequest) {
         { status: 500, headers: rateLimitHeaders }
       );
     }
+
+    // Record successful conversion for usage tracking
+    await recordConversion(context);
 
     // Convert to Uint8Array for Response compatibility
     const pdfData = Buffer.isBuffer(result.data)
