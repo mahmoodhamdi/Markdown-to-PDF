@@ -12,8 +12,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { Separator } from '@/components/ui/separator';
 import { useSettingsStore } from '@/stores/settings-store';
 import { PageSize, Orientation, PageNumberPosition } from '@/types';
+import { CustomCssEditor } from './CustomCssEditor';
 
 export function PageSettingsForm() {
   const t = useTranslations('pageSettings');
@@ -308,6 +310,10 @@ export function PageSettingsForm() {
           </>
         )}
       </div>
+
+      {/* Custom CSS */}
+      <Separator className="my-6" />
+      <CustomCssEditor />
     </div>
   );
 }

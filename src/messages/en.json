@@ -457,5 +457,14 @@
         "Unlimited team members"
       ]
     }
+  },
+  "customCss": {
+    "title": "Custom CSS",
+    "optional": "Optional",
+    "placeholder": "/* Add your custom styles */\nbody {\n  font-family: 'Georgia', serif;\n}\n\nh1 {\n  color: #333;\n}",
+    "hint": "Add custom CSS to style your PDF output. Styles are sanitized for security.",
+    "upgradeTitle": "Unlock Custom CSS",
+    "upgradeDescription": "Upgrade to Pro to add custom CSS styling to your PDFs.",
+    "upgradeButton": "View Plans"
   }
 }
