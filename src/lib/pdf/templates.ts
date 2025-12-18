@@ -6,6 +6,7 @@ export const templates: Template[] = [
     name: 'Resume / CV',
     description: 'Professional resume template',
     category: 'business',
+    premium: false,
     content: `# John Doe
 ## Software Engineer
 
@@ -65,6 +66,7 @@ Experienced software engineer with 5+ years of expertise in building scalable we
     name: 'Cover Letter',
     description: 'Job application cover letter',
     category: 'business',
+    premium: false,
     content: `# Cover Letter
 
 **John Doe**
@@ -108,6 +110,7 @@ Sincerely,
     name: 'Business Report',
     description: 'Professional report template',
     category: 'business',
+    premium: false,
     content: `# Quarterly Business Report
 ## Q4 2024
 
@@ -184,6 +187,7 @@ Q4 2024 demonstrated strong growth across all key metrics. With continued focus 
     name: 'Thesis',
     description: 'Academic thesis template',
     category: 'academic',
+    premium: true,
     content: `# The Impact of Artificial Intelligence on Modern Software Development
 
 ## A Thesis Submitted in Partial Fulfillment of the Requirements for the Degree of Master of Science in Computer Science
@@ -287,6 +291,7 @@ Future studies should explore the long-term effects of AI-assisted development o
     name: 'README',
     description: 'Project documentation template',
     category: 'technical',
+    premium: false,
     content: `# Project Name
 
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
@@ -367,6 +372,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
     name: 'Meeting Notes',
     description: 'Meeting minutes template',
     category: 'business',
+    premium: false,
     content: `# Meeting Notes
 
 ## Project Status Update
@@ -444,6 +450,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
     name: 'Invoice',
     description: 'Simple invoice template',
     category: 'business',
+    premium: true,
     content: `# INVOICE
 
 ---
@@ -513,6 +520,7 @@ Thank you for your business!
     name: 'Proposal',
     description: 'Business proposal template',
     category: 'business',
+    premium: true,
     content: `# Project Proposal
 
 ## Web Application Development
@@ -633,6 +641,7 @@ john@company.com
     name: 'Blog Post',
     description: 'Blog article template',
     category: 'personal',
+    premium: false,
     content: `# How to Build a Successful Product in 2024
 
 *Published on ${new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })} by Jane Author*
@@ -712,6 +721,7 @@ Jane Author is a product manager with 10 years of experience building consumer a
     name: 'Documentation',
     description: 'Technical documentation template',
     category: 'technical',
+    premium: true,
     content: `# API Documentation
 
 ## Overview
@@ -878,4 +888,38 @@ export function getTemplatesByCategory(category: Template['category']): Template
 
 export function getAllTemplates(): Template[] {
   return templates;
+}
+
+/**
+ * Get templates available for a specific plan
+ * Free plan users only get non-premium templates
+ * Pro+ users get all templates
+ */
+export function getTemplatesForPlan(planType: 'free' | 'pro' | 'team' | 'enterprise'): Template[] {
+  if (planType === 'free') {
+    return templates.filter((t) => !t.premium);
+  }
+  return templates;
+}
+
+/**
+ * Check if a template is available for a specific plan
+ */
+export function isTemplateAvailable(templateId: string, planType: 'free' | 'pro' | 'team' | 'enterprise'): boolean {
+  const template = getTemplateById(templateId);
+  if (!template) return false;
+
+  if (planType === 'free') {
+    return !template.premium;
+  }
+  return true;
+}
+
+/**
+ * Get the count of free and premium templates
+ */
+export function getTemplateStats(): { free: number; premium: number; total: number } {
+  const free = templates.filter((t) => !t.premium).length;
+  const premium = templates.filter((t) => t.premium).length;
+  return { free, premium, total: templates.length };
 }

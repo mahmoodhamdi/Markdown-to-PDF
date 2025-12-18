@@ -11,6 +11,9 @@ const documentThemeSchema = z.enum([
   'minimal',
   'dark',
   'professional',
+  'elegant',
+  'modern',
+  'newsletter',
 ]);
 
 // Code themes enum

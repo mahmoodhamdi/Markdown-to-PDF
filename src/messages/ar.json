@@ -185,6 +185,16 @@
     "subtitle": "ابدأ بقالب جاهز",
     "useTemplate": "استخدام القالب",
     "previewTemplate": "معاينة",
+    "premium": "برو",
+    "premiumBadge": "قالب مميز",
+    "unlockPremium": "قم بالترقية إلى برو لفتح هذا القالب",
+    "freeTemplates": "قوالب مجانية",
+    "premiumTemplates": "قوالب مميزة",
+    "stats": {
+      "total": "{count} قوالب",
+      "free": "{count} مجاني",
+      "premium": "{count} مميز"
+    },
     "categories": {
       "all": "جميع القوالب",
       "business": "أعمال",

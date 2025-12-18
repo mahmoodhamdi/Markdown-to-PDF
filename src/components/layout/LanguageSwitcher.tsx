@@ -1,6 +1,6 @@
 'use client';
 
-import { useLocale } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import { usePathname, useRouter } from '@/i18n/routing';
 import {
   Select,
@@ -43,6 +43,7 @@ export function LanguageSwitcherFull() {
   const locale = useLocale();
   const pathname = usePathname();
   const router = useRouter();
+  const t = useTranslations('common');
 
   const handleLocaleChange = (newLocale: string) => {
     router.replace(pathname, { locale: newLocale as Locale });
