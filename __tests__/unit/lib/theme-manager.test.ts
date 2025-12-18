@@ -17,6 +17,9 @@ describe('Theme Manager', () => {
       expect(themes).toHaveProperty('minimal');
       expect(themes).toHaveProperty('dark');
       expect(themes).toHaveProperty('professional');
+      expect(themes).toHaveProperty('elegant');
+      expect(themes).toHaveProperty('modern');
+      expect(themes).toHaveProperty('newsletter');
     });
 
     it('each theme should have required properties', () => {
@@ -71,7 +74,7 @@ describe('Theme Manager', () => {
     it('should return array of all themes', () => {
       const all = getAllThemes();
       expect(Array.isArray(all)).toBe(true);
-      expect(all.length).toBe(5);
+      expect(all.length).toBe(8);
     });
   });
 

@@ -103,10 +103,13 @@ describe('Plan Configuration', () => {
         expect(limits.watermarkText).toBeNull();
       });
 
-      it('should have 5 available themes', () => {
-        expect(limits.availableThemes).toHaveLength(5);
+      it('should have 8 available themes including premium themes', () => {
+        expect(limits.availableThemes).toHaveLength(8);
         expect(limits.availableThemes).toContain('academic');
         expect(limits.availableThemes).toContain('professional');
+        expect(limits.availableThemes).toContain('elegant');
+        expect(limits.availableThemes).toContain('modern');
+        expect(limits.availableThemes).toContain('newsletter');
       });
 
       it('should allow custom CSS', () => {
