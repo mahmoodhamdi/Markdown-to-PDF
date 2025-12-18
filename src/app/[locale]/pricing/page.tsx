@@ -1,23 +1,40 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useTranslations } from 'next-intl';
 import { useSession } from 'next-auth/react';
+import { useSearchParams } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
-import { Check, Zap, Users, Building2 } from 'lucide-react';
+import { Check, Zap, Users, Building2, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { PLANS, PlanType } from '@/lib/plans/config';
 import { Link } from '@/i18n/routing';
+import { toast } from 'sonner';
 
 export default function PricingPage() {
   const t = useTranslations('pricing');
   const { data: session } = useSession();
+  const searchParams = useSearchParams();
   const [isYearly, setIsYearly] = useState(false);
+  const [loadingPlan, setLoadingPlan] = useState<string | null>(null);
 
   const currentPlan = session?.user?.plan || 'free';
+
+  // Handle success/cancel URL parameters from Stripe checkout
+  useEffect(() => {
+    if (searchParams.get('success') === 'true') {
+      const plan = searchParams.get('plan');
+      toast.success(`Successfully upgraded to ${plan} plan!`);
+      // Clear URL parameters
+      window.history.replaceState({}, '', '/pricing');
+    } else if (searchParams.get('canceled') === 'true') {
+      toast.info('Checkout was canceled.');
+      window.history.replaceState({}, '', '/pricing');
+    }
+  }, [searchParams]);
 
   const planIcons: Record<PlanType, React.ReactNode> = {
     free: <Zap className="h-6 w-6" />,
@@ -44,6 +61,42 @@ export default function PricingPage() {
   const getFeatures = (planId: PlanType): string[] => {
     const features = t.raw(`${planId}.features`) as string[];
     return features || [];
+  };
+
+  const handleCheckout = async (planId: PlanType) => {
+    if (planId === 'free' || planId === 'enterprise') return;
+
+    setLoadingPlan(planId);
+
+    try {
+      const response = await fetch('/api/checkout', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          plan: planId,
+          billing: isYearly ? 'yearly' : 'monthly',
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to create checkout session');
+      }
+
+      if (data.url) {
+        window.location.href = data.url;
+      } else {
+        throw new Error('No checkout URL received');
+      }
+    } catch (error) {
+      console.error('Checkout error:', error);
+      toast.error(error instanceof Error ? error.message : 'Failed to start checkout');
+    } finally {
+      setLoadingPlan(null);
+    }
   };
 
   return (
@@ -78,6 +131,7 @@ export default function PricingPage() {
           const plan = PLANS[planId];
           const isCurrentPlan = currentPlan === planId;
           const isPopular = planId === 'pro';
+          const isLoading = loadingPlan === planId;
 
           return (
             <Card
@@ -129,6 +183,10 @@ export default function PricingPage() {
                   <Button className="w-full" variant="outline" disabled>
                     {t('currentPlan')}
                   </Button>
+                ) : planId === 'free' ? (
+                  <Button className="w-full" variant="outline" disabled>
+                    {t('currentPlan')}
+                  </Button>
                 ) : planId === 'enterprise' ? (
                   <Button className="w-full" variant="outline" asChild>
                     <a href="mailto:contact@md2pdf.com">{t('contactSales')}</a>
@@ -141,8 +199,17 @@ export default function PricingPage() {
                   <Button
                     className="w-full"
                     variant={isPopular ? 'default' : 'outline'}
+                    onClick={() => handleCheckout(planId)}
+                    disabled={isLoading || loadingPlan !== null}
                   >
-                    {t('getStarted')}
+                    {isLoading ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Processing...
+                      </>
+                    ) : (
+                      t('getStarted')
+                    )}
                   </Button>
                 )}
               </CardFooter>
