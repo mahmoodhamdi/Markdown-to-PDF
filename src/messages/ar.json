@@ -457,5 +457,14 @@
         "أعضاء غير محدودين"
       ]
     }
+  },
+  "customCss": {
+    "title": "CSS مخصص",
+    "optional": "اختياري",
+    "placeholder": "/* أضف أنماطك المخصصة */\nbody {\n  font-family: 'Georgia', serif;\n}\n\nh1 {\n  color: #333;\n}",
+    "hint": "أضف CSS مخصص لتنسيق مخرجات PDF. يتم تنظيف الأنماط للأمان.",
+    "upgradeTitle": "افتح CSS المخصص",
+    "upgradeDescription": "قم بالترقية إلى Pro لإضافة تنسيق CSS مخصص لملفات PDF الخاصة بك.",
+    "upgradeButton": "عرض الخطط"
   }
 }
