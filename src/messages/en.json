@@ -189,8 +189,8 @@
     "items": {
       "resume": "Resume / CV",
       "resumeDesc": "Professional resume template",
-      "coverLetter": "Cover Letter",
-      "coverLetterDesc": "Job application cover letter",
+      "cover-letter": "Cover Letter",
+      "cover-letterDesc": "Job application cover letter",
       "report": "Business Report",
       "reportDesc": "Professional report template",
       "thesis": "Thesis",
@@ -203,8 +203,8 @@
       "invoiceDesc": "Simple invoice template",
       "proposal": "Proposal",
       "proposalDesc": "Business proposal template",
-      "blogPost": "Blog Post",
-      "blogPostDesc": "Blog article template",
+      "blog-post": "Blog Post",
+      "blog-postDesc": "Blog article template",
       "documentation": "Documentation",
       "documentationDesc": "Technical documentation template"
     }

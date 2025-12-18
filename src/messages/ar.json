@@ -189,8 +189,8 @@
     "items": {
       "resume": "السيرة الذاتية",
       "resumeDesc": "قالب سيرة ذاتية احترافي",
-      "coverLetter": "خطاب تقديم",
-      "coverLetterDesc": "خطاب تقديم لطلب وظيفة",
+      "cover-letter": "خطاب تقديم",
+      "cover-letterDesc": "خطاب تقديم لطلب وظيفة",
       "report": "تقرير عمل",
       "reportDesc": "قالب تقرير احترافي",
       "thesis": "رسالة علمية",
@@ -203,8 +203,8 @@
       "invoiceDesc": "قالب فاتورة بسيط",
       "proposal": "عرض تقديمي",
       "proposalDesc": "قالب عرض تجاري",
-      "blogPost": "مقال مدونة",
-      "blogPostDesc": "قالب مقال",
+      "blog-post": "مقال مدونة",
+      "blog-postDesc": "قالب مقال",
       "documentation": "توثيق",
       "documentationDesc": "قالب توثيق تقني"
     }
