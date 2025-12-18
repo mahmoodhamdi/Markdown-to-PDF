@@ -7,6 +7,7 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { ThemeToggle } from './ThemeToggle';
 import { LanguageSwitcher } from './LanguageSwitcher';
+import { UserMenu } from './UserMenu';
 import { cn } from '@/lib/utils';
 
 export function Header() {
@@ -51,10 +52,12 @@ export function Header() {
         <div className="hidden md:flex items-center space-x-2">
           <LanguageSwitcher />
           <ThemeToggle />
+          <UserMenu />
         </div>
 
         {/* Mobile Menu Button */}
         <div className="flex md:hidden items-center ms-auto space-x-2">
+          <UserMenu />
           <LanguageSwitcher />
           <ThemeToggle />
           <Button

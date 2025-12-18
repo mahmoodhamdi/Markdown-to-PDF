@@ -345,5 +345,117 @@
     "themesTitle": "Themes - Markdown to PDF",
     "batchTitle": "Batch Conversion - Markdown to PDF",
     "apiTitle": "API Documentation - Markdown to PDF"
+  },
+  "auth": {
+    "login": "Sign In",
+    "logout": "Sign Out",
+    "register": "Sign Up",
+    "loginDescription": "Sign in to your account to access all features",
+    "registerDescription": "Create an account to get started",
+    "continueWithGithub": "Continue with GitHub",
+    "continueWithGoogle": "Continue with Google",
+    "orContinueWith": "Or continue with",
+    "email": "Email",
+    "password": "Password",
+    "confirmPassword": "Confirm Password",
+    "name": "Full Name",
+    "namePlaceholder": "John Doe",
+    "passwordPlaceholder": "At least 6 characters",
+    "confirmPasswordPlaceholder": "Repeat your password",
+    "signInWithEmail": "Sign in with Email",
+    "createAccount": "Create Account",
+    "noAccount": "Don't have an account?",
+    "haveAccount": "Already have an account?",
+    "invalidCredentials": "Invalid email or password",
+    "authError": "Authentication failed. Please try again.",
+    "passwordMismatch": "Passwords do not match",
+    "passwordTooShort": "Password must be at least 6 characters",
+    "emailInUse": "This email is already registered",
+    "invalidEmail": "Invalid email address",
+    "weakPassword": "Password is too weak",
+    "registrationFailed": "Registration failed. Please try again.",
+    "registrationSuccess": "Account created successfully!",
+    "redirecting": "Redirecting you to login...",
+    "profile": "Profile",
+    "myAccount": "My Account",
+    "plan": "Plan",
+    "usage": "Usage",
+    "conversionsToday": "Conversions today",
+    "apiCallsToday": "API calls today",
+    "upgrade": "Upgrade",
+    "free": "Free",
+    "pro": "Pro",
+    "team": "Team",
+    "enterprise": "Enterprise"
+  },
+  "pricing": {
+    "title": "Pricing",
+    "subtitle": "Choose the plan that's right for you",
+    "monthly": "Monthly",
+    "yearly": "Yearly",
+    "save": "Save {percent}%",
+    "currentPlan": "Current Plan",
+    "getStarted": "Get Started",
+    "contactSales": "Contact Sales",
+    "features": "Features",
+    "free": {
+      "name": "Free",
+      "price": "$0",
+      "description": "For personal use and small projects",
+      "features": [
+        "20 conversions per day",
+        "500 KB file size limit",
+        "100 API calls per day",
+        "3 basic themes",
+        "5 files batch conversion",
+        "Community support"
+      ]
+    },
+    "pro": {
+      "name": "Pro",
+      "price": "$5",
+      "description": "For professionals and growing teams",
+      "features": [
+        "500 conversions per day",
+        "5 MB file size limit",
+        "2,000 API calls per day",
+        "All themes + custom CSS",
+        "50 files batch conversion",
+        "Email support (48h)",
+        "No watermark",
+        "Custom headers/footers"
+      ]
+    },
+    "team": {
+      "name": "Team",
+      "price": "$15",
+      "description": "For teams and organizations",
+      "features": [
+        "Unlimited conversions",
+        "20 MB file size limit",
+        "10,000 API calls per day",
+        "Brand themes",
+        "200 files batch conversion",
+        "Priority email support (24h)",
+        "Team dashboard",
+        "Usage analytics",
+        "Up to 5 team members"
+      ]
+    },
+    "enterprise": {
+      "name": "Enterprise",
+      "price": "$99",
+      "description": "For large organizations",
+      "features": [
+        "Everything unlimited",
+        "100,000 API calls per day",
+        "SSO/SAML authentication",
+        "Custom domain",
+        "Dedicated support",
+        "SLA 99.9% uptime",
+        "On-premise option",
+        "Unlimited team members"
+      ]
+    }
   }
 }

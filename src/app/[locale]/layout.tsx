@@ -7,6 +7,7 @@ import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
 import { Toaster } from '@/components/ui/sonner';
 import { ServiceWorkerProvider } from '@/components/ServiceWorkerProvider';
+import { AuthProvider } from '@/components/providers/AuthProvider';
 import '@/app/globals.css';
 
 export function generateStaticParams() {
@@ -71,16 +72,18 @@ export default async function LocaleLayout({
         />
       </head>
       <body className="min-h-screen bg-background font-sans antialiased">
-        <NextIntlClientProvider messages={messages}>
-          <ServiceWorkerProvider>
-            <div className="relative flex min-h-screen flex-col">
-              <Header />
-              <main className="flex-1">{children}</main>
-              <Footer />
-            </div>
-            <Toaster />
-          </ServiceWorkerProvider>
-        </NextIntlClientProvider>
+        <AuthProvider>
+          <NextIntlClientProvider messages={messages}>
+            <ServiceWorkerProvider>
+              <div className="relative flex min-h-screen flex-col">
+                <Header />
+                <main className="flex-1">{children}</main>
+                <Footer />
+              </div>
+              <Toaster />
+            </ServiceWorkerProvider>
+          </NextIntlClientProvider>
+        </AuthProvider>
       </body>
     </html>
   );
