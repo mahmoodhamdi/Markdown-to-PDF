@@ -1,0 +1,729 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Markdown to PDF API",
+    "description": "A powerful API for converting Markdown documents to PDF with customizable themes, page settings, and batch processing capabilities.",
+    "version": "1.0.0",
+    "contact": {
+      "name": "Markdown to PDF Support",
+      "email": "support@example.com"
+    },
+    "license": {
+      "name": "MIT",
+      "url": "https://opensource.org/licenses/MIT"
+    }
+  },
+  "servers": [
+    {
+      "url": "/api",
+      "description": "Current server"
+    }
+  ],
+  "tags": [
+    {
+      "name": "Conversion",
+      "description": "PDF conversion endpoints"
+    },
+    {
+      "name": "Preview",
+      "description": "HTML preview generation"
+    },
+    {
+      "name": "Resources",
+      "description": "Themes and templates"
+    },
+    {
+      "name": "Health",
+      "description": "Health check endpoints"
+    }
+  ],
+  "paths": {
+    "/convert": {
+      "post": {
+        "tags": ["Conversion"],
+        "summary": "Convert Markdown to PDF",
+        "description": "Converts Markdown content to a PDF document with customizable themes and page settings.",
+        "operationId": "convertToPdf",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ConvertRequest"
+              },
+              "examples": {
+                "simple": {
+                  "summary": "Simple conversion",
+                  "value": {
+                    "markdown": "# Hello World\n\nThis is **bold** text."
+                  }
+                },
+                "withTheme": {
+                  "summary": "With theme and settings",
+                  "value": {
+                    "markdown": "# Document Title\n\n## Introduction\n\nThis is a sample document.",
+                    "theme": "academic",
+                    "codeTheme": "github-dark",
+                    "pageSettings": {
+                      "pageSize": "a4",
+                      "orientation": "portrait",
+                      "margins": {
+                        "top": 25,
+                        "bottom": 25,
+                        "left": 20,
+                        "right": 20
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "PDF file generated successfully",
+            "content": {
+              "application/pdf": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            },
+            "headers": {
+              "Content-Disposition": {
+                "schema": {
+                  "type": "string",
+                  "example": "attachment; filename=\"document.pdf\""
+                }
+              },
+              "X-RateLimit-Limit": {
+                "schema": {
+                  "type": "integer",
+                  "example": 60
+                },
+                "description": "Rate limit ceiling"
+              },
+              "X-RateLimit-Remaining": {
+                "schema": {
+                  "type": "integer"
+                },
+                "description": "Remaining requests"
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit exceeded",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": ["Conversion"],
+        "summary": "Get conversion endpoint info",
+        "description": "Returns information about the conversion endpoint and its parameters.",
+        "operationId": "getConvertInfo",
+        "responses": {
+          "200": {
+            "description": "Endpoint information",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "endpoint": {
+                      "type": "string"
+                    },
+                    "method": {
+                      "type": "string"
+                    },
+                    "description": {
+                      "type": "string"
+                    },
+                    "parameters": {
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/convert/batch": {
+      "post": {
+        "tags": ["Conversion"],
+        "summary": "Batch convert multiple files",
+        "description": "Converts multiple Markdown files to PDF in a single request. Maximum 20 files per batch.",
+        "operationId": "batchConvert",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BatchRequest"
+              },
+              "example": {
+                "files": [
+                  {
+                    "id": "doc1",
+                    "filename": "chapter1.pdf",
+                    "markdown": "# Chapter 1\n\nIntroduction..."
+                  },
+                  {
+                    "id": "doc2",
+                    "filename": "chapter2.pdf",
+                    "markdown": "# Chapter 2\n\nContinuation..."
+                  }
+                ],
+                "theme": "github",
+                "codeTheme": "github-light"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Batch conversion results",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BatchResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit exceeded (10 requests/minute)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/preview": {
+      "post": {
+        "tags": ["Preview"],
+        "summary": "Generate HTML preview",
+        "description": "Generates an HTML preview of Markdown content with the specified theme.",
+        "operationId": "generatePreview",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PreviewRequest"
+              },
+              "example": {
+                "markdown": "# Hello World\n\nThis is **bold** text.",
+                "theme": "github"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "HTML preview generated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PreviewResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit exceeded (120 requests/minute)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/themes": {
+      "get": {
+        "tags": ["Resources"],
+        "summary": "Get available themes",
+        "description": "Returns a list of available document themes and code highlighting themes.",
+        "operationId": "getThemes",
+        "responses": {
+          "200": {
+            "description": "List of themes",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ThemesResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/templates": {
+      "get": {
+        "tags": ["Resources"],
+        "summary": "Get available templates",
+        "description": "Returns a list of available document templates with their categories.",
+        "operationId": "getTemplates",
+        "responses": {
+          "200": {
+            "description": "List of templates",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TemplatesResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/health": {
+      "get": {
+        "tags": ["Health"],
+        "summary": "Health check",
+        "description": "Returns the health status of the API.",
+        "operationId": "healthCheck",
+        "responses": {
+          "200": {
+            "description": "API is healthy",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HealthResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "ConvertRequest": {
+        "type": "object",
+        "required": ["markdown"],
+        "properties": {
+          "markdown": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 1000000,
+            "description": "Markdown content to convert (max 1MB)"
+          },
+          "theme": {
+            "$ref": "#/components/schemas/DocumentTheme"
+          },
+          "codeTheme": {
+            "$ref": "#/components/schemas/CodeTheme"
+          },
+          "pageSettings": {
+            "$ref": "#/components/schemas/PageSettings"
+          },
+          "customCss": {
+            "type": "string",
+            "maxLength": 50000,
+            "description": "Custom CSS to apply (max 50KB)"
+          }
+        }
+      },
+      "PreviewRequest": {
+        "type": "object",
+        "required": ["markdown"],
+        "properties": {
+          "markdown": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 1000000,
+            "description": "Markdown content to preview"
+          },
+          "theme": {
+            "$ref": "#/components/schemas/DocumentTheme"
+          }
+        }
+      },
+      "BatchRequest": {
+        "type": "object",
+        "required": ["files"],
+        "properties": {
+          "files": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 20,
+            "items": {
+              "$ref": "#/components/schemas/BatchFile"
+            }
+          },
+          "theme": {
+            "$ref": "#/components/schemas/DocumentTheme"
+          },
+          "codeTheme": {
+            "$ref": "#/components/schemas/CodeTheme"
+          },
+          "pageSettings": {
+            "$ref": "#/components/schemas/PageSettings"
+          }
+        }
+      },
+      "BatchFile": {
+        "type": "object",
+        "required": ["id", "filename", "markdown"],
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 100,
+            "description": "Unique identifier for the file"
+          },
+          "filename": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 255,
+            "pattern": "^[^<>:\"/\\\\|?*]+$",
+            "description": "Output filename"
+          },
+          "markdown": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 500000,
+            "description": "Markdown content"
+          }
+        }
+      },
+      "DocumentTheme": {
+        "type": "string",
+        "enum": ["github", "academic", "minimal", "dark", "professional"],
+        "default": "github",
+        "description": "Document styling theme"
+      },
+      "CodeTheme": {
+        "type": "string",
+        "enum": ["github-dark", "github-light", "monokai", "dracula", "nord", "one-dark", "vs-code"],
+        "default": "github-light",
+        "description": "Code syntax highlighting theme"
+      },
+      "PageSettings": {
+        "type": "object",
+        "properties": {
+          "pageSize": {
+            "type": "string",
+            "enum": ["a4", "letter", "legal", "a3", "custom"],
+            "default": "a4"
+          },
+          "orientation": {
+            "type": "string",
+            "enum": ["portrait", "landscape"],
+            "default": "portrait"
+          },
+          "margins": {
+            "$ref": "#/components/schemas/PageMargins"
+          },
+          "customWidth": {
+            "type": "number",
+            "minimum": 50,
+            "maximum": 1000,
+            "description": "Custom page width in mm (when pageSize is 'custom')"
+          },
+          "customHeight": {
+            "type": "number",
+            "minimum": 50,
+            "maximum": 1000,
+            "description": "Custom page height in mm (when pageSize is 'custom')"
+          },
+          "headerFooter": {
+            "$ref": "#/components/schemas/HeaderFooter"
+          },
+          "pageNumbers": {
+            "$ref": "#/components/schemas/PageNumbers"
+          },
+          "watermark": {
+            "$ref": "#/components/schemas/Watermark"
+          }
+        }
+      },
+      "PageMargins": {
+        "type": "object",
+        "properties": {
+          "top": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 100,
+            "default": 20
+          },
+          "bottom": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 100,
+            "default": 20
+          },
+          "left": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 100,
+            "default": 20
+          },
+          "right": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 100,
+            "default": 20
+          }
+        }
+      },
+      "HeaderFooter": {
+        "type": "object",
+        "properties": {
+          "showHeader": {
+            "type": "boolean",
+            "default": false
+          },
+          "showFooter": {
+            "type": "boolean",
+            "default": false
+          },
+          "headerText": {
+            "type": "string",
+            "maxLength": 500
+          },
+          "footerText": {
+            "type": "string",
+            "maxLength": 500
+          }
+        }
+      },
+      "PageNumbers": {
+        "type": "object",
+        "properties": {
+          "show": {
+            "type": "boolean",
+            "default": true
+          },
+          "position": {
+            "type": "string",
+            "enum": ["bottom-center", "bottom-right", "bottom-left", "top-center", "top-right"],
+            "default": "bottom-center"
+          }
+        }
+      },
+      "Watermark": {
+        "type": "object",
+        "properties": {
+          "show": {
+            "type": "boolean",
+            "default": false
+          },
+          "text": {
+            "type": "string",
+            "maxLength": 100
+          },
+          "opacity": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1,
+            "default": 0.1
+          }
+        }
+      },
+      "PreviewResponse": {
+        "type": "object",
+        "properties": {
+          "html": {
+            "type": "string",
+            "description": "Generated HTML content"
+          }
+        }
+      },
+      "BatchResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "results": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "success": {
+                  "type": "boolean"
+                },
+                "data": {
+                  "type": "string",
+                  "format": "byte",
+                  "description": "Base64 encoded PDF data"
+                },
+                "error": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "summary": {
+            "type": "object",
+            "properties": {
+              "total": {
+                "type": "integer"
+              },
+              "success": {
+                "type": "integer"
+              },
+              "failed": {
+                "type": "integer"
+              }
+            }
+          }
+        }
+      },
+      "ThemesResponse": {
+        "type": "object",
+        "properties": {
+          "documentThemes": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "description": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "codeThemes": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "TemplatesResponse": {
+        "type": "object",
+        "properties": {
+          "templates": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "description": {
+                  "type": "string"
+                },
+                "category": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "HealthResponse": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "example": "healthy"
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "version": {
+            "type": "string",
+            "example": "1.0.0"
+          }
+        }
+      },
+      "Error": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "string",
+            "description": "Error message"
+          }
+        }
+      }
+    }
+  }
+}

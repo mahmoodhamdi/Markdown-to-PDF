@@ -2,10 +2,11 @@
 
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
+import { Link } from '@/i18n/routing';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Copy, Check } from 'lucide-react';
+import { Copy, Check, ExternalLink, FileJson } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 export default function ApiDocsPage() {
@@ -70,6 +71,46 @@ export default function ApiDocsPage() {
       <div className="mb-8">
         <h1 className="text-3xl font-bold">{t('title')}</h1>
         <p className="text-muted-foreground mt-2">{t('subtitle')}</p>
+      </div>
+
+      {/* Quick Links */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+        <Card className="hover:shadow-md transition-shadow">
+          <CardHeader className="pb-3">
+            <CardTitle className="flex items-center gap-2 text-lg">
+              <ExternalLink className="h-5 w-5 text-primary" />
+              Swagger UI
+            </CardTitle>
+            <CardDescription>
+              Interactive API documentation with try-it-out functionality
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Link href="/api-docs/swagger">
+              <Button variant="outline" className="w-full">
+                Open Swagger UI
+              </Button>
+            </Link>
+          </CardContent>
+        </Card>
+        <Card className="hover:shadow-md transition-shadow">
+          <CardHeader className="pb-3">
+            <CardTitle className="flex items-center gap-2 text-lg">
+              <FileJson className="h-5 w-5 text-primary" />
+              OpenAPI Specification
+            </CardTitle>
+            <CardDescription>
+              Download the OpenAPI 3.0 specification file
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <a href="/openapi.json" target="_blank" rel="noopener noreferrer">
+              <Button variant="outline" className="w-full">
+                View openapi.json
+              </Button>
+            </a>
+          </CardContent>
+        </Card>
       </div>
 
       {/* Introduction */}
