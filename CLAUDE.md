@@ -41,6 +41,13 @@ docker-compose -f docker/docker-compose.yml up
 |----------|-------------|---------|
 | `NEXT_PUBLIC_APP_URL` | Application URL | `http://localhost:3000` |
 | `PUPPETEER_EXECUTABLE_PATH` | Chrome/Chromium path | Auto-detected |
+| `NEXTAUTH_URL` | NextAuth callback URL | `http://localhost:3000` |
+| `NEXTAUTH_SECRET` | NextAuth session secret | Required |
+| `GITHUB_ID` / `GITHUB_SECRET` | GitHub OAuth credentials | Required for auth |
+| `NEXT_PUBLIC_FIREBASE_*` | Firebase client config | Required |
+| `FIREBASE_PROJECT_ID` / `FIREBASE_CLIENT_EMAIL` / `FIREBASE_PRIVATE_KEY` | Firebase Admin | Required for server features |
+| `STRIPE_SECRET_KEY` / `STRIPE_WEBHOOK_SECRET` | Stripe payments | Required for billing |
+| `EMAIL_SERVER_*` | SMTP configuration | Required for email features |
 
 ## Architecture Overview
 
@@ -50,7 +57,31 @@ docker-compose -f docker/docker-compose.yml up
 
 2. **PDF Generator** (`src/lib/pdf/generator.ts`): Uses Puppeteer to render HTML and generate PDFs. `generateHtmlDocument()` creates the full HTML with theme CSS, KaTeX/Mermaid scripts. `generatePdf()` launches headless Chrome for conversion.
 
-3. **Theme Manager** (`src/lib/themes/manager.ts`): Manages 5 document themes (github, academic, minimal, dark, professional) and 7 code themes. CSS is embedded directly in the file to avoid import issues.
+3. **Theme Manager** (`src/lib/themes/manager.ts`): Manages document themes (github, academic, minimal, dark, professional, elegant, modern, newsletter) and code themes. CSS is embedded directly in the file to avoid import issues.
+
+### Freemium Plan System
+
+Plans defined in `src/lib/plans/config.ts` with four tiers: `free`, `pro`, `team`, `enterprise`. Each plan has limits for:
+- Daily conversions and API calls
+- Max file size and batch files
+- Available themes (some are premium-only)
+- Cloud storage quota
+- Team member seats
+- Custom CSS/headers/footers
+
+Key modules:
+- `src/lib/plans/usage.ts` - Track daily usage against limits
+- `src/lib/plans/rate-limit.ts` - Plan-aware rate limiting
+- `src/lib/stripe/` - Stripe checkout and webhook handling
+
+### Backend Services (Firebase)
+
+All services use Firebase Admin SDK (`src/lib/firebase/admin.ts`):
+
+- **Cloud Storage** (`src/lib/storage/service.ts`): File upload/download with per-user quota tracking
+- **Team Management** (`src/lib/teams/service.ts`): Teams with roles (owner/admin/member), invitations, shared settings
+- **Usage Analytics** (`src/lib/analytics/service.ts`): Event tracking, daily aggregation, usage summaries
+- **SSO/SAML** (`src/lib/sso/`): Enterprise SSO with SAML, OIDC, Azure AD, Okta, Google Workspace support
 
 ### State Management (Zustand)
 
@@ -60,10 +91,12 @@ docker-compose -f docker/docker-compose.yml up
 
 All stores use `persist` middleware to save to localStorage.
 
-### Custom Hooks
+### Authentication
 
-- `hooks/useAutoSave.ts`: Auto-saves editor content to localStorage with debouncing
-- `hooks/useKeyboardShortcuts.ts`: Global keyboard shortcuts (Ctrl+B bold, Ctrl+I italic, etc.)
+Uses NextAuth.js (`src/lib/auth/config.ts`) with:
+- GitHub OAuth provider
+- Firebase Adapter for session storage
+- Email/password authentication
 
 ### Internationalization
 
@@ -74,13 +107,33 @@ All stores use `persist` middleware to save to localStorage.
 
 ### API Routes
 
-All routes in `src/app/api/` with rate limiting and Zod validation (`src/lib/validations/api-schemas.ts`):
-- `POST /api/convert` - Main PDF conversion endpoint (60 req/min)
+Core routes in `src/app/api/`:
+- `POST /api/convert` - PDF conversion (60 req/min)
 - `POST /api/convert/batch` - Batch conversion (10 req/min)
-- `POST /api/preview` - HTML preview generation (120 req/min)
+- `POST /api/preview` - HTML preview (120 req/min)
 - `GET /api/themes` - Available themes
 - `GET /api/templates` - Document templates
 - `GET /api/health` - Health check
+
+Storage routes (`/api/storage/`):
+- `POST /api/storage/upload` - Upload file
+- `GET|DELETE /api/storage/files/[fileId]` - Manage files
+- `GET /api/storage/quota` - Check quota
+
+Team routes (`/api/teams/`):
+- CRUD operations for teams and members
+
+Analytics routes (`/api/analytics/`):
+- `POST /api/analytics/track` - Track events
+- `GET /api/analytics/summary` - Usage summary
+- `GET /api/analytics/history` - Historical data
+
+SSO routes (`/api/sso/`):
+- Configuration, domain verification, audit logs
+
+Payment routes:
+- `POST /api/checkout` - Create Stripe checkout session
+- `POST /api/webhooks/stripe` - Handle Stripe webhooks
 
 ### Type Definitions
 
@@ -89,6 +142,9 @@ Core types in `src/types/index.ts`:
 - `PageSettings`, `PageMargins`, `Watermark` - PDF configuration
 - `ConversionOptions`, `ConversionResult` - API contracts
 - `Template`, `BatchFile` - Feature-specific types
+
+Plan types in `src/lib/plans/config.ts`:
+- `PlanType`, `PlanLimits`, `Plan`
 
 ### Component Structure
 

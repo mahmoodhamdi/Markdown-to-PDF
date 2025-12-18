@@ -1,22 +1,39 @@
 # Markdown to PDF Converter
 
-A production-ready Markdown to PDF converter web application built with Next.js 14, TypeScript, and Tailwind CSS.
+A production-ready Markdown to PDF converter web application built with Next.js 14, TypeScript, and Tailwind CSS. Features a freemium model with user authentication, team management, and enterprise SSO support.
 
 ![Editor Screenshot](screenshots/editor-en.png)
 
 ## Features
 
+### Core Features
 - **Live Preview** - See changes in real-time as you type
-- **5 Document Themes** - GitHub, Academic, Minimal, Dark, Professional
+- **8 Document Themes** - GitHub, Academic, Minimal, Dark, Professional, Elegant, Modern, Newsletter
 - **Syntax Highlighting** - Support for 20+ programming languages
 - **Math Equations** - LaTeX/KaTeX support
 - **Mermaid Diagrams** - Flowcharts, sequence diagrams, and more
 - **Batch Conversion** - Convert multiple files at once
-- **10 Document Templates** - Resume, Thesis, README, Meeting Notes, and more
+- **15+ Document Templates** - Resume, Thesis, README, Meeting Notes, and more
 - **Bilingual Support** - English and Arabic with full RTL support
 - **Responsive Design** - Works on mobile, tablet, and desktop
 - **Docker Support** - Easy deployment with Docker
 - **REST API** - Programmatic access to conversion features
+
+### Premium Features
+- **User Authentication** - GitHub, Google, and email login
+- **Cloud Storage** - Save documents in the cloud
+- **Custom CSS** - Style your documents with custom CSS
+- **Team Management** - Collaborate with team members
+- **Usage Analytics** - Track conversion metrics
+- **Priority Rendering** - Faster PDF generation
+- **No Watermark** - Remove watermark from PDFs
+
+### Enterprise Features
+- **SSO Integration** - SAML, OIDC, Azure AD, Okta, Google Workspace
+- **Custom Domains** - Use your own domain
+- **SLA Guarantee** - 99.9% uptime
+- **Priority Support** - Dedicated support channel
+- **Self-Hosting** - Deploy on your own infrastructure
 
 ## Screenshots
 
@@ -75,6 +92,10 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 - **Internationalization**: next-intl
 - **Testing**: Vitest + Playwright
 - **UI Components**: Radix UI
+- **Authentication**: NextAuth.js
+- **Database**: Firebase (Firestore)
+- **Storage**: Firebase Storage
+- **Payments**: Stripe
 
 ## API Documentation
 
@@ -203,10 +224,32 @@ src/
 
 ## Environment Variables
 
-| Variable | Description | Default |
-|----------|-------------|---------|
-| `NEXT_PUBLIC_APP_URL` | Application URL | `http://localhost:3000` |
-| `PUPPETEER_EXECUTABLE_PATH` | Chrome/Chromium path | Auto-detected |
+See [CREDENTIALS.md](CREDENTIALS.md) for detailed setup instructions.
+
+| Variable | Description | Required |
+|----------|-------------|----------|
+| `NEXTAUTH_URL` | Application URL | Yes |
+| `NEXTAUTH_SECRET` | Session encryption key (32+ chars) | Yes |
+| `FIREBASE_*` | Firebase configuration | Yes |
+| `GITHUB_ID/SECRET` | GitHub OAuth | Optional |
+| `GOOGLE_CLIENT_ID/SECRET` | Google OAuth | Optional |
+| `STRIPE_SECRET_KEY` | Stripe payments | Optional |
+| `EMAIL_SERVER_*` | SMTP configuration | Optional |
+
+## Pricing Plans
+
+| Feature | Free | Pro ($5/mo) | Team ($15/mo) | Enterprise |
+|---------|------|-------------|---------------|------------|
+| Conversions/day | 20 | 500 | Unlimited | Unlimited |
+| File size | 500KB | 5MB | 20MB | 100MB |
+| Themes | 3 | All | All + Brand | Custom |
+| Cloud Storage | - | 1GB | 10GB | Unlimited |
+| Team Members | - | - | 5 | Unlimited |
+| SSO | - | - | - | Yes |
+
+## Self-Hosting
+
+See [SELF_HOSTING.md](SELF_HOSTING.md) for detailed deployment instructions.
 
 ## Contributing
 

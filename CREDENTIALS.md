@@ -2,6 +2,8 @@
 
 This document lists all external services and credentials required to run the Markdown-to-PDF application with full functionality.
 
+> **Note:** The minimum required credentials for basic functionality are Firebase. All other services are optional and enable additional features.
+
 ## Environment Variables
 
 Create a `.env.local` file in the root directory with the following variables:
@@ -181,3 +183,43 @@ Error: Callback URL mismatch
 Webhook signature verification failed
 ```
 **Solution:** Ensure `STRIPE_WEBHOOK_SECRET` matches the webhook endpoint's signing secret.
+
+### Email Not Sending
+```
+Error: Connection refused
+```
+**Solution:**
+- For Gmail, ensure you're using an App Password, not your regular password
+- Check SMTP port is correct (587 for TLS, 465 for SSL)
+- Verify firewall allows outbound connections on SMTP port
+
+## Quick Start (Minimal Setup)
+
+For development without payments or email:
+
+```bash
+# Minimum required (.env.local)
+NEXTAUTH_URL=http://localhost:3000
+NEXTAUTH_SECRET=your-32-char-secret-key-here-xxx
+
+# Firebase (required)
+NEXT_PUBLIC_FIREBASE_API_KEY=xxx
+NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=xxx.firebaseapp.com
+NEXT_PUBLIC_FIREBASE_PROJECT_ID=xxx
+NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=xxx.appspot.com
+NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=xxx
+NEXT_PUBLIC_FIREBASE_APP_ID=xxx
+
+FIREBASE_PROJECT_ID=xxx
+FIREBASE_CLIENT_EMAIL=xxx@xxx.iam.gserviceaccount.com
+FIREBASE_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----\n...\n-----END PRIVATE KEY-----\n"
+```
+
+Then run:
+```bash
+npm run dev
+```
+
+## Contact
+
+For help setting up credentials: mwm.softwars.solutions@gmail.com

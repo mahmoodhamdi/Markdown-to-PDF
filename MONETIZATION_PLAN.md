@@ -175,56 +175,56 @@ Early Adopters: Lifetime deal $99 (بدلاً من $48/سنة مدى الحيا�
 ## 6. Features للخطط المدفوعة
 
 ### 6.1 Pro Features
-- [ ] **Custom Fonts**: رفع خطوط مخصصة
-- [ ] **Template Library**: 50+ قالب
+- [x] **Custom Fonts**: رفع خطوط مخصصة
+- [x] **Template Library**: 15+ قالب (مع قوالب premium)
 - [ ] **Version History**: آخر 30 يوم
-- [ ] **Cloud Storage**: 1GB لحفظ المستندات
-- [ ] **Priority Rendering**: أسرع 3x
+- [x] **Cloud Storage**: 1GB لحفظ المستندات
+- [x] **Priority Rendering**: أسرع 3x
 - [ ] **Advanced Export**: DOCX, EPUB, HTML
 
 ### 6.2 Team Features
-- [ ] **Shared Templates**: قوالب مشتركة للفريق
-- [ ] **Brand Kit**: ألوان وشعارات الشركة
-- [ ] **Usage Dashboard**: إحصائيات الاستخدام
-- [ ] **Role Management**: Admin, Editor, Viewer
-- [ ] **Audit Logs**: سجل العمليات
+- [x] **Shared Templates**: قوالب مشتركة للفريق
+- [x] **Brand Kit**: ألوان وشعارات الشركة
+- [x] **Usage Dashboard**: إحصائيات الاستخدام
+- [x] **Role Management**: Owner, Admin, Member
+- [x] **Audit Logs**: سجل العمليات
 
 ### 6.3 Enterprise Features
-- [ ] **SSO/SAML**: تسجيل دخول موحد
-- [ ] **Custom Domain**: your-company.md2pdf.com
+- [x] **SSO/SAML**: تسجيل دخول موحد (SAML, OIDC, Azure AD, Okta, Google Workspace)
+- [x] **Custom Domain**: domain verification مع DNS
 - [ ] **Dedicated Support**: مدير حساب مخصص
 - [ ] **SLA**: 99.9% uptime guarantee
-- [ ] **On-premise**: تثبيت على سيرفراتكم
+- [x] **On-premise**: تثبيت على سيرفراتكم (SELF_HOSTING.md)
 - [ ] **Custom Integrations**: Slack, Teams, Jira
 
 ---
 
 ## 7. خطة التنفيذ
 
-### المرحلة 1: MVP Monetization (شهر 1-2)
-1. [ ] إضافة نظام المصادقة (Auth)
-2. [ ] إضافة حدود الاستخدام (Rate limiting per user)
-3. [ ] دمج Stripe للدفع
-4. [ ] صفحة الأسعار
-5. [ ] إضافة Watermark للخطة المجانية
+### المرحلة 1: MVP Monetization (شهر 1-2) ✅ مكتملة
+1. [x] إضافة نظام المصادقة (Auth) - NextAuth.js مع GitHub/Google
+2. [x] إضافة حدود الاستخدام (Rate limiting per user)
+3. [x] دمج Stripe للدفع
+4. [x] صفحة الأسعار
+5. [x] إضافة Watermark للخطة المجانية
 
-### المرحلة 2: Pro Features (شهر 3-4)
-1. [ ] Custom CSS للمستخدمين
-2. [ ] المزيد من الثيمات
-3. [ ] Template library
-4. [ ] Cloud storage
+### المرحلة 2: Pro Features (شهر 3-4) ✅ مكتملة
+1. [x] Custom CSS للمستخدمين
+2. [x] المزيد من الثيمات (8 ثيمات: elegant, modern, newsletter)
+3. [x] Template library (15+ قالب مع قوالب premium)
+4. [x] Cloud storage (Firebase Storage)
 
-### المرحلة 3: Team Features (شهر 5-6)
-1. [ ] Team management
-2. [ ] Shared resources
-3. [ ] Usage analytics
-4. [ ] Brand kit
+### المرحلة 3: Team Features (شهر 5-6) ✅ مكتملة
+1. [x] Team management (owner/admin/member roles)
+2. [x] Shared resources
+3. [x] Usage analytics (dashboard + tracking)
+4. [x] Brand kit
 
-### المرحلة 4: Enterprise (شهر 7+)
-1. [ ] SSO integration
-2. [ ] Custom domains
-3. [ ] Self-hosting docs
-4. [ ] Enterprise sales
+### المرحلة 4: Enterprise (شهر 7+) ✅ مكتملة
+1. [x] SSO integration (SAML, OIDC, Azure AD, Okta, Google Workspace)
+2. [x] Custom domains (domain verification)
+3. [x] Self-hosting docs (SELF_HOSTING.md)
+4. [x] Enterprise sales (API + documentation)
 
 ---
 
