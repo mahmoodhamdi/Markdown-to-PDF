@@ -1,7 +1,7 @@
 'use client';
 
 import { useTranslations } from 'next-intl';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { MarkdownEditor } from '@/components/editor/MarkdownEditor';
 import { EditorToolbar } from '@/components/editor/EditorToolbar';
 import { EditorStats } from '@/components/editor/EditorStats';
@@ -17,6 +17,7 @@ export default function HomePage() {
   const tPreview = useTranslations('preview');
   const { viewMode, content, setContent, showToc, isFullscreen, setIsFullscreen } = useEditorStore();
   const [isMobile, setIsMobile] = useState(false);
+  const hasInitialized = useRef(false);
 
   useEffect(() => {
     const checkMobile = () => {
@@ -28,10 +29,13 @@ export default function HomePage() {
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
-  // Set default content if empty
+  // Set default content only on initial mount if no persisted content exists
   useEffect(() => {
-    if (!content) {
-      setContent(t('placeholder'));
+    if (!hasInitialized.current) {
+      hasInitialized.current = true;
+      if (!content) {
+        setContent(t('placeholder'));
+      }
     }
   }, [content, setContent, t]);
 

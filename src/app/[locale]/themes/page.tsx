@@ -92,12 +92,16 @@ export default function ThemesPage() {
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              {codeThemeIds.map((id) => (
-                <SelectItem key={id} value={id}>
-                  {t(`codeThemes.${id.replace(/-/g, '')}` as 'codeThemes.title') ||
-                    id.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')}
-                </SelectItem>
-              ))}
+              {codeThemeIds.map((id) => {
+                // Convert hyphenated-id to camelCase for translation key
+                const translationKey = id.replace(/-([a-z])/g, (_, letter) => letter.toUpperCase());
+                return (
+                  <SelectItem key={id} value={id}>
+                    {t(`codeThemes.${translationKey}` as 'codeThemes.title') ||
+                      id.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')}
+                  </SelectItem>
+                );
+              })}
             </SelectContent>
           </Select>
         </div>

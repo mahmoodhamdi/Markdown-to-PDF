@@ -26,10 +26,21 @@ npm run test:coverage    # Coverage report
 npx vitest run __tests__/unit/lib/utils.test.ts
 npx vitest run __tests__/unit/lib/utils.test.ts -t "test name"  # Run specific test
 
+# Format
+npm run format            # Prettier format all files
+npm run format:check      # Check formatting without changes
+
 # Docker
 docker build -f docker/Dockerfile -t markdown-to-pdf .
 docker-compose -f docker/docker-compose.yml up
 ```
+
+## Environment Variables
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| `NEXT_PUBLIC_APP_URL` | Application URL | `http://localhost:3000` |
+| `PUPPETEER_EXECUTABLE_PATH` | Chrome/Chromium path | Auto-detected |
 
 ## Architecture Overview
 
