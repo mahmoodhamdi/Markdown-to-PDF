@@ -1,29 +1,29 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { generatePdfBatch } from '@/lib/pdf/generator';
-import { checkRateLimit, getRateLimitHeaders } from '@/lib/rate-limit';
 import { batchRequestSchema, validateRequest } from '@/lib/validations/api-schemas';
 import { DocumentTheme, CodeTheme, PageSettings } from '@/types';
-
-// Rate limit: 10 batch requests per minute (batch is heavy)
-const RATE_LIMIT = 10;
-const RATE_WINDOW = 60 * 1000;
+import {
+  getRequestContext,
+  checkConversionRateLimit,
+  checkBatchCountLimit,
+  checkFileSizeLimit,
+  recordConversion,
+  createRateLimitErrorResponse,
+  getPlanLimits,
+} from '@/lib/plans';
 
 export async function POST(request: NextRequest) {
-  // Get client IP for rate limiting
-  const ip = request.headers.get('x-forwarded-for')?.split(',')[0] ||
-    request.headers.get('x-real-ip') ||
-    'anonymous';
+  // Get request context (auth status, user plan, IP)
+  const context = await getRequestContext(request);
 
-  // Check rate limit
-  const rateLimitResult = checkRateLimit(`batch:${ip}`, RATE_LIMIT, RATE_WINDOW);
-  const rateLimitHeaders = getRateLimitHeaders(rateLimitResult);
+  // Check conversion rate limit based on user plan
+  const rateLimitResult = await checkConversionRateLimit(context);
 
   if (!rateLimitResult.success) {
-    return NextResponse.json(
-      { error: 'Too many requests. Please try again later.' },
-      { status: 429, headers: rateLimitHeaders }
-    );
+    return createRateLimitErrorResponse(rateLimitResult);
   }
+
+  const rateLimitHeaders = rateLimitResult.headers;
 
   try {
     const rawBody = await request.json();
@@ -39,6 +39,37 @@ export async function POST(request: NextRequest) {
     }
 
     const body = validation.data;
+
+    // Check batch file count limit based on plan
+    const batchCountCheck = checkBatchCountLimit(body.files.length, context);
+
+    if (!batchCountCheck.success) {
+      return createRateLimitErrorResponse(batchCountCheck);
+    }
+
+    // Get plan limits for feature gating
+    const planLimits = getPlanLimits(context.userPlan);
+
+    // Check if the requested theme is available for the user's plan
+    if (body.theme && !planLimits.availableThemes.includes(body.theme)) {
+      return NextResponse.json(
+        { error: `Theme "${body.theme}" is not available for your plan. Available themes: ${planLimits.availableThemes.join(', ')}` },
+        { status: 403, headers: rateLimitHeaders }
+      );
+    }
+
+    // Check file sizes for all files
+    for (const file of body.files) {
+      const fileSize = new TextEncoder().encode(file.markdown).length;
+      const fileSizeCheck = checkFileSizeLimit(fileSize, context);
+
+      if (!fileSizeCheck.success) {
+        return NextResponse.json(
+          { error: `File "${file.filename}" exceeds size limit: ${fileSizeCheck.error}` },
+          { status: 413, headers: rateLimitHeaders }
+        );
+      }
+    }
 
     // Use optimized batch processing with browser pool
     const results = await generatePdfBatch(
@@ -56,6 +87,13 @@ export async function POST(request: NextRequest) {
 
     const successCount = results.filter((r) => r.success).length;
     const failedCount = results.filter((r) => !r.success).length;
+
+    // Record successful conversions for usage tracking
+    if (successCount > 0) {
+      await recordConversion(context);
+      // Note: We count batch as 1 conversion operation, not per file
+      // This is more user-friendly for batch operations
+    }
 
     return NextResponse.json({
       success: failedCount === 0,

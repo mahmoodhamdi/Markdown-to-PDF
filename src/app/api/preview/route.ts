@@ -1,28 +1,27 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { generateHtmlPreview } from '@/lib/pdf/generator';
-import { checkRateLimit, getRateLimitHeaders } from '@/lib/rate-limit';
 import { previewRequestSchema, validateRequest } from '@/lib/validations/api-schemas';
-
-// Rate limit: 120 requests per minute (preview is lighter than convert)
-const RATE_LIMIT = 120;
-const RATE_WINDOW = 60 * 1000;
+import {
+  getRequestContext,
+  checkApiRateLimit,
+  checkFileSizeLimit,
+  recordApiCall,
+  createRateLimitErrorResponse,
+  getPlanLimits,
+} from '@/lib/plans';
 
 export async function POST(request: NextRequest) {
-  // Get client IP for rate limiting
-  const ip = request.headers.get('x-forwarded-for')?.split(',')[0] ||
-    request.headers.get('x-real-ip') ||
-    'anonymous';
+  // Get request context (auth status, user plan, IP)
+  const context = await getRequestContext(request);
 
-  // Check rate limit
-  const rateLimitResult = checkRateLimit(`preview:${ip}`, RATE_LIMIT, RATE_WINDOW);
-  const rateLimitHeaders = getRateLimitHeaders(rateLimitResult);
+  // Check API rate limit based on user plan
+  const rateLimitResult = await checkApiRateLimit(context);
 
   if (!rateLimitResult.success) {
-    return NextResponse.json(
-      { error: 'Too many requests. Please try again later.' },
-      { status: 429, headers: rateLimitHeaders }
-    );
+    return createRateLimitErrorResponse(rateLimitResult);
   }
+
+  const rateLimitHeaders = rateLimitResult.headers;
 
   try {
     const rawBody = await request.json();
@@ -39,7 +38,29 @@ export async function POST(request: NextRequest) {
 
     const body = validation.data;
 
+    // Check file size limit based on plan
+    const contentSize = new TextEncoder().encode(body.markdown).length;
+    const fileSizeCheck = checkFileSizeLimit(contentSize, context);
+
+    if (!fileSizeCheck.success) {
+      return createRateLimitErrorResponse(fileSizeCheck);
+    }
+
+    // Get plan limits for feature gating
+    const planLimits = getPlanLimits(context.userPlan);
+
+    // Check if the requested theme is available for the user's plan
+    if (body.theme && !planLimits.availableThemes.includes(body.theme)) {
+      return NextResponse.json(
+        { error: `Theme "${body.theme}" is not available for your plan. Available themes: ${planLimits.availableThemes.join(', ')}` },
+        { status: 403, headers: rateLimitHeaders }
+      );
+    }
+
     const html = await generateHtmlPreview(body.markdown, body.theme);
+
+    // Record API call for usage tracking
+    await recordApiCall(context);
 
     return NextResponse.json({ html }, { headers: rateLimitHeaders });
   } catch (error) {
