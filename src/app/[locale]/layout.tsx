@@ -32,6 +32,44 @@ export default async function LocaleLayout({
 
   return (
     <html lang={locale} dir={dir} suppressHydrationWarning>
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function() {
+                try {
+                  var stored = localStorage.getItem('theme-storage');
+                  if (stored) {
+                    var parsed = JSON.parse(stored);
+                    var mode = parsed.state && parsed.state.mode;
+                    if (mode === 'dark') {
+                      document.documentElement.classList.add('dark');
+                    } else if (mode === 'light') {
+                      document.documentElement.classList.add('light');
+                    } else if (mode === 'system' || !mode) {
+                      if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                        document.documentElement.classList.add('dark');
+                      } else {
+                        document.documentElement.classList.add('light');
+                      }
+                    }
+                  } else {
+                    if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                      document.documentElement.classList.add('dark');
+                    } else {
+                      document.documentElement.classList.add('light');
+                    }
+                  }
+                } catch (e) {
+                  if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                    document.documentElement.classList.add('dark');
+                  }
+                }
+              })();
+            `,
+          }}
+        />
+      </head>
       <body className="min-h-screen bg-background font-sans antialiased">
         <NextIntlClientProvider messages={messages}>
           <ServiceWorkerProvider>
