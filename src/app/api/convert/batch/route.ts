@@ -71,6 +71,19 @@ export async function POST(request: NextRequest) {
       }
     }
 
+    // Prepare page settings with watermark for free plan users
+    let pageSettings = body.pageSettings as PageSettings;
+    if (planLimits.hasWatermark && planLimits.watermarkText) {
+      pageSettings = {
+        ...pageSettings,
+        watermark: {
+          show: true,
+          text: planLimits.watermarkText,
+          opacity: 0.08,
+        },
+      };
+    }
+
     // Use optimized batch processing with browser pool
     const results = await generatePdfBatch(
       body.files.map((file) => ({
@@ -81,7 +94,7 @@ export async function POST(request: NextRequest) {
       {
         theme: body.theme as DocumentTheme,
         codeTheme: body.codeTheme as CodeTheme,
-        pageSettings: body.pageSettings as PageSettings,
+        pageSettings,
       }
     );
 
