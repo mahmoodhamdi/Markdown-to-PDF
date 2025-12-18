@@ -15,11 +15,14 @@ export function Header() {
   const tCommon = useTranslations('common');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
+  const tPricing = useTranslations('pricing');
+
   const navItems = [
     { href: '/', label: t('home') },
     { href: '/templates', label: t('templates') },
     { href: '/themes', label: t('themes') },
     { href: '/batch', label: t('batch') },
+    { href: '/pricing', label: tPricing('title') },
     { href: '/api-docs', label: t('apiDocs') },
     { href: '/settings', label: t('settings') },
   ];
