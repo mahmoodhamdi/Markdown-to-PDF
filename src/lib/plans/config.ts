@@ -76,7 +76,7 @@ export const PLANS: Record<PlanType, Plan> = {
       maxFileSize: 5 * 1024 * 1024, // 5 MB
       apiCallsPerDay: 2000,
       maxBatchFiles: 50,
-      availableThemes: ['github', 'minimal', 'dark', 'academic', 'professional'],
+      availableThemes: ['github', 'minimal', 'dark', 'academic', 'professional', 'elegant', 'modern', 'newsletter'],
       hasWatermark: false,
       watermarkText: null,
       supportLevel: 'email-48h',
@@ -97,7 +97,7 @@ export const PLANS: Record<PlanType, Plan> = {
       maxFileSize: 20 * 1024 * 1024, // 20 MB
       apiCallsPerDay: 10000,
       maxBatchFiles: 200,
-      availableThemes: ['github', 'minimal', 'dark', 'academic', 'professional'],
+      availableThemes: ['github', 'minimal', 'dark', 'academic', 'professional', 'elegant', 'modern', 'newsletter'],
       hasWatermark: false,
       watermarkText: null,
       supportLevel: 'email-24h',
@@ -118,7 +118,7 @@ export const PLANS: Record<PlanType, Plan> = {
       maxFileSize: 100 * 1024 * 1024, // 100 MB
       apiCallsPerDay: 100000,
       maxBatchFiles: Infinity,
-      availableThemes: ['github', 'minimal', 'dark', 'academic', 'professional'],
+      availableThemes: ['github', 'minimal', 'dark', 'academic', 'professional', 'elegant', 'modern', 'newsletter'],
       hasWatermark: false,
       watermarkText: null,
       supportLevel: 'priority',

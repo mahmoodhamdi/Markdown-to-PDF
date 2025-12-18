@@ -122,7 +122,13 @@
       "dark": "داكن",
       "darkDesc": "سمة مناسبة للوضع الداكن",
       "professional": "احترافي",
-      "professionalDesc": "للمستندات التجارية والرسمية"
+      "professionalDesc": "للمستندات التجارية والرسمية",
+      "elegant": "أنيق",
+      "elegantDesc": "تصميم serif متطور للمستندات الرسمية",
+      "modern": "عصري",
+      "modernDesc": "تصميم معاصر نظيف مع خطوط جريئة",
+      "newsletter": "نشرة إخبارية",
+      "newsletterDesc": "تخطيط بأسلوب المجلات للمدونات والمقالات"
     },
     "codeThemes": {
       "title": "سمة الأكواد",

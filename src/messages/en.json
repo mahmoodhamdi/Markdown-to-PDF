@@ -122,7 +122,13 @@
       "dark": "Dark",
       "darkDesc": "Dark mode friendly theme",
       "professional": "Professional",
-      "professionalDesc": "Business and corporate documents"
+      "professionalDesc": "Business and corporate documents",
+      "elegant": "Elegant",
+      "elegantDesc": "Sophisticated serif design for formal documents",
+      "modern": "Modern",
+      "modernDesc": "Clean contemporary design with bold typography",
+      "newsletter": "Newsletter",
+      "newsletterDesc": "Magazine-style layout for blog posts and articles"
     },
     "codeThemes": {
       "title": "Code Theme",
