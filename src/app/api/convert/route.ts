@@ -10,6 +10,7 @@ import {
   createRateLimitErrorResponse,
   getPlanLimits,
 } from '@/lib/plans';
+import type { ConversionOptions } from '@/types';
 
 export async function POST(request: NextRequest) {
   // Get request context (auth status, user plan, IP)
@@ -86,7 +87,7 @@ export async function POST(request: NextRequest) {
       };
     }
 
-    const result = await generatePdf(body);
+    const result = await generatePdf(body as ConversionOptions);
 
     if (!result.success || !result.data) {
       return NextResponse.json(

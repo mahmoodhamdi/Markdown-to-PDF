@@ -82,6 +82,8 @@ export interface Template {
   description: string;
   category: 'business' | 'academic' | 'personal' | 'technical';
   content: string;
+  /** Whether this template requires a Pro+ plan */
+  premium?: boolean;
 }
 
 export interface BatchFile {

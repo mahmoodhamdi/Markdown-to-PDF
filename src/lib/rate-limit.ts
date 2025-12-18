@@ -21,7 +21,9 @@ function cleanup(windowMs: number): void {
   lastCleanup = now;
   const cutoff = now - windowMs;
 
-  for (const [key, entry] of rateLimitStore.entries()) {
+  const entries = Array.from(rateLimitStore.entries());
+  for (let i = 0; i < entries.length; i++) {
+    const [key, entry] = entries[i];
     entry.timestamps = entry.timestamps.filter((ts) => ts > cutoff);
     if (entry.timestamps.length === 0) {
       rateLimitStore.delete(key);

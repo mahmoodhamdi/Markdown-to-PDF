@@ -185,6 +185,16 @@
     "subtitle": "Start with a pre-made template",
     "useTemplate": "Use Template",
     "previewTemplate": "Preview",
+    "premium": "Pro",
+    "premiumBadge": "Premium Template",
+    "unlockPremium": "Upgrade to Pro to unlock this template",
+    "freeTemplates": "Free Templates",
+    "premiumTemplates": "Premium Templates",
+    "stats": {
+      "total": "{count} templates",
+      "free": "{count} free",
+      "premium": "{count} premium"
+    },
     "categories": {
       "all": "All Templates",
       "business": "Business",

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { Suspense, useState } from 'react';
 import { signIn } from 'next-auth/react';
 import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/routing';
@@ -10,8 +10,9 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Github, Mail, Loader2 } from 'lucide-react';
 import { useSearchParams } from 'next/navigation';
+import { Skeleton } from '@/components/ui/skeleton';
 
-export default function LoginPage() {
+function LoginContent() {
   const t = useTranslations('auth');
   const searchParams = useSearchParams();
   const callbackUrl = searchParams.get('callbackUrl') || '/';
@@ -158,5 +159,44 @@ export default function LoginPage() {
         </CardContent>
       </Card>
     </div>
+  );
+}
+
+function LoginLoading() {
+  return (
+    <div className="container flex items-center justify-center min-h-[80vh]">
+      <Card className="w-full max-w-md">
+        <CardHeader className="text-center">
+          <Skeleton className="h-8 w-24 mx-auto mb-2" />
+          <Skeleton className="h-4 w-48 mx-auto" />
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <Skeleton className="h-10 w-full" />
+          <Skeleton className="h-10 w-full" />
+          <div className="relative py-4">
+            <Skeleton className="h-4 w-32 mx-auto" />
+          </div>
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Skeleton className="h-4 w-12" />
+              <Skeleton className="h-10 w-full" />
+            </div>
+            <div className="space-y-2">
+              <Skeleton className="h-4 w-16" />
+              <Skeleton className="h-10 w-full" />
+            </div>
+            <Skeleton className="h-10 w-full" />
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={<LoginLoading />}>
+      <LoginContent />
+    </Suspense>
   );
 }
