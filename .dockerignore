@@ -1,0 +1,51 @@
+# Dependencies
+node_modules
+.pnp
+.pnp.js
+
+# Build outputs
+.next
+out
+build
+dist
+
+# Testing
+coverage
+playwright-report
+test-results
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# IDE
+.idea
+.vscode
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Git
+.git
+.gitignore
+
+# Docker
+docker/
+Dockerfile*
+docker-compose*
+
+# Misc
+*.log
+*.md
+!README.md
+screenshots/
+docs/
+
+# Firebase credentials
+*-firebase-adminsdk-*.json
+firebase-service-account*.json
+client_secret*.json
