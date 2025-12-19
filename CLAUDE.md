@@ -43,10 +43,14 @@ docker-compose -f docker/docker-compose.yml up
 | `PUPPETEER_EXECUTABLE_PATH` | Chrome/Chromium path | Auto-detected |
 | `NEXTAUTH_URL` | NextAuth callback URL | `http://localhost:3000` |
 | `NEXTAUTH_SECRET` | NextAuth session secret | Required |
+| `MONGODB_URI` | MongoDB connection string | Required |
 | `GITHUB_ID` / `GITHUB_SECRET` | GitHub OAuth credentials | Required for auth |
-| `NEXT_PUBLIC_FIREBASE_*` | Firebase client config | Required |
-| `FIREBASE_PROJECT_ID` / `FIREBASE_CLIENT_EMAIL` / `FIREBASE_PRIVATE_KEY` | Firebase Admin | Required for server features |
-| `STRIPE_SECRET_KEY` / `STRIPE_WEBHOOK_SECRET` | Stripe payments | Required for billing |
+| `NEXT_PUBLIC_FIREBASE_*` | Firebase client config | Required for storage |
+| `FIREBASE_PROJECT_ID` / `FIREBASE_CLIENT_EMAIL` / `FIREBASE_PRIVATE_KEY` | Firebase Admin | Required for storage |
+| `STRIPE_SECRET_KEY` / `STRIPE_WEBHOOK_SECRET` | Stripe payments (Global) | Optional |
+| `PAYMOB_SECRET_KEY` / `PAYMOB_HMAC_SECRET` | Paymob payments (Egypt) | Optional |
+| `PAYTABS_SERVER_KEY` / `PAYTABS_PROFILE_ID` | PayTabs payments (MENA) | Optional |
+| `PADDLE_API_KEY` / `PADDLE_WEBHOOK_SECRET` | Paddle payments (MoR) | Optional |
 | `EMAIL_SERVER_*` | SMTP configuration | Required for email features |
 
 ## Architecture Overview
@@ -74,14 +78,25 @@ Key modules:
 - `src/lib/plans/rate-limit.ts` - Plan-aware rate limiting
 - `src/lib/stripe/` - Stripe checkout and webhook handling
 
-### Backend Services (Firebase)
+### Backend Services (MongoDB + Firebase Storage)
 
-All services use Firebase Admin SDK (`src/lib/firebase/admin.ts`):
+Database uses MongoDB with Mongoose (`src/lib/db/mongodb.ts`), Storage uses Firebase:
 
-- **Cloud Storage** (`src/lib/storage/service.ts`): File upload/download with per-user quota tracking
+- **Database** (`src/lib/db/`): MongoDB models for users, subscriptions, teams, SSO configs, analytics
+- **Cloud Storage** (`src/lib/storage/service.ts`): Firebase Storage for file upload/download with per-user quota tracking
 - **Team Management** (`src/lib/teams/service.ts`): Teams with roles (owner/admin/member), invitations, shared settings
 - **Usage Analytics** (`src/lib/analytics/service.ts`): Event tracking, daily aggregation, usage summaries
 - **SSO/SAML** (`src/lib/sso/`): Enterprise SSO with SAML, OIDC, Azure AD, Okta, Google Workspace support
+
+### Payment Gateways
+
+Multi-gateway payment system (`src/lib/payments/`):
+
+- **Stripe** (`src/lib/payments/stripe/`): Global payments, default gateway
+- **Paymob** (`src/lib/payments/paymob/`): Egyptian market (EGP, mobile wallets)
+- **PayTabs** (`src/lib/payments/paytabs/`): MENA region (Saudi Arabia, UAE, etc.)
+- **Paddle** (`src/lib/payments/paddle/`): Merchant of Record for EU markets
+- **Gateway Selector** (`src/lib/payments/gateway-selector.ts`): Auto-selects gateway based on country/currency
 
 ### State Management (Zustand)
 
@@ -132,8 +147,12 @@ SSO routes (`/api/sso/`):
 - Configuration, domain verification, audit logs
 
 Payment routes:
-- `POST /api/checkout` - Create Stripe checkout session
+- `POST /api/checkout` - Create checkout session (auto-selects or uses specified gateway)
+- `GET /api/checkout` - Get available gateways for user's region
 - `POST /api/webhooks/stripe` - Handle Stripe webhooks
+- `POST /api/webhooks/paymob` - Handle Paymob webhooks
+- `POST /api/webhooks/paytabs` - Handle PayTabs webhooks
+- `POST /api/webhooks/paddle` - Handle Paddle webhooks
 
 ### Type Definitions
 
