@@ -90,12 +90,12 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 - **Diagrams**: Mermaid
 - **State Management**: Zustand
 - **Internationalization**: next-intl
-- **Testing**: Vitest + Playwright
+- **Testing**: Vitest + Playwright (709 tests)
 - **UI Components**: Radix UI
 - **Authentication**: NextAuth.js
-- **Database**: Firebase (Firestore)
+- **Database**: MongoDB (Mongoose)
 - **Storage**: Firebase Storage
-- **Payments**: Stripe
+- **Payments**: Multi-gateway (Stripe, Paymob, PayTabs, Paddle)
 
 ## API Documentation
 
@@ -157,6 +157,59 @@ GET /api/templates
 GET /api/health
 ```
 
+### Checkout (Payment)
+
+```bash
+POST /api/checkout
+Content-Type: application/json
+
+{
+  "plan": "pro",
+  "billing": "monthly",
+  "gateway": "stripe",      // Optional: stripe, paymob, paytabs, paddle
+  "countryCode": "US"       // Optional: auto-selects gateway
+}
+```
+
+### Storage
+
+```bash
+# Upload file
+POST /api/storage/upload
+
+# List files
+GET /api/storage/files
+
+# Get storage quota
+GET /api/storage/quota
+```
+
+### Teams
+
+```bash
+# Create team
+POST /api/teams
+
+# Get team
+GET /api/teams/[teamId]
+
+# Manage members
+POST /api/teams/[teamId]/members
+```
+
+### Analytics
+
+```bash
+# Track event
+POST /api/analytics/track
+
+# Get summary
+GET /api/analytics/summary
+
+# Get history
+GET /api/analytics/history
+```
+
 ## Testing
 
 ```bash
@@ -207,6 +260,13 @@ src/
 │   │   ├── batch/         # Batch conversion
 │   │   └── api-docs/      # API documentation
 │   └── api/               # API routes
+│       ├── convert/       # PDF conversion
+│       ├── checkout/      # Payment checkout
+│       ├── webhooks/      # Payment webhooks (Stripe, Paymob, PayTabs, Paddle)
+│       ├── storage/       # Cloud storage
+│       ├── teams/         # Team management
+│       ├── analytics/     # Usage analytics
+│       └── sso/           # Enterprise SSO
 ├── components/            # React components
 │   ├── editor/           # Editor components
 │   ├── preview/          # Preview components
@@ -216,7 +276,14 @@ src/
 ├── lib/                   # Core libraries
 │   ├── markdown/         # Markdown parser
 │   ├── pdf/              # PDF generator
-│   └── themes/           # Theme manager
+│   ├── themes/           # Theme manager
+│   ├── payments/         # Multi-gateway payments
+│   ├── storage/          # Cloud storage service
+│   ├── teams/            # Team management service
+│   ├── analytics/        # Analytics service
+│   ├── sso/              # SSO service
+│   ├── db/               # MongoDB models & connection
+│   └── plans/            # Pricing & rate limiting
 ├── stores/               # Zustand stores
 ├── messages/             # i18n translations
 └── types/                # TypeScript types
@@ -230,10 +297,14 @@ See [CREDENTIALS.md](CREDENTIALS.md) for detailed setup instructions.
 |----------|-------------|----------|
 | `NEXTAUTH_URL` | Application URL | Yes |
 | `NEXTAUTH_SECRET` | Session encryption key (32+ chars) | Yes |
-| `FIREBASE_*` | Firebase configuration | Yes |
+| `MONGODB_URI` | MongoDB connection string | Yes |
+| `FIREBASE_*` | Firebase Storage configuration | Yes |
 | `GITHUB_ID/SECRET` | GitHub OAuth | Optional |
 | `GOOGLE_CLIENT_ID/SECRET` | Google OAuth | Optional |
-| `STRIPE_SECRET_KEY` | Stripe payments | Optional |
+| `STRIPE_SECRET_KEY` | Stripe payments (Global) | Optional |
+| `PAYMOB_SECRET_KEY` | Paymob payments (Egypt) | Optional |
+| `PAYTABS_SERVER_KEY` | PayTabs payments (MENA) | Optional |
+| `PADDLE_API_KEY` | Paddle payments (MoR) | Optional |
 | `EMAIL_SERVER_*` | SMTP configuration | Optional |
 
 ## Pricing Plans

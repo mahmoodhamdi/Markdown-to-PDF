@@ -33,6 +33,26 @@
       "description": "Themes and templates"
     },
     {
+      "name": "Payment",
+      "description": "Payment and checkout endpoints"
+    },
+    {
+      "name": "Storage",
+      "description": "Cloud storage endpoints"
+    },
+    {
+      "name": "Teams",
+      "description": "Team management endpoints"
+    },
+    {
+      "name": "Analytics",
+      "description": "Usage analytics endpoints"
+    },
+    {
+      "name": "SSO",
+      "description": "Enterprise SSO endpoints"
+    },
+    {
       "name": "Health",
       "description": "Health check endpoints"
     }
@@ -351,6 +371,323 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/HealthResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/checkout": {
+      "post": {
+        "tags": ["Payment"],
+        "summary": "Create checkout session",
+        "description": "Creates a payment checkout session. Automatically selects the best gateway based on user location and currency, or use a specific gateway.",
+        "operationId": "createCheckout",
+        "security": [{"bearerAuth": []}],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CheckoutRequest"
+              },
+              "examples": {
+                "autoSelect": {
+                  "summary": "Auto-select gateway",
+                  "value": {
+                    "plan": "pro",
+                    "billing": "monthly",
+                    "countryCode": "EG"
+                  }
+                },
+                "specificGateway": {
+                  "summary": "Specific gateway",
+                  "value": {
+                    "plan": "team",
+                    "billing": "yearly",
+                    "gateway": "stripe"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Checkout session created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CheckoutResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      },
+      "get": {
+        "tags": ["Payment"],
+        "summary": "Get available gateways",
+        "description": "Returns available payment gateways for the user's region.",
+        "operationId": "getGateways",
+        "responses": {
+          "200": {
+            "description": "Available gateways",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GatewaysResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/storage/upload": {
+      "post": {
+        "tags": ["Storage"],
+        "summary": "Upload file",
+        "description": "Upload a file to cloud storage.",
+        "operationId": "uploadFile",
+        "security": [{"bearerAuth": []}],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "file": {
+                    "type": "string",
+                    "format": "binary"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "File uploaded",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StoredFile"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/storage/files": {
+      "get": {
+        "tags": ["Storage"],
+        "summary": "List files",
+        "description": "List all files for the authenticated user.",
+        "operationId": "listFiles",
+        "security": [{"bearerAuth": []}],
+        "responses": {
+          "200": {
+            "description": "List of files",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/StoredFile"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/storage/quota": {
+      "get": {
+        "tags": ["Storage"],
+        "summary": "Get storage quota",
+        "description": "Get storage usage and limits for the authenticated user.",
+        "operationId": "getStorageQuota",
+        "security": [{"bearerAuth": []}],
+        "responses": {
+          "200": {
+            "description": "Storage quota info",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StorageQuota"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/teams": {
+      "post": {
+        "tags": ["Teams"],
+        "summary": "Create team",
+        "description": "Create a new team (requires Team or Enterprise plan).",
+        "operationId": "createTeam",
+        "security": [{"bearerAuth": []}],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateTeamRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Team created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Team"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": ["Teams"],
+        "summary": "List user teams",
+        "description": "Get all teams the user belongs to.",
+        "operationId": "listTeams",
+        "security": [{"bearerAuth": []}],
+        "responses": {
+          "200": {
+            "description": "List of teams",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Team"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/analytics/track": {
+      "post": {
+        "tags": ["Analytics"],
+        "summary": "Track event",
+        "description": "Track a usage event.",
+        "operationId": "trackEvent",
+        "security": [{"bearerAuth": []}],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TrackEventRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Event tracked"
+          }
+        }
+      }
+    },
+    "/analytics/summary": {
+      "get": {
+        "tags": ["Analytics"],
+        "summary": "Get usage summary",
+        "description": "Get usage summary for the authenticated user.",
+        "operationId": "getAnalyticsSummary",
+        "security": [{"bearerAuth": []}],
+        "responses": {
+          "200": {
+            "description": "Usage summary",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AnalyticsSummary"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/sso/config": {
+      "post": {
+        "tags": ["SSO"],
+        "summary": "Create SSO configuration",
+        "description": "Create a new SSO configuration (Enterprise only).",
+        "operationId": "createSSOConfig",
+        "security": [{"bearerAuth": []}],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SSOConfigRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "SSO configuration created"
+          }
+        }
+      },
+      "get": {
+        "tags": ["SSO"],
+        "summary": "Get SSO configurations",
+        "description": "List SSO configurations for the organization.",
+        "operationId": "listSSOConfigs",
+        "security": [{"bearerAuth": []}],
+        "responses": {
+          "200": {
+            "description": "SSO configurations"
+          }
+        }
+      }
+    },
+    "/sso/check": {
+      "get": {
+        "tags": ["SSO"],
+        "summary": "Check SSO for domain",
+        "description": "Check if SSO is configured for an email domain.",
+        "operationId": "checkSSO",
+        "parameters": [
+          {
+            "name": "email",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "email"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "SSO check result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SSOCheckResponse"
                 }
               }
             }
@@ -723,6 +1060,273 @@
             "description": "Error message"
           }
         }
+      },
+      "CheckoutRequest": {
+        "type": "object",
+        "required": ["plan", "billing"],
+        "properties": {
+          "plan": {
+            "type": "string",
+            "enum": ["pro", "team", "enterprise"],
+            "description": "Subscription plan"
+          },
+          "billing": {
+            "type": "string",
+            "enum": ["monthly", "yearly"],
+            "description": "Billing cycle"
+          },
+          "gateway": {
+            "type": "string",
+            "enum": ["stripe", "paymob", "paytabs", "paddle"],
+            "description": "Payment gateway (auto-selected if not specified)"
+          },
+          "countryCode": {
+            "type": "string",
+            "description": "ISO country code for gateway selection"
+          },
+          "currency": {
+            "type": "string",
+            "description": "Preferred currency"
+          }
+        }
+      },
+      "CheckoutResponse": {
+        "type": "object",
+        "properties": {
+          "url": {
+            "type": "string",
+            "format": "uri",
+            "description": "Checkout URL to redirect user"
+          },
+          "sessionId": {
+            "type": "string",
+            "description": "Checkout session ID"
+          },
+          "gateway": {
+            "type": "string",
+            "description": "Selected payment gateway"
+          }
+        }
+      },
+      "GatewaysResponse": {
+        "type": "object",
+        "properties": {
+          "gateways": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "available": {
+                  "type": "boolean"
+                }
+              }
+            }
+          },
+          "recommended": {
+            "type": "string",
+            "description": "Recommended gateway for user's region"
+          }
+        }
+      },
+      "StoredFile": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "filename": {
+            "type": "string"
+          },
+          "originalName": {
+            "type": "string"
+          },
+          "mimeType": {
+            "type": "string"
+          },
+          "size": {
+            "type": "integer"
+          },
+          "path": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string",
+            "format": "uri"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "StorageQuota": {
+        "type": "object",
+        "properties": {
+          "used": {
+            "type": "integer",
+            "description": "Used storage in bytes"
+          },
+          "limit": {
+            "type": "integer",
+            "description": "Storage limit in bytes"
+          },
+          "remaining": {
+            "type": "integer",
+            "description": "Remaining storage in bytes"
+          },
+          "percentage": {
+            "type": "number",
+            "description": "Usage percentage"
+          }
+        }
+      },
+      "CreateTeamRequest": {
+        "type": "object",
+        "required": ["name"],
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 100
+          }
+        }
+      },
+      "Team": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "ownerId": {
+            "type": "string"
+          },
+          "plan": {
+            "type": "string"
+          },
+          "members": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TeamMember"
+            }
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "TeamMember": {
+        "type": "object",
+        "properties": {
+          "userId": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "role": {
+            "type": "string",
+            "enum": ["owner", "admin", "member"]
+          },
+          "joinedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "TrackEventRequest": {
+        "type": "object",
+        "required": ["event"],
+        "properties": {
+          "event": {
+            "type": "string",
+            "description": "Event name"
+          },
+          "properties": {
+            "type": "object",
+            "description": "Event properties"
+          }
+        }
+      },
+      "AnalyticsSummary": {
+        "type": "object",
+        "properties": {
+          "totalConversions": {
+            "type": "integer"
+          },
+          "totalPreviews": {
+            "type": "integer"
+          },
+          "storageUsed": {
+            "type": "integer"
+          },
+          "dailyUsage": {
+            "type": "object",
+            "properties": {
+              "conversions": {
+                "type": "integer"
+              },
+              "limit": {
+                "type": "integer"
+              }
+            }
+          }
+        }
+      },
+      "SSOConfigRequest": {
+        "type": "object",
+        "required": ["provider", "config"],
+        "properties": {
+          "provider": {
+            "type": "string",
+            "enum": ["saml", "oidc", "azure_ad", "okta", "google_workspace"]
+          },
+          "config": {
+            "type": "object",
+            "description": "Provider-specific configuration"
+          },
+          "domains": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Email domains for SSO"
+          }
+        }
+      },
+      "SSOCheckResponse": {
+        "type": "object",
+        "properties": {
+          "ssoEnabled": {
+            "type": "boolean"
+          },
+          "provider": {
+            "type": "string"
+          },
+          "loginUrl": {
+            "type": "string",
+            "format": "uri"
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
       }
     }
   }

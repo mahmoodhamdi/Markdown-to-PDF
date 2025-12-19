@@ -8,7 +8,11 @@ The application uses Next.js environment variables. Variables prefixed with `NEX
 
 ## Required Variables
 
-None. The application works out of the box without any configuration.
+| Variable | Description |
+|----------|-------------|
+| `NEXTAUTH_URL` | Application URL (e.g., `http://localhost:3000`) |
+| `NEXTAUTH_SECRET` | Session encryption key (generate with `openssl rand -base64 32`) |
+| `MONGODB_URI` | MongoDB connection string |
 
 ## Optional Variables
 
@@ -18,6 +22,74 @@ None. The application works out of the box without any configuration.
 |----------|---------|-------------|
 | `NODE_ENV` | `development` | Environment mode (`development`, `production`, `test`) |
 | `PORT` | `3000` | Server port number |
+| `NEXT_PUBLIC_APP_URL` | `http://localhost:3000` | Public application URL |
+
+### Authentication (OAuth)
+
+| Variable | Description |
+|----------|-------------|
+| `GITHUB_ID` | GitHub OAuth App Client ID |
+| `GITHUB_SECRET` | GitHub OAuth App Client Secret |
+| `GOOGLE_CLIENT_ID` | Google OAuth Client ID |
+| `GOOGLE_CLIENT_SECRET` | Google OAuth Client Secret |
+
+### Firebase (Storage)
+
+| Variable | Description |
+|----------|-------------|
+| `NEXT_PUBLIC_FIREBASE_API_KEY` | Firebase API key |
+| `NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN` | Firebase auth domain |
+| `NEXT_PUBLIC_FIREBASE_PROJECT_ID` | Firebase project ID |
+| `NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET` | Firebase storage bucket |
+| `FIREBASE_PROJECT_ID` | Firebase project ID (server) |
+| `FIREBASE_CLIENT_EMAIL` | Firebase service account email |
+| `FIREBASE_PRIVATE_KEY` | Firebase service account private key |
+
+### Payment Gateways
+
+#### Stripe (Global)
+| Variable | Description |
+|----------|-------------|
+| `STRIPE_SECRET_KEY` | Stripe secret key (`sk_...`) |
+| `STRIPE_PUBLISHABLE_KEY` | Stripe publishable key (`pk_...`) |
+| `STRIPE_WEBHOOK_SECRET` | Stripe webhook secret (`whsec_...`) |
+
+#### Paymob (Egypt)
+| Variable | Description |
+|----------|-------------|
+| `PAYMOB_API_KEY` | Paymob API key |
+| `PAYMOB_SECRET_KEY` | Paymob secret key |
+| `PAYMOB_PUBLIC_KEY` | Paymob public key |
+| `PAYMOB_INTEGRATION_ID_CARD` | Card payment integration ID |
+| `PAYMOB_INTEGRATION_ID_WALLET` | Mobile wallet integration ID |
+| `PAYMOB_HMAC_SECRET` | Webhook HMAC secret |
+
+#### PayTabs (MENA)
+| Variable | Description |
+|----------|-------------|
+| `PAYTABS_PROFILE_ID` | PayTabs profile ID |
+| `PAYTABS_SERVER_KEY` | PayTabs server key |
+| `PAYTABS_CLIENT_KEY` | PayTabs client key |
+| `PAYTABS_REGION` | Region code (ARE, SAU, EGY, JOR, OMN, BHR) |
+
+#### Paddle (MoR)
+| Variable | Description |
+|----------|-------------|
+| `PADDLE_API_KEY` | Paddle API key |
+| `PADDLE_CLIENT_TOKEN` | Paddle client token |
+| `PADDLE_WEBHOOK_SECRET` | Paddle webhook secret |
+| `PADDLE_ENVIRONMENT` | `sandbox` or `production` |
+| `PADDLE_SELLER_ID` | Paddle seller ID |
+
+### Email (SMTP)
+
+| Variable | Description |
+|----------|-------------|
+| `EMAIL_SERVER_HOST` | SMTP server host |
+| `EMAIL_SERVER_PORT` | SMTP server port |
+| `EMAIL_SERVER_USER` | SMTP username |
+| `EMAIL_SERVER_PASSWORD` | SMTP password |
+| `EMAIL_FROM` | Sender email address |
 
 ### CI/CD Settings
 
@@ -32,11 +104,21 @@ Create a `.env.local` file in the project root for local development:
 ```bash
 # .env.local (example)
 
+# Required
+NEXTAUTH_URL=http://localhost:3000
+NEXTAUTH_SECRET=your-32-character-secret-key-here
+MONGODB_URI=mongodb://localhost:27017/markdown-to-pdf
+
+# OAuth (optional - for testing auth)
+GITHUB_ID=your-github-client-id
+GITHUB_SECRET=your-github-client-secret
+
+# Payments (optional - for testing payments)
+STRIPE_SECRET_KEY=sk_test_...
+STRIPE_WEBHOOK_SECRET=whsec_...
+
 # Optional: Custom port
 # PORT=3001
-
-# Optional: Enable debug logging
-# DEBUG=true
 ```
 
 ## Production Setup
@@ -88,16 +170,14 @@ CI=true  # Enables CI mode in tests
 NODE_ENV=test
 ```
 
-## Future Variables
+## Advanced Variables
 
-The following variables may be added in future versions:
-
-| Variable | Purpose |
-|----------|---------|
-| `RATE_LIMIT_MAX` | Custom rate limit per minute |
-| `MAX_FILE_SIZE` | Maximum upload file size |
-| `PUPPETEER_EXECUTABLE_PATH` | Custom Chrome/Chromium path |
-| `REDIS_URL` | Redis connection for distributed rate limiting |
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `PUPPETEER_EXECUTABLE_PATH` | Auto-detected | Custom Chrome/Chromium path |
+| `RATE_LIMIT_MAX` | Plan-based | Custom rate limit per minute |
+| `MAX_FILE_SIZE` | Plan-based | Maximum upload file size |
+| `REDIS_URL` | - | Redis URL for distributed rate limiting (optional) |
 
 ## Security Notes
 
