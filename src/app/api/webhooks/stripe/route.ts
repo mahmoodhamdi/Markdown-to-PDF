@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { stripe, isStripeConfigured } from '@/lib/stripe/config';
-import { adminDb } from '@/lib/firebase/admin';
+import { connectDB } from '@/lib/db/mongodb';
+import { User } from '@/lib/db/models/User';
 import Stripe from 'stripe';
 
 const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
@@ -93,13 +94,15 @@ async function handleCheckoutComplete(session: Stripe.Checkout.Session) {
   }
 
   try {
-    // Update user's plan in Firestore
-    await adminDb.collection('users').doc(userEmail).update({
-      plan,
-      stripeCustomerId: session.customer,
-      stripeSubscriptionId: session.subscription,
-      subscriptionStatus: 'active',
-      updatedAt: new Date().toISOString(),
+    await connectDB();
+
+    // Update user's plan in MongoDB
+    await User.findByIdAndUpdate(userEmail, {
+      $set: {
+        plan,
+        stripeCustomerId: session.customer as string,
+        stripeSubscriptionId: session.subscription as string,
+      },
     });
 
     console.log(`User ${userEmail} upgraded to ${plan} plan`);
@@ -117,14 +120,16 @@ async function handleSubscriptionUpdate(subscription: Stripe.Subscription) {
   }
 
   try {
+    await connectDB();
+
     const status = subscription.status;
     const plan = subscription.metadata?.plan as 'pro' | 'team' | 'enterprise';
 
     // Update subscription status
-    await adminDb.collection('users').doc(userEmail).update({
-      subscriptionStatus: status,
-      plan: status === 'active' ? plan : 'free',
-      updatedAt: new Date().toISOString(),
+    await User.findByIdAndUpdate(userEmail, {
+      $set: {
+        plan: status === 'active' ? plan : 'free',
+      },
     });
 
     console.log(`Subscription updated for ${userEmail}: ${status}`);
@@ -142,12 +147,14 @@ async function handleSubscriptionCanceled(subscription: Stripe.Subscription) {
   }
 
   try {
+    await connectDB();
+
     // Downgrade user to free plan
-    await adminDb.collection('users').doc(userEmail).update({
-      plan: 'free',
-      subscriptionStatus: 'canceled',
-      stripeSubscriptionId: null,
-      updatedAt: new Date().toISOString(),
+    await User.findByIdAndUpdate(userEmail, {
+      $set: {
+        plan: 'free',
+        stripeSubscriptionId: null,
+      },
     });
 
     console.log(`Subscription canceled for ${userEmail}, downgraded to free`);
@@ -175,13 +182,6 @@ async function handlePaymentFailed(invoice: Stripe.Invoice) {
 
   console.log(`Payment failed for ${customerEmail}`);
 
-  try {
-    // Update subscription status to past_due
-    await adminDb.collection('users').doc(customerEmail).update({
-      subscriptionStatus: 'past_due',
-      updatedAt: new Date().toISOString(),
-    });
-  } catch (error) {
-    console.error('Error handling payment failure:', error);
-  }
+  // Note: We could update subscription status here, but typically
+  // Stripe will send a subscription.updated event with the past_due status
 }
