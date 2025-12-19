@@ -1,6 +1,11 @@
 import { describe, it, expect, vi } from 'vitest';
 import { getPlanLimits } from '@/lib/plans/config';
 
+// Mock MongoDB connection first (must be before any imports that use it)
+vi.mock('@/lib/db/mongodb', () => ({
+  connectDB: vi.fn().mockResolvedValue(undefined),
+}));
+
 // Mock the Firebase admin module before importing rate-limit
 vi.mock('@/lib/firebase/admin', () => ({
   adminAuth: {},

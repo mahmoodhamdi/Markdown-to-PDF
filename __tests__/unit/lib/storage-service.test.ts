@@ -3,6 +3,12 @@
  */
 
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+
+// Mock MongoDB connection first (must be before any imports that use it)
+vi.mock('@/lib/db/mongodb', () => ({
+  connectDB: vi.fn().mockResolvedValue(undefined),
+}));
+
 import {
   formatBytes,
   getAllowedMimeTypes,
