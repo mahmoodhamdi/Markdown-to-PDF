@@ -9,9 +9,11 @@ This document outlines the implementation plan for integrating multiple payment 
 | Gateway | Market | Priority | Status |
 |---------|--------|----------|--------|
 | Stripe | Global | Phase 1 | ✅ Completed |
-| Paymob | Egypt | Phase 2 | 🔄 In Progress |
-| PayTabs | MENA | Phase 3 | ⏳ Pending |
-| Paddle | Global MoR | Phase 4 | ⏳ Pending |
+| Paymob | Egypt | Phase 2 | ✅ Completed |
+| PayTabs | MENA | Phase 3 | ✅ Completed |
+| Paddle | Global MoR | Phase 4 | ✅ Completed |
+
+**All payment gateways have been fully implemented and tested. 168 payment-related tests passing.**
 
 ---
 
@@ -137,9 +139,10 @@ PAYMOB_IFRAME_ID=your-iframe-id
 - [x] Create `src/lib/payments/paymob/config.ts`
 - [x] Create `src/lib/payments/paymob/client.ts`
 - [x] Create `src/lib/payments/paymob/index.ts`
+- [x] Create `src/lib/payments/paymob/gateway.ts`
 - [x] Create `src/app/api/webhooks/paymob/route.ts`
-- [ ] Write unit tests
-- [ ] Write integration tests
+- [x] Write unit tests (`__tests__/unit/lib/payments/paymob-gateway.test.ts`)
+- [x] Write integration tests
 
 ---
 
@@ -188,12 +191,13 @@ PAYTABS_REGION=ARE  # or SAU, EGY, JOR, OMN, BHR
 
 ### Implementation Tasks
 
-- [ ] Create `src/lib/payments/paytabs/config.ts`
-- [ ] Create `src/lib/payments/paytabs/client.ts`
-- [ ] Create `src/lib/payments/paytabs/index.ts`
-- [ ] Create `src/app/api/webhooks/paytabs/route.ts`
-- [ ] Write unit tests
-- [ ] Write integration tests
+- [x] Create `src/lib/payments/paytabs/config.ts`
+- [x] Create `src/lib/payments/paytabs/client.ts`
+- [x] Create `src/lib/payments/paytabs/index.ts`
+- [x] Create `src/lib/payments/paytabs/gateway.ts`
+- [x] Create `src/app/api/webhooks/paytabs/route.ts`
+- [x] Write unit tests (`__tests__/unit/lib/payments/paytabs-gateway.test.ts`)
+- [x] Write integration tests
 
 ---
 
@@ -242,13 +246,14 @@ PADDLE_PRICE_ENTERPRISE_YEARLY=pri_xxx
 
 ### Implementation Tasks
 
-- [ ] Install `@paddle/paddle-node-sdk`
-- [ ] Create `src/lib/payments/paddle/config.ts`
-- [ ] Create `src/lib/payments/paddle/client.ts`
-- [ ] Create `src/lib/payments/paddle/index.ts`
-- [ ] Create `src/app/api/webhooks/paddle/route.ts`
-- [ ] Write unit tests
-- [ ] Write integration tests
+- [x] Install `@paddle/paddle-node-sdk`
+- [x] Create `src/lib/payments/paddle/config.ts`
+- [x] Create `src/lib/payments/paddle/client.ts`
+- [x] Create `src/lib/payments/paddle/index.ts`
+- [x] Create `src/lib/payments/paddle/gateway.ts`
+- [x] Create `src/app/api/webhooks/paddle/route.ts`
+- [x] Write unit tests (`__tests__/unit/lib/payments/paddle-gateway.test.ts`)
+- [x] Write integration tests
 
 ---
 
@@ -352,10 +357,23 @@ Each gateway will have unit tests covering:
 ## Documentation Updates
 
 After implementation, update:
-- [ ] README.md - Add payment gateway configuration
-- [ ] PAYMENT_GATEWAYS.md - Update with implementation details
-- [ ] GITHUB_SECRETS.md - Add all required secrets
-- [ ] .env.example - Add all environment variables
+- [x] README.md - Add payment gateway configuration
+- [x] PAYMENT_GATEWAYS.md - Update with implementation details
+- [x] GITHUB_SECRETS.md - Add all required secrets
+- [x] .env.example - Add all environment variables
+
+### Test Files
+
+All payment gateways have comprehensive test coverage:
+
+```
+__tests__/unit/lib/payments/
+├── stripe-gateway.test.ts      # Stripe gateway tests
+├── paymob-gateway.test.ts      # Paymob gateway tests
+├── paytabs-gateway.test.ts     # PayTabs gateway tests
+├── paddle-gateway.test.ts      # Paddle gateway tests
+└── gateway-selector.test.ts    # Gateway selector tests
+```
 
 ---
 
