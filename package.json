@@ -52,7 +52,7 @@
     "marked-highlight": "^2.1.4",
     "mermaid": "^11.3.0",
     "mongoose": "^9.0.2",
-    "next": "14.2.15",
+    "next": "^14.2.35",
     "next-auth": "^4.24.13",
     "next-intl": "^3.22.0",
     "nodemailer": "^7.0.11",
