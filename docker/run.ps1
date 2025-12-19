@@ -12,14 +12,9 @@ $ErrorActionPreference = "Stop"
 
 function Test-PortAvailable {
     param([int]$Port)
-    try {
-        $listener = [System.Net.Sockets.TcpListener]::new([System.Net.IPAddress]::Any, $Port)
-        $listener.Start()
-        $listener.Stop()
-        return $true
-    } catch {
-        return $false
-    }
+    # Use netstat to check if port is in use (more reliable than TcpListener on Windows)
+    $connections = netstat -ano | Select-String ":$Port\s"
+    return ($null -eq $connections -or $connections.Count -eq 0)
 }
 
 function Find-AvailablePort {
@@ -50,7 +45,7 @@ Push-Location $PSScriptRoot
 try {
     # Stop existing container if running
     Write-Host "Stopping existing container..." -ForegroundColor Cyan
-    docker-compose down 2>$null
+    docker-compose down 2>&1 | Out-Null
 
     # Build if requested
     if ($Build) {
