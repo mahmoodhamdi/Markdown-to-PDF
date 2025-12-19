@@ -51,3 +51,6 @@ next-env.d.ts
 
 # screenshots - keep app screenshots for README
 !/screenshots/*.png
+
+# Google OAuth credentials
+client_secret*.json

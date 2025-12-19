@@ -1,8 +1,10 @@
 /**
  * Usage tracking service for rate limiting per user plan
+ * Uses MongoDB for data storage
  */
 
-import { adminDb } from '@/lib/firebase/admin';
+import { connectDB } from '@/lib/db/mongodb';
+import { User } from '@/lib/db/models/User';
 import { getPlanLimits, PlanType } from './config';
 
 export interface UsageData {
@@ -52,14 +54,15 @@ function getDefaultUsage(): UsageData {
  */
 export async function getUserUsage(email: string): Promise<UsageData> {
   try {
-    const userDoc = await adminDb.collection('users').doc(email).get();
+    await connectDB();
 
-    if (!userDoc.exists) {
+    const user = await User.findById(email);
+
+    if (!user) {
       return getDefaultUsage();
     }
 
-    const userData = userDoc.data();
-    const usage = userData?.usage as UsageData | undefined;
+    const usage = user.usage;
 
     if (!usage) {
       return getDefaultUsage();
@@ -70,13 +73,17 @@ export async function getUserUsage(email: string): Promise<UsageData> {
     if (usage.lastReset !== today) {
       // Reset usage for new day
       const newUsage = getDefaultUsage();
-      await adminDb.collection('users').doc(email).update({
-        usage: newUsage,
+      await User.findByIdAndUpdate(email, {
+        $set: { usage: newUsage },
       });
       return newUsage;
     }
 
-    return usage;
+    return {
+      conversions: usage.conversions || 0,
+      apiCalls: usage.apiCalls || 0,
+      lastReset: usage.lastReset,
+    };
   } catch (error) {
     console.error('Error getting user usage:', error);
     return getDefaultUsage();
@@ -95,8 +102,8 @@ export async function checkConversionLimit(
 
   const current = usage.conversions;
   const limit = limits.conversionsPerDay;
-  const remaining = Math.max(0, limit - current);
-  const allowed = current < limit;
+  const remaining = limit === Infinity ? Infinity : Math.max(0, limit - current);
+  const allowed = limit === Infinity || current < limit;
 
   return {
     allowed,
@@ -119,8 +126,8 @@ export async function checkApiCallLimit(
 
   const current = usage.apiCalls;
   const limit = limits.apiCallsPerDay;
-  const remaining = Math.max(0, limit - current);
-  const allowed = current < limit;
+  const remaining = limit === Infinity ? Infinity : Math.max(0, limit - current);
+  const allowed = limit === Infinity || current < limit;
 
   return {
     allowed,
@@ -159,7 +166,7 @@ export function checkBatchLimit(
   const maxFiles = limits.maxBatchFiles;
 
   return {
-    allowed: fileCount <= maxFiles,
+    allowed: maxFiles === Infinity || fileCount <= maxFiles,
     maxFiles,
     currentFiles: fileCount,
   };
@@ -173,10 +180,13 @@ export async function incrementConversions(
   count: number = 1
 ): Promise<void> {
   try {
+    await connectDB();
+
+    // Get current usage to handle reset if needed
     const usage = await getUserUsage(email);
 
-    await adminDb.collection('users').doc(email).update({
-      'usage.conversions': usage.conversions + count,
+    await User.findByIdAndUpdate(email, {
+      $set: { 'usage.conversions': usage.conversions + count },
     });
   } catch (error) {
     console.error('Error incrementing conversions:', error);
@@ -191,10 +201,13 @@ export async function incrementApiCalls(
   count: number = 1
 ): Promise<void> {
   try {
+    await connectDB();
+
+    // Get current usage to handle reset if needed
     const usage = await getUserUsage(email);
 
-    await adminDb.collection('users').doc(email).update({
-      'usage.apiCalls': usage.apiCalls + count,
+    await User.findByIdAndUpdate(email, {
+      $set: { 'usage.apiCalls': usage.apiCalls + count },
     });
   } catch (error) {
     console.error('Error incrementing API calls:', error);
@@ -217,21 +230,28 @@ export async function getUsageReport(
   const usage = await getUserUsage(email);
   const limits = getPlanLimits(plan);
 
+  const conversionsRemaining = limits.conversionsPerDay === Infinity
+    ? Infinity
+    : Math.max(0, limits.conversionsPerDay - usage.conversions);
+  const apiCallsRemaining = limits.apiCallsPerDay === Infinity
+    ? Infinity
+    : Math.max(0, limits.apiCallsPerDay - usage.apiCalls);
+
   return {
     usage,
     limits: {
       conversions: {
-        allowed: usage.conversions < limits.conversionsPerDay,
+        allowed: limits.conversionsPerDay === Infinity || usage.conversions < limits.conversionsPerDay,
         current: usage.conversions,
         limit: limits.conversionsPerDay,
-        remaining: Math.max(0, limits.conversionsPerDay - usage.conversions),
+        remaining: conversionsRemaining,
         resetAt: getTomorrowReset(),
       },
       apiCalls: {
-        allowed: usage.apiCalls < limits.apiCallsPerDay,
+        allowed: limits.apiCallsPerDay === Infinity || usage.apiCalls < limits.apiCallsPerDay,
         current: usage.apiCalls,
         limit: limits.apiCallsPerDay,
-        remaining: Math.max(0, limits.apiCallsPerDay - usage.apiCalls),
+        remaining: apiCallsRemaining,
         resetAt: getTomorrowReset(),
       },
     },

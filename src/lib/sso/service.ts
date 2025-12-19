@@ -1,13 +1,23 @@
 /**
  * SSO Service
  * Manages SSO/SAML configurations for Enterprise organizations
+ * Uses MongoDB for data storage
  */
 
-import { adminDb } from '@/lib/firebase/admin';
+import { connectDB } from '@/lib/db/mongodb';
+import {
+  SSOConfiguration as SSOConfigurationModel,
+  SSODomainMapping as SSODomainMappingModel,
+  SSOAuditLog as SSOAuditLogModel,
+  type ISSOConfiguration,
+  type ISSODomainMapping,
+  type ISSOAuditLog,
+  type SSOProvider,
+  type SSOStatus,
+  type SSOAuditAction,
+} from '@/lib/db/models/SSO';
 import {
   SSOConfiguration,
-  SSOProvider,
-  SSOStatus,
   SSODomainMapping,
   SSOAuditLog,
   SAMLConfig,
@@ -20,23 +30,68 @@ import {
 } from './types';
 import crypto from 'crypto';
 
-// Collection names
-const SSO_CONFIGS_COLLECTION = 'sso_configurations';
-const SSO_DOMAINS_COLLECTION = 'sso_domains';
-const SSO_AUDIT_COLLECTION = 'sso_audit_logs';
-
-/**
- * Generate a unique ID
- */
-function generateId(): string {
-  return `sso_${Date.now()}_${crypto.randomBytes(8).toString('hex')}`;
-}
+export type { SSOProvider, SSOStatus } from '@/lib/db/models/SSO';
 
 /**
  * Generate verification token for domain verification
  */
 function generateVerificationToken(): string {
   return `md2pdf-verify-${crypto.randomBytes(16).toString('hex')}`;
+}
+
+/**
+ * Convert MongoDB document to SSOConfiguration type
+ */
+function toSSOConfiguration(doc: ISSOConfiguration): SSOConfiguration {
+  return {
+    id: doc._id.toString(),
+    organizationId: doc.organizationId,
+    provider: doc.provider,
+    status: doc.status,
+    config: doc.config as unknown as SAMLConfig | OIDCConfig | AzureADConfig | OktaConfig | GoogleWorkspaceConfig,
+    domain: doc.domain,
+    enforceSSO: doc.enforceSSO,
+    allowBypass: doc.allowBypass,
+    jitProvisioning: doc.jitProvisioning,
+    defaultRole: doc.defaultRole,
+    createdAt: doc.createdAt.toISOString(),
+    updatedAt: doc.updatedAt.toISOString(),
+    lastTestedAt: doc.lastTestedAt?.toISOString(),
+    testResult: doc.testResult,
+  };
+}
+
+/**
+ * Convert MongoDB document to SSODomainMapping type
+ */
+function toSSODomainMapping(doc: ISSODomainMapping): SSODomainMapping {
+  return {
+    domain: doc.domain,
+    organizationId: doc.organizationId,
+    ssoConfigId: doc.ssoConfigId,
+    verified: doc.verified,
+    verificationToken: doc.verificationToken,
+    verificationMethod: doc.verificationMethod,
+    createdAt: doc.createdAt.toISOString(),
+  };
+}
+
+/**
+ * Convert MongoDB document to SSOAuditLog type
+ */
+function toSSOAuditLog(doc: ISSOAuditLog): SSOAuditLog {
+  return {
+    id: doc._id.toString(),
+    organizationId: doc.organizationId,
+    action: doc.action,
+    userId: doc.userId,
+    userEmail: doc.userEmail,
+    ssoConfigId: doc.ssoConfigId,
+    details: doc.details,
+    ipAddress: doc.ipAddress,
+    userAgent: doc.userAgent,
+    timestamp: doc.timestamp.toISOString(),
+  };
 }
 
 /**
@@ -54,91 +109,82 @@ export async function createSSOConfig(
     defaultRole?: 'member' | 'admin';
   }
 ): Promise<SSOConfiguration> {
-  const id = generateId();
-  const now = new Date().toISOString();
+  await connectDB();
 
-  const ssoConfig: SSOConfiguration = {
-    id,
+  const ssoConfig = await SSOConfigurationModel.create({
     organizationId,
     provider,
     status: 'pending',
-    config,
+    config: config as unknown as Record<string, unknown>,
     domain: domain.toLowerCase(),
     enforceSSO: options?.enforceSSO ?? false,
     allowBypass: options?.allowBypass ?? true,
     jitProvisioning: options?.jitProvisioning ?? true,
     defaultRole: options?.defaultRole ?? 'member',
-    createdAt: now,
-    updatedAt: now,
-  };
-
-  await adminDb.collection(SSO_CONFIGS_COLLECTION).doc(id).set(ssoConfig);
+  });
 
   // Log audit
-  await logSSOAudit(organizationId, 'config_created', undefined, undefined, id);
+  await logSSOAudit(organizationId, 'config_created', undefined, undefined, ssoConfig._id.toString());
 
-  return ssoConfig;
+  return toSSOConfiguration(ssoConfig);
 }
 
 /**
  * Get SSO configuration by ID
  */
 export async function getSSOConfig(configId: string): Promise<SSOConfiguration | null> {
-  const doc = await adminDb.collection(SSO_CONFIGS_COLLECTION).doc(configId).get();
+  await connectDB();
 
-  if (!doc.exists) {
+  const doc = await SSOConfigurationModel.findById(configId);
+
+  if (!doc) {
     return null;
   }
 
-  return doc.data() as SSOConfiguration;
+  return toSSOConfiguration(doc);
 }
 
 /**
  * Get SSO configuration for an organization
  */
 export async function getSSOConfigByOrganization(organizationId: string): Promise<SSOConfiguration | null> {
-  const snapshot = await adminDb
-    .collection(SSO_CONFIGS_COLLECTION)
-    .where('organizationId', '==', organizationId)
-    .limit(1)
-    .get();
+  await connectDB();
 
-  if (snapshot.empty) {
+  const doc = await SSOConfigurationModel.findOne({ organizationId });
+
+  if (!doc) {
     return null;
   }
 
-  return snapshot.docs[0].data() as SSOConfiguration;
+  return toSSOConfiguration(doc);
 }
 
 /**
  * Get SSO configuration by email domain
  */
 export async function getSSOConfigByDomain(emailDomain: string): Promise<SSOConfiguration | null> {
+  await connectDB();
+
   const domain = emailDomain.toLowerCase();
 
   // First check domain mappings
-  const domainDoc = await adminDb
-    .collection(SSO_DOMAINS_COLLECTION)
-    .where('domain', '==', domain)
-    .where('verified', '==', true)
-    .limit(1)
-    .get();
+  const domainMapping = await SSODomainMappingModel.findOne({
+    domain,
+    verified: true,
+  });
 
-  if (!domainDoc.empty) {
-    const mapping = domainDoc.docs[0].data() as SSODomainMapping;
-    return getSSOConfig(mapping.ssoConfigId);
+  if (domainMapping) {
+    return getSSOConfig(domainMapping.ssoConfigId);
   }
 
   // Fallback to direct domain match in config
-  const configDoc = await adminDb
-    .collection(SSO_CONFIGS_COLLECTION)
-    .where('domain', '==', domain)
-    .where('status', '==', 'active')
-    .limit(1)
-    .get();
+  const configDoc = await SSOConfigurationModel.findOne({
+    domain,
+    status: 'active',
+  });
 
-  if (!configDoc.empty) {
-    return configDoc.docs[0].data() as SSOConfiguration;
+  if (configDoc) {
+    return toSSOConfiguration(configDoc);
   }
 
   return null;
@@ -156,59 +202,50 @@ export async function updateSSOConfig(
     >
   >
 ): Promise<SSOConfiguration | null> {
-  const configRef = adminDb.collection(SSO_CONFIGS_COLLECTION).doc(configId);
-  const doc = await configRef.get();
+  await connectDB();
 
-  if (!doc.exists) {
+  const doc = await SSOConfigurationModel.findById(configId);
+
+  if (!doc) {
     return null;
   }
 
-  const updatedConfig = {
-    ...updates,
-    updatedAt: new Date().toISOString(),
-  };
+  const updatedDoc = await SSOConfigurationModel.findByIdAndUpdate(
+    configId,
+    { $set: updates },
+    { new: true }
+  );
 
-  await configRef.update(updatedConfig);
-
-  const existingData = doc.data() as SSOConfiguration;
+  if (!updatedDoc) {
+    return null;
+  }
 
   // Log audit
-  await logSSOAudit(existingData.organizationId, 'config_updated', undefined, undefined, configId);
+  await logSSOAudit(doc.organizationId, 'config_updated', undefined, undefined, configId);
 
-  return {
-    ...existingData,
-    ...updatedConfig,
-  } as SSOConfiguration;
+  return toSSOConfiguration(updatedDoc);
 }
 
 /**
  * Delete SSO configuration
  */
 export async function deleteSSOConfig(configId: string): Promise<boolean> {
-  const doc = await adminDb.collection(SSO_CONFIGS_COLLECTION).doc(configId).get();
+  await connectDB();
 
-  if (!doc.exists) {
+  const doc = await SSOConfigurationModel.findById(configId);
+
+  if (!doc) {
     return false;
   }
 
-  const config = doc.data() as SSOConfiguration;
-
   // Delete associated domain mappings
-  const domainDocs = await adminDb
-    .collection(SSO_DOMAINS_COLLECTION)
-    .where('ssoConfigId', '==', configId)
-    .get();
+  await SSODomainMappingModel.deleteMany({ ssoConfigId: configId });
 
-  const batch = adminDb.batch();
-  domainDocs.docs.forEach((domainDoc) => {
-    batch.delete(domainDoc.ref);
-  });
-  batch.delete(adminDb.collection(SSO_CONFIGS_COLLECTION).doc(configId));
-
-  await batch.commit();
+  // Delete the config
+  await SSOConfigurationModel.findByIdAndDelete(configId);
 
   // Log audit
-  await logSSOAudit(config.organizationId, 'config_deleted', undefined, undefined, configId);
+  await logSSOAudit(doc.organizationId, 'config_deleted', undefined, undefined, configId);
 
   return true;
 }
@@ -235,40 +272,43 @@ export async function createDomainMapping(
   organizationId: string,
   ssoConfigId: string
 ): Promise<SSODomainMapping> {
+  await connectDB();
+
   const normalizedDomain = domain.toLowerCase();
   const verificationToken = generateVerificationToken();
 
-  const mapping: SSODomainMapping = {
+  const mapping = await SSODomainMappingModel.create({
     domain: normalizedDomain,
     organizationId,
     ssoConfigId,
     verified: false,
     verificationToken,
     verificationMethod: 'dns',
-    createdAt: new Date().toISOString(),
-  };
+  });
 
-  await adminDb.collection(SSO_DOMAINS_COLLECTION).doc(normalizedDomain).set(mapping);
-
-  return mapping;
+  return toSSODomainMapping(mapping);
 }
 
 /**
  * Verify domain mapping
  */
 export async function verifyDomainMapping(domain: string): Promise<boolean> {
-  const normalizedDomain = domain.toLowerCase();
-  const docRef = adminDb.collection(SSO_DOMAINS_COLLECTION).doc(normalizedDomain);
-  const doc = await docRef.get();
+  await connectDB();
 
-  if (!doc.exists) {
+  const normalizedDomain = domain.toLowerCase();
+  const doc = await SSODomainMappingModel.findOne({ domain: normalizedDomain });
+
+  if (!doc) {
     return false;
   }
 
-  await docRef.update({
-    verified: true,
-    verificationToken: null,
-  });
+  await SSODomainMappingModel.updateOne(
+    { domain: normalizedDomain },
+    {
+      $set: { verified: true },
+      $unset: { verificationToken: 1 },
+    }
+  );
 
   return true;
 }
@@ -277,27 +317,26 @@ export async function verifyDomainMapping(domain: string): Promise<boolean> {
  * Get domain mapping
  */
 export async function getDomainMapping(domain: string): Promise<SSODomainMapping | null> {
-  const doc = await adminDb.collection(SSO_DOMAINS_COLLECTION).doc(domain.toLowerCase()).get();
+  await connectDB();
 
-  if (!doc.exists) {
+  const doc = await SSODomainMappingModel.findOne({ domain: domain.toLowerCase() });
+
+  if (!doc) {
     return null;
   }
 
-  return doc.data() as SSODomainMapping;
+  return toSSODomainMapping(doc);
 }
 
 /**
  * Delete domain mapping
  */
 export async function deleteDomainMapping(domain: string): Promise<boolean> {
-  const doc = await adminDb.collection(SSO_DOMAINS_COLLECTION).doc(domain.toLowerCase()).get();
+  await connectDB();
 
-  if (!doc.exists) {
-    return false;
-  }
+  const result = await SSODomainMappingModel.deleteOne({ domain: domain.toLowerCase() });
 
-  await adminDb.collection(SSO_DOMAINS_COLLECTION).doc(domain.toLowerCase()).delete();
-  return true;
+  return result.deletedCount > 0;
 }
 
 /**
@@ -321,12 +360,15 @@ export async function testSSOConfig(
   const result = await testProviderConfig(config.provider, config.config);
 
   // Update config with test result
-  await adminDb.collection(SSO_CONFIGS_COLLECTION).doc(configId).update({
-    lastTestedAt: new Date().toISOString(),
-    testResult: {
-      success: result.success,
-      error: result.error,
-      testedBy,
+  await connectDB();
+  await SSOConfigurationModel.findByIdAndUpdate(configId, {
+    $set: {
+      lastTestedAt: new Date(),
+      testResult: {
+        success: result.success,
+        error: result.error,
+        testedBy,
+      },
     },
   });
 
@@ -685,7 +727,7 @@ export function generateSPMetadata(
  */
 export async function logSSOAudit(
   organizationId: string,
-  action: SSOAuditLog['action'],
+  action: SSOAuditAction,
   userId?: string,
   userEmail?: string,
   ssoConfigId?: string,
@@ -693,20 +735,24 @@ export async function logSSOAudit(
   ipAddress?: string,
   userAgent?: string
 ): Promise<void> {
-  const auditLog: SSOAuditLog = {
-    id: `audit_${Date.now()}_${crypto.randomBytes(4).toString('hex')}`,
-    organizationId,
-    action,
-    userId,
-    userEmail,
-    ssoConfigId,
-    details,
-    ipAddress,
-    userAgent,
-    timestamp: new Date().toISOString(),
-  };
+  try {
+    await connectDB();
 
-  await adminDb.collection(SSO_AUDIT_COLLECTION).doc(auditLog.id).set(auditLog);
+    await SSOAuditLogModel.create({
+      organizationId,
+      action,
+      userId,
+      userEmail,
+      ssoConfigId,
+      details,
+      ipAddress,
+      userAgent,
+      timestamp: new Date(),
+    });
+  } catch (error) {
+    console.error('Failed to log SSO audit:', error);
+    // Don't throw - audit logging should not break the main flow
+  }
 }
 
 /**
@@ -715,23 +761,16 @@ export async function logSSOAudit(
 export async function getSSOAuditLogs(
   organizationId: string,
   limit: number = 50,
-  startAfter?: string
+  skip: number = 0
 ): Promise<SSOAuditLog[]> {
-  let query = adminDb
-    .collection(SSO_AUDIT_COLLECTION)
-    .where('organizationId', '==', organizationId)
-    .orderBy('timestamp', 'desc')
+  await connectDB();
+
+  const docs = await SSOAuditLogModel.find({ organizationId })
+    .sort({ timestamp: -1 })
+    .skip(skip)
     .limit(limit);
 
-  if (startAfter) {
-    const startDoc = await adminDb.collection(SSO_AUDIT_COLLECTION).doc(startAfter).get();
-    if (startDoc.exists) {
-      query = query.startAfter(startDoc);
-    }
-  }
-
-  const snapshot = await query.get();
-  return snapshot.docs.map((doc) => doc.data() as SSOAuditLog);
+  return docs.map(toSSOAuditLog);
 }
 
 /**
@@ -809,15 +848,72 @@ export async function recordSSOLogout(
 /**
  * Get all SSO configurations (admin only)
  */
-export async function getAllSSOConfigs(
-  status?: SSOStatus
-): Promise<SSOConfiguration[]> {
-  let query = adminDb.collection(SSO_CONFIGS_COLLECTION) as FirebaseFirestore.Query<FirebaseFirestore.DocumentData>;
+export async function getAllSSOConfigs(status?: SSOStatus): Promise<SSOConfiguration[]> {
+  await connectDB();
 
-  if (status) {
-    query = query.where('status', '==', status);
+  const query = status ? { status } : {};
+  const docs = await SSOConfigurationModel.find(query);
+
+  return docs.map(toSSOConfiguration);
+}
+
+/**
+ * Get SSO configuration count by status
+ */
+export async function getSSOConfigStats(): Promise<Record<SSOStatus, number>> {
+  await connectDB();
+
+  const result = await SSOConfigurationModel.aggregate([
+    {
+      $group: {
+        _id: '$status',
+        count: { $sum: 1 },
+      },
+    },
+  ]);
+
+  const stats: Record<SSOStatus, number> = {
+    active: 0,
+    inactive: 0,
+    pending: 0,
+    error: 0,
+  };
+
+  result.forEach((item) => {
+    stats[item._id as SSOStatus] = item.count;
+  });
+
+  return stats;
+}
+
+/**
+ * Get domains for an SSO configuration
+ */
+export async function getDomainsForConfig(ssoConfigId: string): Promise<SSODomainMapping[]> {
+  await connectDB();
+
+  const docs = await SSODomainMappingModel.find({ ssoConfigId });
+
+  return docs.map(toSSODomainMapping);
+}
+
+/**
+ * Clean up old audit logs (older than 90 days)
+ */
+export async function cleanupOldAuditLogs(): Promise<number> {
+  try {
+    await connectDB();
+
+    const cutoffDate = new Date();
+    cutoffDate.setDate(cutoffDate.getDate() - 90);
+
+    const result = await SSOAuditLogModel.deleteMany({
+      timestamp: { $lt: cutoffDate },
+    });
+
+    return result.deletedCount || 0;
+  } catch (error) {
+    console.error('Failed to cleanup old audit logs:', error);
+    return 0;
   }
-
-  const snapshot = await query.get();
-  return snapshot.docs.map((doc) => doc.data() as SSOConfiguration);
 }

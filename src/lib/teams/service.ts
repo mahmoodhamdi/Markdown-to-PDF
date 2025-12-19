@@ -1,12 +1,14 @@
 /**
  * Team Management Service
  * Handles team creation, member management, and team settings
+ * Uses MongoDB for data storage
  */
 
-import { adminDb } from '@/lib/firebase/admin';
+import { connectDB } from '@/lib/db/mongodb';
+import { Team, TeamMemberLookup, type ITeam, type ITeamMember, type TeamRole } from '@/lib/db/models/Team';
 import { getPlanLimits, PlanType } from '@/lib/plans/config';
 
-export type TeamRole = 'owner' | 'admin' | 'member';
+export type { TeamRole } from '@/lib/db/models/Team';
 
 export interface TeamMember {
   userId: string;
@@ -17,7 +19,7 @@ export interface TeamMember {
   invitedBy?: string;
 }
 
-export interface Team {
+export interface TeamData {
   id: string;
   name: string;
   ownerId: string;
@@ -53,13 +55,13 @@ export interface InviteMemberInput {
 
 export interface TeamResult {
   success: boolean;
-  team?: Team;
+  team?: TeamData;
   error?: string;
 }
 
 export interface TeamListResult {
   success: boolean;
-  teams?: Team[];
+  teams?: TeamData[];
   error?: string;
 }
 
@@ -69,25 +71,42 @@ export interface MemberResult {
   error?: string;
 }
 
-// Collection names
-const TEAMS_COLLECTION = 'teams';
-const TEAM_MEMBERS_COLLECTION = 'team_members';
-
 /**
- * Default team settings
+ * Convert MongoDB team document to TeamData
  */
-const DEFAULT_TEAM_SETTINGS: TeamSettings = {
-  allowMemberInvites: false,
-  defaultMemberRole: 'member',
-  sharedStorageEnabled: true,
-  sharedTemplatesEnabled: true,
-};
+function toTeamData(doc: ITeam): TeamData {
+  return {
+    id: doc._id.toString(),
+    name: doc.name,
+    ownerId: doc.ownerId,
+    ownerEmail: doc.ownerEmail,
+    plan: doc.plan,
+    members: doc.members.map((m: ITeamMember) => ({
+      userId: m.userId,
+      email: m.email,
+      name: m.name,
+      role: m.role,
+      joinedAt: m.joinedAt,
+      invitedBy: m.invitedBy,
+    })),
+    settings: {
+      allowMemberInvites: doc.settings.allowMemberInvites,
+      defaultMemberRole: doc.settings.defaultMemberRole,
+      sharedStorageEnabled: doc.settings.sharedStorageEnabled,
+      sharedTemplatesEnabled: doc.settings.sharedTemplatesEnabled,
+    },
+    createdAt: doc.createdAt,
+    updatedAt: doc.updatedAt,
+  };
+}
 
 /**
  * Create a new team
  */
 export async function createTeam(input: CreateTeamInput): Promise<TeamResult> {
   try {
+    await connectDB();
+
     // Validate plan allows teams
     const limits = getPlanLimits(input.plan);
     if (limits.teamMembersAllowed === 0) {
@@ -98,12 +117,8 @@ export async function createTeam(input: CreateTeamInput): Promise<TeamResult> {
     }
 
     // Check if user already owns a team
-    const existingTeams = await adminDb
-      .collection(TEAMS_COLLECTION)
-      .where('ownerId', '==', input.ownerId)
-      .get();
-
-    if (!existingTeams.empty) {
+    const existingTeam = await Team.findOne({ ownerId: input.ownerId });
+    if (existingTeam) {
       return {
         success: false,
         error: 'You already own a team',
@@ -111,10 +126,8 @@ export async function createTeam(input: CreateTeamInput): Promise<TeamResult> {
     }
 
     // Create team
-    const teamId = `team_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
     const now = new Date();
-
-    const ownerMember: TeamMember = {
+    const ownerMember: ITeamMember = {
       userId: input.ownerId,
       email: input.ownerEmail,
       name: input.ownerName,
@@ -122,40 +135,33 @@ export async function createTeam(input: CreateTeamInput): Promise<TeamResult> {
       joinedAt: now,
     };
 
-    const team: Team = {
-      id: teamId,
+    const team = await Team.create({
       name: input.name,
       ownerId: input.ownerId,
       ownerEmail: input.ownerEmail,
       plan: input.plan,
       members: [ownerMember],
-      settings: { ...DEFAULT_TEAM_SETTINGS },
-      createdAt: now,
-      updatedAt: now,
-    };
-
-    await adminDb.collection(TEAMS_COLLECTION).doc(teamId).set({
-      ...team,
-      createdAt: now.toISOString(),
-      updatedAt: now.toISOString(),
-      members: team.members.map((m) => ({
-        ...m,
-        joinedAt: m.joinedAt.toISOString(),
-      })),
+      settings: {
+        allowMemberInvites: false,
+        defaultMemberRole: 'member',
+        sharedStorageEnabled: true,
+        sharedTemplatesEnabled: true,
+      },
     });
 
-    // Also add to team_members collection for efficient lookups
-    await adminDb.collection(TEAM_MEMBERS_COLLECTION).doc(`${teamId}_${input.ownerId}`).set({
-      teamId,
+    // Add to team_members lookup collection
+    await TeamMemberLookup.create({
+      teamId: team._id.toString(),
       userId: input.ownerId,
       email: input.ownerEmail,
       role: 'owner',
-      joinedAt: now.toISOString(),
+      joinedAt: now,
+      status: 'active',
     });
 
     return {
       success: true,
-      team,
+      team: toTeamData(team),
     };
   } catch (error) {
     console.error('Create team error:', error);
@@ -171,17 +177,11 @@ export async function createTeam(input: CreateTeamInput): Promise<TeamResult> {
  */
 export async function getTeam(teamId: string, userId: string): Promise<TeamResult> {
   try {
-    const doc = await adminDb.collection(TEAMS_COLLECTION).doc(teamId).get();
+    await connectDB();
 
-    if (!doc.exists) {
-      return {
-        success: false,
-        error: 'Team not found',
-      };
-    }
+    const team = await Team.findById(teamId);
 
-    const data = doc.data();
-    if (!data) {
+    if (!team) {
       return {
         success: false,
         error: 'Team not found',
@@ -189,7 +189,7 @@ export async function getTeam(teamId: string, userId: string): Promise<TeamResul
     }
 
     // Check if user is a member
-    const isMember = data.members.some((m: TeamMember) => m.userId === userId);
+    const isMember = team.members.some((m: ITeamMember) => m.userId === userId);
     if (!isMember) {
       return {
         success: false,
@@ -197,24 +197,9 @@ export async function getTeam(teamId: string, userId: string): Promise<TeamResul
       };
     }
 
-    const team: Team = {
-      id: data.id,
-      name: data.name,
-      ownerId: data.ownerId,
-      ownerEmail: data.ownerEmail,
-      plan: data.plan,
-      members: data.members.map((m: TeamMember & { joinedAt: string }) => ({
-        ...m,
-        joinedAt: new Date(m.joinedAt),
-      })),
-      settings: data.settings,
-      createdAt: new Date(data.createdAt),
-      updatedAt: new Date(data.updatedAt),
-    };
-
     return {
       success: true,
-      team,
+      team: toTeamData(team),
     };
   } catch (error) {
     console.error('Get team error:', error);
@@ -230,13 +215,12 @@ export async function getTeam(teamId: string, userId: string): Promise<TeamResul
  */
 export async function getTeamsForUser(userId: string): Promise<TeamListResult> {
   try {
-    // Get team memberships
-    const membershipsSnapshot = await adminDb
-      .collection(TEAM_MEMBERS_COLLECTION)
-      .where('userId', '==', userId)
-      .get();
+    await connectDB();
 
-    if (membershipsSnapshot.empty) {
+    // Get team memberships
+    const memberships = await TeamMemberLookup.find({ userId });
+
+    if (memberships.length === 0) {
       return {
         success: true,
         teams: [],
@@ -244,35 +228,12 @@ export async function getTeamsForUser(userId: string): Promise<TeamListResult> {
     }
 
     // Get team details
-    const teamIds = membershipsSnapshot.docs.map((doc) => doc.data().teamId);
-    const teams: Team[] = [];
-
-    for (const teamId of teamIds) {
-      const teamDoc = await adminDb.collection(TEAMS_COLLECTION).doc(teamId).get();
-      if (teamDoc.exists) {
-        const data = teamDoc.data();
-        if (data) {
-          teams.push({
-            id: data.id,
-            name: data.name,
-            ownerId: data.ownerId,
-            ownerEmail: data.ownerEmail,
-            plan: data.plan,
-            members: data.members.map((m: TeamMember & { joinedAt: string }) => ({
-              ...m,
-              joinedAt: new Date(m.joinedAt),
-            })),
-            settings: data.settings,
-            createdAt: new Date(data.createdAt),
-            updatedAt: new Date(data.updatedAt),
-          });
-        }
-      }
-    }
+    const teamIds = memberships.map((m) => m.teamId);
+    const teams = await Team.find({ _id: { $in: teamIds } });
 
     return {
       success: true,
-      teams,
+      teams: teams.map(toTeamData),
     };
   } catch (error) {
     console.error('Get teams for user error:', error);
@@ -292,6 +253,8 @@ export async function updateTeam(
   updates: { name?: string; settings?: Partial<TeamSettings> }
 ): Promise<TeamResult> {
   try {
+    await connectDB();
+
     const teamResult = await getTeam(teamId, userId);
     if (!teamResult.success || !teamResult.team) {
       return teamResult;
@@ -306,10 +269,7 @@ export async function updateTeam(
       };
     }
 
-    const now = new Date();
-    const updateData: Record<string, unknown> = {
-      updatedAt: now.toISOString(),
-    };
+    const updateData: Record<string, unknown> = {};
 
     if (updates.name) {
       updateData.name = updates.name;
@@ -322,20 +282,22 @@ export async function updateTeam(
       };
     }
 
-    await adminDb.collection(TEAMS_COLLECTION).doc(teamId).update(updateData);
+    const updatedTeam = await Team.findByIdAndUpdate(
+      teamId,
+      { $set: updateData },
+      { new: true }
+    );
 
-    const updatedTeam: Team = {
-      ...teamResult.team,
-      name: updates.name || teamResult.team.name,
-      settings: updates.settings
-        ? { ...teamResult.team.settings, ...updates.settings }
-        : teamResult.team.settings,
-      updatedAt: now,
-    };
+    if (!updatedTeam) {
+      return {
+        success: false,
+        error: 'Failed to update team',
+      };
+    }
 
     return {
       success: true,
-      team: updatedTeam,
+      team: toTeamData(updatedTeam),
     };
   } catch (error) {
     console.error('Update team error:', error);
@@ -351,16 +313,18 @@ export async function updateTeam(
  */
 export async function deleteTeam(teamId: string, userId: string): Promise<{ success: boolean; error?: string }> {
   try {
-    const teamResult = await getTeam(teamId, userId);
-    if (!teamResult.success || !teamResult.team) {
+    await connectDB();
+
+    const team = await Team.findById(teamId);
+    if (!team) {
       return {
         success: false,
-        error: teamResult.error || 'Team not found',
+        error: 'Team not found',
       };
     }
 
     // Only owner can delete
-    if (teamResult.team.ownerId !== userId) {
+    if (team.ownerId !== userId) {
       return {
         success: false,
         error: 'Only the team owner can delete the team',
@@ -368,20 +332,10 @@ export async function deleteTeam(teamId: string, userId: string): Promise<{ succ
     }
 
     // Delete all member records
-    const memberDocs = await adminDb
-      .collection(TEAM_MEMBERS_COLLECTION)
-      .where('teamId', '==', teamId)
-      .get();
-
-    const batch = adminDb.batch();
-    memberDocs.docs.forEach((doc) => {
-      batch.delete(doc.ref);
-    });
+    await TeamMemberLookup.deleteMany({ teamId });
 
     // Delete team
-    batch.delete(adminDb.collection(TEAMS_COLLECTION).doc(teamId));
-
-    await batch.commit();
+    await Team.findByIdAndDelete(teamId);
 
     return { success: true };
   } catch (error) {
@@ -402,18 +356,18 @@ export async function addTeamMember(
   input: InviteMemberInput
 ): Promise<MemberResult> {
   try {
-    const teamResult = await getTeam(teamId, userId);
-    if (!teamResult.success || !teamResult.team) {
+    await connectDB();
+
+    const team = await Team.findById(teamId);
+    if (!team) {
       return {
         success: false,
-        error: teamResult.error || 'Team not found',
+        error: 'Team not found',
       };
     }
 
-    const team = teamResult.team;
-
     // Check if user can invite
-    const inviter = team.members.find((m) => m.userId === userId);
+    const inviter = team.members.find((m: ITeamMember) => m.userId === userId);
     if (!inviter) {
       return {
         success: false,
@@ -444,7 +398,7 @@ export async function addTeamMember(
     }
 
     // Check if already a member
-    const existingMember = team.members.find((m) => m.email === input.email);
+    const existingMember = team.members.find((m: ITeamMember) => m.email === input.email);
     if (existingMember) {
       return {
         success: false,
@@ -460,8 +414,8 @@ export async function addTeamMember(
     // Only owner can add admins
     const effectiveRole = role === 'admin' && inviter.role !== 'owner' ? 'member' : role;
 
-    const newMember: TeamMember = {
-      userId: newMemberId, // Placeholder until user accepts
+    const newMember: ITeamMember = {
+      userId: newMemberId,
       email: input.email,
       name: input.name,
       role: effectiveRole,
@@ -470,29 +424,31 @@ export async function addTeamMember(
     };
 
     // Update team
-    const updatedMembers = [...team.members, newMember];
-    await adminDb.collection(TEAMS_COLLECTION).doc(teamId).update({
-      members: updatedMembers.map((m) => ({
-        ...m,
-        joinedAt: m.joinedAt.toISOString(),
-      })),
-      updatedAt: now.toISOString(),
+    await Team.findByIdAndUpdate(teamId, {
+      $push: { members: newMember },
     });
 
     // Add member lookup record
-    await adminDb.collection(TEAM_MEMBERS_COLLECTION).doc(`${teamId}_${newMemberId}`).set({
+    await TeamMemberLookup.create({
       teamId,
       userId: newMemberId,
       email: input.email,
       role: effectiveRole,
-      joinedAt: now.toISOString(),
+      joinedAt: now,
       invitedBy: userId,
       status: 'pending',
     });
 
     return {
       success: true,
-      member: newMember,
+      member: {
+        userId: newMemberId,
+        email: input.email,
+        name: input.name,
+        role: effectiveRole,
+        joinedAt: now,
+        invitedBy: userId,
+      },
     };
   } catch (error) {
     console.error('Add team member error:', error);
@@ -512,18 +468,18 @@ export async function removeTeamMember(
   memberIdToRemove: string
 ): Promise<{ success: boolean; error?: string }> {
   try {
-    const teamResult = await getTeam(teamId, userId);
-    if (!teamResult.success || !teamResult.team) {
+    await connectDB();
+
+    const team = await Team.findById(teamId);
+    if (!team) {
       return {
         success: false,
-        error: teamResult.error || 'Team not found',
+        error: 'Team not found',
       };
     }
 
-    const team = teamResult.team;
-
     // Check if user can remove members
-    const remover = team.members.find((m) => m.userId === userId);
+    const remover = team.members.find((m: ITeamMember) => m.userId === userId);
     if (!remover) {
       return {
         success: false,
@@ -531,7 +487,7 @@ export async function removeTeamMember(
       };
     }
 
-    const memberToRemove = team.members.find((m) => m.userId === memberIdToRemove);
+    const memberToRemove = team.members.find((m: ITeamMember) => m.userId === memberIdToRemove);
     if (!memberToRemove) {
       return {
         success: false,
@@ -561,19 +517,12 @@ export async function removeTeamMember(
     }
 
     // Remove member
-    const now = new Date();
-    const updatedMembers = team.members.filter((m) => m.userId !== memberIdToRemove);
-
-    await adminDb.collection(TEAMS_COLLECTION).doc(teamId).update({
-      members: updatedMembers.map((m) => ({
-        ...m,
-        joinedAt: m.joinedAt.toISOString(),
-      })),
-      updatedAt: now.toISOString(),
+    await Team.findByIdAndUpdate(teamId, {
+      $pull: { members: { userId: memberIdToRemove } },
     });
 
     // Remove member lookup record
-    await adminDb.collection(TEAM_MEMBERS_COLLECTION).doc(`${teamId}_${memberIdToRemove}`).delete();
+    await TeamMemberLookup.deleteOne({ teamId, userId: memberIdToRemove });
 
     return { success: true };
   } catch (error) {
@@ -595,15 +544,15 @@ export async function updateMemberRole(
   newRole: TeamRole
 ): Promise<MemberResult> {
   try {
-    const teamResult = await getTeam(teamId, userId);
-    if (!teamResult.success || !teamResult.team) {
+    await connectDB();
+
+    const team = await Team.findById(teamId);
+    if (!team) {
       return {
         success: false,
-        error: teamResult.error || 'Team not found',
+        error: 'Team not found',
       };
     }
-
-    const team = teamResult.team;
 
     // Only owner can change roles
     if (team.ownerId !== userId) {
@@ -621,7 +570,7 @@ export async function updateMemberRole(
       };
     }
 
-    const memberIndex = team.members.findIndex((m) => m.userId === memberIdToUpdate);
+    const memberIndex = team.members.findIndex((m: ITeamMember) => m.userId === memberIdToUpdate);
     if (memberIndex === -1) {
       return {
         success: false,
@@ -629,28 +578,38 @@ export async function updateMemberRole(
       };
     }
 
-    // Update member
-    const now = new Date();
-    const updatedMember = { ...team.members[memberIndex], role: newRole };
-    team.members[memberIndex] = updatedMember;
+    // Update member role
+    const updatedTeam = await Team.findOneAndUpdate(
+      { _id: teamId, 'members.userId': memberIdToUpdate },
+      { $set: { 'members.$.role': newRole } },
+      { new: true }
+    );
 
-    await adminDb.collection(TEAMS_COLLECTION).doc(teamId).update({
-      members: team.members.map((m) => ({
-        ...m,
-        joinedAt: m.joinedAt.toISOString(),
-      })),
-      updatedAt: now.toISOString(),
-    });
+    if (!updatedTeam) {
+      return {
+        success: false,
+        error: 'Failed to update role',
+      };
+    }
 
     // Update member lookup record
-    await adminDb
-      .collection(TEAM_MEMBERS_COLLECTION)
-      .doc(`${teamId}_${memberIdToUpdate}`)
-      .update({ role: newRole });
+    await TeamMemberLookup.updateOne(
+      { teamId, userId: memberIdToUpdate },
+      { $set: { role: newRole } }
+    );
+
+    const updatedMember = updatedTeam.members.find((m: ITeamMember) => m.userId === memberIdToUpdate);
 
     return {
       success: true,
-      member: updatedMember,
+      member: updatedMember ? {
+        userId: updatedMember.userId,
+        email: updatedMember.email,
+        name: updatedMember.name,
+        role: updatedMember.role,
+        joinedAt: updatedMember.joinedAt,
+        invitedBy: updatedMember.invitedBy,
+      } : undefined,
     };
   } catch (error) {
     console.error('Update member role error:', error);
@@ -664,7 +623,7 @@ export async function updateMemberRole(
 /**
  * Get team member count
  */
-export function getTeamMemberCount(team: Team): number {
+export function getTeamMemberCount(team: TeamData): number {
   return team.members.length;
 }
 
@@ -679,14 +638,14 @@ export function getTeamMemberLimit(plan: PlanType): number {
 /**
  * Check if user is team owner
  */
-export function isTeamOwner(team: Team, userId: string): boolean {
+export function isTeamOwner(team: TeamData, userId: string): boolean {
   return team.ownerId === userId;
 }
 
 /**
  * Check if user is team admin
  */
-export function isTeamAdmin(team: Team, userId: string): boolean {
+export function isTeamAdmin(team: TeamData, userId: string): boolean {
   const member = team.members.find((m) => m.userId === userId);
   return member?.role === 'admin' || member?.role === 'owner';
 }
@@ -694,7 +653,7 @@ export function isTeamAdmin(team: Team, userId: string): boolean {
 /**
  * Get user's role in team
  */
-export function getUserTeamRole(team: Team, userId: string): TeamRole | null {
+export function getUserTeamRole(team: TeamData, userId: string): TeamRole | null {
   const member = team.members.find((m) => m.userId === userId);
   return member?.role || null;
 }

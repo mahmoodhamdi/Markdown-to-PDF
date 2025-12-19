@@ -1,43 +1,19 @@
 /**
  * Usage Analytics Service
  * Tracks user activity, conversions, and usage metrics
+ * Uses MongoDB for data storage
  */
 
-import { adminDb } from '@/lib/firebase/admin';
+import { connectDB } from '@/lib/db/mongodb';
+import { UsageEvent, DailyUsage, type EventType } from '@/lib/db/models/Usage';
 import { PlanType, getPlanLimits } from '@/lib/plans/config';
 
-export type EventType =
-  | 'conversion'
-  | 'api_call'
-  | 'file_upload'
-  | 'file_download'
-  | 'template_used'
-  | 'batch_conversion';
-
-export interface UsageEvent {
-  id: string;
-  userId: string;
-  eventType: EventType;
-  metadata?: Record<string, unknown>;
-  timestamp: Date;
-  date: string; // YYYY-MM-DD for daily aggregation
-}
-
-export interface DailyUsage {
-  date: string;
-  conversions: number;
-  apiCalls: number;
-  fileUploads: number;
-  fileDownloads: number;
-  templatesUsed: number;
-  batchConversions: number;
-  storageUsed: number;
-}
+export type { EventType } from '@/lib/db/models/Usage';
 
 export interface UsageSummary {
-  today: DailyUsage;
-  thisWeek: DailyUsage;
-  thisMonth: DailyUsage;
+  today: DailyUsageData;
+  thisWeek: DailyUsageData;
+  thisMonth: DailyUsageData;
   limits: {
     conversionsPerDay: number;
     apiCallsPerDay: number;
@@ -48,15 +24,22 @@ export interface UsageSummary {
   };
 }
 
+export interface DailyUsageData {
+  date: string;
+  conversions: number;
+  apiCalls: number;
+  fileUploads: number;
+  fileDownloads: number;
+  templatesUsed: number;
+  batchConversions: number;
+  storageUsed: number;
+}
+
 export interface UsageHistory {
-  daily: DailyUsage[];
+  daily: DailyUsageData[];
   startDate: string;
   endDate: string;
 }
-
-// Collection names
-const EVENTS_COLLECTION = 'usage_events';
-const DAILY_USAGE_COLLECTION = 'daily_usage';
 
 /**
  * Get current date in YYYY-MM-DD format
@@ -93,64 +76,41 @@ export async function trackEvent(
   metadata?: Record<string, unknown>
 ): Promise<void> {
   try {
+    await connectDB();
+
     const now = new Date();
     const date = getCurrentDate();
-    const eventId = `${userId}_${eventType}_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
 
     // Store individual event
-    await adminDb.collection(EVENTS_COLLECTION).doc(eventId).set({
-      id: eventId,
+    await UsageEvent.create({
       userId,
       eventType,
       metadata: metadata || {},
-      timestamp: now.toISOString(),
+      timestamp: now,
       date,
     });
 
-    // Update daily aggregation
-    const dailyKey = `${userId}_${date}`;
-    const dailyRef = adminDb.collection(DAILY_USAGE_COLLECTION).doc(dailyKey);
+    // Update daily aggregation using upsert
+    const fieldMap: Record<EventType, string> = {
+      conversion: 'conversions',
+      api_call: 'apiCalls',
+      file_upload: 'fileUploads',
+      file_download: 'fileDownloads',
+      template_used: 'templatesUsed',
+      batch_conversion: 'batchConversions',
+    };
 
-    await adminDb.runTransaction(async (transaction) => {
-      const dailyDoc = await transaction.get(dailyRef);
-
-      const defaultUsage: Record<string, number | string> = {
-        conversions: 0,
-        apiCalls: 0,
-        fileUploads: 0,
-        fileDownloads: 0,
-        templatesUsed: 0,
-        batchConversions: 0,
-        storageUsed: 0,
-        userId,
-        date,
-      };
-
-      const docData = dailyDoc.exists ? dailyDoc.data() : null;
-      const currentUsage: Record<string, number | string> = docData
-        ? { ...docData }
-        : { ...defaultUsage };
-
-      // Increment the appropriate counter
-      const fieldMap: Record<EventType, string> = {
-        conversion: 'conversions',
-        api_call: 'apiCalls',
-        file_upload: 'fileUploads',
-        file_download: 'fileDownloads',
-        template_used: 'templatesUsed',
-        batch_conversion: 'batchConversions',
-      };
-
-      const field = fieldMap[eventType];
-      if (field) {
-        const currentValue = typeof currentUsage[field] === 'number' ? currentUsage[field] : 0;
-        currentUsage[field] = (currentValue as number) + 1;
-      }
-
-      currentUsage.updatedAt = now.toISOString();
-
-      transaction.set(dailyRef, currentUsage);
-    });
+    const field = fieldMap[eventType];
+    if (field) {
+      await DailyUsage.findOneAndUpdate(
+        { userId, date },
+        {
+          $inc: { [field]: 1 },
+          $setOnInsert: { userId, date },
+        },
+        { upsert: true, new: true }
+      );
+    }
   } catch (error) {
     console.error('Failed to track event:', error);
     // Don't throw - analytics should not break the main flow
@@ -160,26 +120,13 @@ export async function trackEvent(
 /**
  * Get daily usage for a user
  */
-export async function getDailyUsage(userId: string, date: string): Promise<DailyUsage> {
+export async function getDailyUsage(userId: string, date: string): Promise<DailyUsageData> {
   try {
-    const dailyKey = `${userId}_${date}`;
-    const doc = await adminDb.collection(DAILY_USAGE_COLLECTION).doc(dailyKey).get();
+    await connectDB();
 
-    if (!doc.exists) {
-      return {
-        date,
-        conversions: 0,
-        apiCalls: 0,
-        fileUploads: 0,
-        fileDownloads: 0,
-        templatesUsed: 0,
-        batchConversions: 0,
-        storageUsed: 0,
-      };
-    }
+    const usage = await DailyUsage.findOne({ userId, date });
 
-    const data = doc.data();
-    if (!data) {
+    if (!usage) {
       return {
         date,
         conversions: 0,
@@ -194,13 +141,13 @@ export async function getDailyUsage(userId: string, date: string): Promise<Daily
 
     return {
       date,
-      conversions: data.conversions || 0,
-      apiCalls: data.apiCalls || 0,
-      fileUploads: data.fileUploads || 0,
-      fileDownloads: data.fileDownloads || 0,
-      templatesUsed: data.templatesUsed || 0,
-      batchConversions: data.batchConversions || 0,
-      storageUsed: data.storageUsed || 0,
+      conversions: usage.conversions || 0,
+      apiCalls: usage.apiCalls || 0,
+      fileUploads: usage.fileUploads || 0,
+      fileDownloads: usage.fileDownloads || 0,
+      templatesUsed: usage.templatesUsed || 0,
+      batchConversions: usage.batchConversions || 0,
+      storageUsed: usage.storageUsed || 0,
     };
   } catch (error) {
     console.error('Failed to get daily usage:', error);
@@ -224,38 +171,54 @@ export async function getUsageRange(
   userId: string,
   startDate: string,
   endDate: string
-): Promise<DailyUsage> {
+): Promise<DailyUsageData> {
   try {
-    const snapshot = await adminDb
-      .collection(DAILY_USAGE_COLLECTION)
-      .where('userId', '==', userId)
-      .where('date', '>=', startDate)
-      .where('date', '<=', endDate)
-      .get();
+    await connectDB();
 
-    const totals: DailyUsage = {
+    const result = await DailyUsage.aggregate([
+      {
+        $match: {
+          userId,
+          date: { $gte: startDate, $lte: endDate },
+        },
+      },
+      {
+        $group: {
+          _id: null,
+          conversions: { $sum: '$conversions' },
+          apiCalls: { $sum: '$apiCalls' },
+          fileUploads: { $sum: '$fileUploads' },
+          fileDownloads: { $sum: '$fileDownloads' },
+          templatesUsed: { $sum: '$templatesUsed' },
+          batchConversions: { $sum: '$batchConversions' },
+          storageUsed: { $max: '$storageUsed' },
+        },
+      },
+    ]);
+
+    if (result.length === 0) {
+      return {
+        date: `${startDate} to ${endDate}`,
+        conversions: 0,
+        apiCalls: 0,
+        fileUploads: 0,
+        fileDownloads: 0,
+        templatesUsed: 0,
+        batchConversions: 0,
+        storageUsed: 0,
+      };
+    }
+
+    return {
       date: `${startDate} to ${endDate}`,
-      conversions: 0,
-      apiCalls: 0,
-      fileUploads: 0,
-      fileDownloads: 0,
-      templatesUsed: 0,
-      batchConversions: 0,
-      storageUsed: 0,
+      conversions: result[0].conversions || 0,
+      apiCalls: result[0].apiCalls || 0,
+      fileUploads: result[0].fileUploads || 0,
+      fileDownloads: result[0].fileDownloads || 0,
+      templatesUsed: result[0].templatesUsed || 0,
+      batchConversions: result[0].batchConversions || 0,
+      storageUsed: result[0].storageUsed || 0,
     };
-
-    snapshot.docs.forEach((doc) => {
-      const data = doc.data();
-      totals.conversions += data.conversions || 0;
-      totals.apiCalls += data.apiCalls || 0;
-      totals.fileUploads += data.fileUploads || 0;
-      totals.fileDownloads += data.fileDownloads || 0;
-      totals.templatesUsed += data.templatesUsed || 0;
-      totals.batchConversions += data.batchConversions || 0;
-      totals.storageUsed = Math.max(totals.storageUsed, data.storageUsed || 0);
-    });
-
-    return totals;
   } catch (error) {
     console.error('Failed to get usage range:', error);
     return {
@@ -324,15 +287,15 @@ export async function getUsageHistory(
   const startDate = startDateObj.toISOString().split('T')[0];
 
   try {
-    const snapshot = await adminDb
-      .collection(DAILY_USAGE_COLLECTION)
-      .where('userId', '==', userId)
-      .where('date', '>=', startDate)
-      .where('date', '<=', endDate)
-      .orderBy('date', 'asc')
-      .get();
+    await connectDB();
 
-    const usageMap = new Map<string, DailyUsage>();
+    const usageData = await DailyUsage.find({
+      userId,
+      date: { $gte: startDate, $lte: endDate },
+    }).sort({ date: 1 });
+
+    // Create a map of existing data
+    const usageMap = new Map<string, DailyUsageData>();
 
     // Initialize all days with zero values
     const currentDate = new Date(startDateObj);
@@ -353,17 +316,16 @@ export async function getUsageHistory(
     }
 
     // Fill in actual data
-    snapshot.docs.forEach((doc) => {
-      const data = doc.data();
-      usageMap.set(data.date, {
-        date: data.date,
-        conversions: data.conversions || 0,
-        apiCalls: data.apiCalls || 0,
-        fileUploads: data.fileUploads || 0,
-        fileDownloads: data.fileDownloads || 0,
-        templatesUsed: data.templatesUsed || 0,
-        batchConversions: data.batchConversions || 0,
-        storageUsed: data.storageUsed || 0,
+    usageData.forEach((doc) => {
+      usageMap.set(doc.date, {
+        date: doc.date,
+        conversions: doc.conversions || 0,
+        apiCalls: doc.apiCalls || 0,
+        fileUploads: doc.fileUploads || 0,
+        fileDownloads: doc.fileDownloads || 0,
+        templatesUsed: doc.templatesUsed || 0,
+        batchConversions: doc.batchConversions || 0,
+        storageUsed: doc.storageUsed || 0,
       });
     });
 
@@ -419,13 +381,8 @@ export async function checkDailyLimits(
  */
 export async function getTotalEventCount(userId: string): Promise<number> {
   try {
-    const snapshot = await adminDb
-      .collection(EVENTS_COLLECTION)
-      .where('userId', '==', userId)
-      .count()
-      .get();
-
-    return snapshot.data().count;
+    await connectDB();
+    return await UsageEvent.countDocuments({ userId });
   } catch (error) {
     console.error('Failed to get event count:', error);
     return 0;
@@ -437,27 +394,17 @@ export async function getTotalEventCount(userId: string): Promise<number> {
  */
 export async function cleanupOldEvents(): Promise<number> {
   try {
+    await connectDB();
+
     const cutoffDate = new Date();
     cutoffDate.setDate(cutoffDate.getDate() - 90);
     const cutoffStr = cutoffDate.toISOString().split('T')[0];
 
-    const snapshot = await adminDb
-      .collection(EVENTS_COLLECTION)
-      .where('date', '<', cutoffStr)
-      .limit(500)
-      .get();
-
-    if (snapshot.empty) {
-      return 0;
-    }
-
-    const batch = adminDb.batch();
-    snapshot.docs.forEach((doc) => {
-      batch.delete(doc.ref);
+    const result = await UsageEvent.deleteMany({
+      date: { $lt: cutoffStr },
     });
 
-    await batch.commit();
-    return snapshot.size;
+    return result.deletedCount || 0;
   } catch (error) {
     console.error('Failed to cleanup old events:', error);
     return 0;

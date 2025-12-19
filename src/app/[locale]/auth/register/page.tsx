@@ -8,8 +8,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Loader2, UserPlus, Check } from 'lucide-react';
-import { auth } from '@/lib/firebase/config';
-import { createUserWithEmailAndPassword, updateProfile } from 'firebase/auth';
 import { signIn } from 'next-auth/react';
 
 export default function RegisterPage() {
@@ -40,13 +38,27 @@ export default function RegisterPage() {
     setIsLoading(true);
 
     try {
-      // Create user in Firebase
-      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-
-      // Update profile with name
-      await updateProfile(userCredential.user, {
-        displayName: name,
+      // Call registration API
+      const response = await fetch('/api/auth/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ name, email, password }),
       });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        if (data.code === 'email_in_use') {
+          setError(t('emailInUse'));
+        } else if (data.code === 'validation_error') {
+          setError(data.error);
+        } else {
+          setError(t('registrationFailed'));
+        }
+        return;
+      }
 
       setSuccess(true);
 
@@ -58,17 +70,8 @@ export default function RegisterPage() {
           callbackUrl: '/',
         });
       }, 1500);
-    } catch (err: unknown) {
-      const firebaseError = err as { code?: string };
-      if (firebaseError.code === 'auth/email-already-in-use') {
-        setError(t('emailInUse'));
-      } else if (firebaseError.code === 'auth/invalid-email') {
-        setError(t('invalidEmail'));
-      } else if (firebaseError.code === 'auth/weak-password') {
-        setError(t('weakPassword'));
-      } else {
-        setError(t('registrationFailed'));
-      }
+    } catch {
+      setError(t('registrationFailed'));
     } finally {
       setIsLoading(false);
     }
