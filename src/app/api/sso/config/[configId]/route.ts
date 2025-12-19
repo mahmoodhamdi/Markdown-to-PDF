@@ -15,6 +15,7 @@ import {
   activateSSOConfig,
   deactivateSSOConfig,
 } from '@/lib/sso/service';
+import type { SSOConfiguration } from '@/lib/sso/types';
 import { checkRateLimit, getRateLimitHeaders } from '@/lib/rate-limit';
 import { z } from 'zod';
 
@@ -149,7 +150,9 @@ export async function PATCH(
     } else {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { status, ...updateData } = validation.data;
-      updatedConfig = await updateSSOConfig(configId, updateData);
+      // Cast config to the expected type since it's validated by the schema
+      const typedUpdateData = updateData as Partial<Pick<SSOConfiguration, 'config' | 'enforceSSO' | 'allowBypass' | 'jitProvisioning' | 'defaultRole'>>;
+      updatedConfig = await updateSSOConfig(configId, typedUpdateData);
     }
 
     if (!updatedConfig) {

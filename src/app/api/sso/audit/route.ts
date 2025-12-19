@@ -50,7 +50,7 @@ export async function GET(request: NextRequest) {
 
     // Parse pagination params
     const limitParam = request.nextUrl.searchParams.get('limit');
-    const startAfter = request.nextUrl.searchParams.get('startAfter');
+    const skipParam = request.nextUrl.searchParams.get('skip');
 
     let limit = 50;
     if (limitParam) {
@@ -60,11 +60,19 @@ export async function GET(request: NextRequest) {
       }
     }
 
+    let skip = 0;
+    if (skipParam) {
+      const parsedSkip = parseInt(skipParam, 10);
+      if (!isNaN(parsedSkip) && parsedSkip >= 0) {
+        skip = parsedSkip;
+      }
+    }
+
     // Get audit logs
     const logs = await getSSOAuditLogs(
       organizationId,
       limit,
-      startAfter || undefined
+      skip
     );
 
     return NextResponse.json({
@@ -72,9 +80,9 @@ export async function GET(request: NextRequest) {
       logs,
       pagination: {
         limit,
+        skip,
         count: logs.length,
         hasMore: logs.length === limit,
-        nextCursor: logs.length > 0 ? logs[logs.length - 1].id : undefined,
       },
     });
   } catch (error) {

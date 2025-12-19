@@ -10,11 +10,10 @@ import { authOptions } from '@/lib/auth/config';
 import {
   createDomainMapping,
   getSSOConfigByOrganization,
+  getDomainsForConfig,
 } from '@/lib/sso/service';
-import { adminDb } from '@/lib/firebase/admin';
 import { checkRateLimit, getRateLimitHeaders } from '@/lib/rate-limit';
 import { z } from 'zod';
-import { SSODomainMapping } from '@/lib/sso/types';
 
 const createDomainSchema = z.object({
   domain: z.string().min(3).regex(/^[a-z0-9.-]+\.[a-z]{2,}$/i, 'Invalid domain format'),
@@ -61,13 +60,17 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // Get domain mappings for organization
-    const snapshot = await adminDb
-      .collection('sso_domains')
-      .where('organizationId', '==', organizationId)
-      .get();
+    // Get SSO config for organization first
+    const ssoConfig = await getSSOConfigByOrganization(organizationId);
+    if (!ssoConfig) {
+      return NextResponse.json({
+        success: true,
+        domains: [],
+      });
+    }
 
-    const domains = snapshot.docs.map((doc) => doc.data() as SSODomainMapping);
+    // Get domain mappings for the SSO config
+    const domains = await getDomainsForConfig(ssoConfig.id);
 
     return NextResponse.json({
       success: true,

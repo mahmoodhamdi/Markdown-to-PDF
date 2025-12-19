@@ -2,13 +2,15 @@ import { NextAuthOptions } from 'next-auth';
 import GitHubProvider from 'next-auth/providers/github';
 import GoogleProvider from 'next-auth/providers/google';
 import CredentialsProvider from 'next-auth/providers/credentials';
-import { adminAuth, adminDb } from '@/lib/firebase/admin';
+import { connectDB } from '@/lib/db/mongodb';
+import { User } from '@/lib/db/models/User';
+import bcrypt from 'bcryptjs';
 
-// Environment variable helpers
-const getEnvVar = (key: string): string => {
-  const value = process.env[key];
+// Environment variable helpers - supports both naming conventions
+const getEnvVar = (key: string, altKey?: string): string => {
+  const value = process.env[key] || (altKey ? process.env[altKey] : undefined);
   if (!value) {
-    console.warn(`Missing environment variable: ${key}`);
+    console.warn(`Missing environment variable: ${key}${altKey ? ` or ${altKey}` : ''}`);
     return '';
   }
   return value;
@@ -61,45 +63,43 @@ const getDefaultUsage = () => ({
   lastReset: new Date().toISOString().split('T')[0],
 });
 
-// Get or create user in Firestore
+// Get or create user in MongoDB
 async function getOrCreateUser(email: string, name?: string | null, image?: string | null) {
   try {
-    const usersRef = adminDb.collection('users');
-    const userDoc = await usersRef.doc(email).get();
+    await connectDB();
 
-    if (userDoc.exists) {
-      const userData = userDoc.data();
+    let user = await User.findById(email);
+
+    if (user) {
       // Reset usage if it's a new day
       const today = new Date().toISOString().split('T')[0];
-      if (userData?.usage?.lastReset !== today) {
-        await usersRef.doc(email).update({
-          'usage.conversions': 0,
-          'usage.apiCalls': 0,
-          'usage.lastReset': today,
-        });
-        return {
-          ...userData,
-          usage: { ...getDefaultUsage(), lastReset: today },
+      if (user.usage?.lastReset !== today) {
+        user.usage = {
+          conversions: 0,
+          apiCalls: 0,
+          lastReset: today,
         };
+        await user.save();
       }
-      return userData;
+      return user.toObject();
     }
 
     // Create new user
-    const newUser = {
+    user = new User({
+      _id: email,
       email,
       name: name || '',
       image: image || '',
-      plan: 'free' as const,
+      plan: 'free',
       usage: getDefaultUsage(),
-      createdAt: new Date().toISOString(),
-    };
+    });
 
-    await usersRef.doc(email).set(newUser);
-    return newUser;
+    await user.save();
+    return user.toObject();
   } catch (error) {
     console.error('Error getting/creating user:', error);
     return {
+      email,
       plan: 'free' as const,
       usage: getDefaultUsage(),
     };
@@ -109,8 +109,8 @@ async function getOrCreateUser(email: string, name?: string | null, image?: stri
 export const authOptions: NextAuthOptions = {
   providers: [
     GitHubProvider({
-      clientId: getEnvVar('GITHUB_ID'),
-      clientSecret: getEnvVar('GITHUB_SECRET'),
+      clientId: getEnvVar('GITHUB_ID', 'AUTH_GITHUB_ID'),
+      clientSecret: getEnvVar('GITHUB_SECRET', 'AUTH_GITHUB_SECRET'),
     }),
     GoogleProvider({
       clientId: getEnvVar('GOOGLE_CLIENT_ID'),
@@ -135,21 +135,37 @@ export const authOptions: NextAuthOptions = {
         }
 
         try {
-          // Verify with Firebase Auth
-          const userRecord = await adminAuth.getUserByEmail(credentials.email);
+          await connectDB();
 
-          // For credentials, we need to verify the password through Firebase client SDK
-          // This is a simplified version - in production, use Firebase client auth
-          if (userRecord) {
-            return {
-              id: userRecord.uid,
-              email: userRecord.email,
-              name: userRecord.displayName,
-              image: userRecord.photoURL,
-            };
+          // Find user by email
+          const user = await User.findById(credentials.email);
+
+          if (!user) {
+            throw new Error('No user found with this email');
           }
-          return null;
-        } catch {
+
+          // Check password
+          if (!user.password) {
+            throw new Error('This account uses social login. Please sign in with your provider.');
+          }
+
+          const isValid = await bcrypt.compare(
+            credentials.password,
+            user.password
+          );
+
+          if (!isValid) {
+            throw new Error('Invalid credentials');
+          }
+
+          return {
+            id: user._id,
+            email: user.email,
+            name: user.name,
+            image: user.image,
+          };
+        } catch (error) {
+          console.error('Auth error:', error);
           throw new Error('Invalid credentials');
         }
       },
@@ -164,7 +180,7 @@ export const authOptions: NextAuthOptions = {
   callbacks: {
     async signIn({ user, account }) {
       if (account?.provider === 'github' || account?.provider === 'google') {
-        // Create/update user in Firestore
+        // Create/update user in MongoDB
         if (user.email) {
           await getOrCreateUser(user.email, user.name, user.image);
         }
@@ -174,7 +190,7 @@ export const authOptions: NextAuthOptions = {
     async jwt({ token, user }) {
       if (user?.email) {
         const userData = await getOrCreateUser(user.email, user.name, user.image);
-        token.id = user.id;
+        token.id = user.id || user.email;
         token.plan = userData?.plan || 'free';
         token.usage = userData?.usage || getDefaultUsage();
       }

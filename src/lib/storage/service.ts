@@ -1,10 +1,20 @@
 /**
  * Cloud Storage Service
  * Handles file upload, download, listing, and quota tracking
+ * Uses MongoDB for metadata and Cloudinary for file storage
  */
 
-import { adminStorage, adminDb } from '@/lib/firebase/admin';
+import { v2 as cloudinary } from 'cloudinary';
+import { connectDB } from '@/lib/db/mongodb';
+import { UserFile, StorageQuota } from '@/lib/db/models/UserFile';
 import { getPlanLimits, PlanType } from '@/lib/plans/config';
+
+// Configure Cloudinary
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
 
 export interface StoredFile {
   id: string;
@@ -19,7 +29,7 @@ export interface StoredFile {
   updatedAt: Date;
 }
 
-export interface StorageQuota {
+export interface StorageQuotaData {
   used: number;
   limit: number;
   remaining: number;
@@ -35,7 +45,7 @@ export interface UploadResult {
 export interface ListFilesResult {
   success: boolean;
   files?: StoredFile[];
-  quota?: StorageQuota;
+  quota?: StorageQuotaData;
   error?: string;
 }
 
@@ -44,39 +54,21 @@ export interface DeleteResult {
   error?: string;
 }
 
-// Collection name for file metadata
-const FILES_COLLECTION = 'user_files';
-const QUOTA_COLLECTION = 'storage_quota';
-
-/**
- * Get the storage bucket
- */
-function getBucket() {
-  return adminStorage.bucket();
-}
-
-/**
- * Generate a unique file path for a user
- */
-function generateFilePath(userId: string, filename: string): string {
-  const timestamp = Date.now();
-  const sanitizedFilename = filename.replace(/[^a-zA-Z0-9.-]/g, '_');
-  return `users/${userId}/files/${timestamp}_${sanitizedFilename}`;
-}
-
 /**
  * Get user's storage quota information
  */
 export async function getStorageQuota(
   userId: string,
   planType: PlanType
-): Promise<StorageQuota> {
+): Promise<StorageQuotaData> {
+  await connectDB();
+
   const limits = getPlanLimits(planType);
   const quotaLimit = limits.cloudStorageBytes;
 
-  // Get current usage from Firestore
-  const quotaDoc = await adminDb.collection(QUOTA_COLLECTION).doc(userId).get();
-  const used = quotaDoc.exists ? (quotaDoc.data()?.used || 0) : 0;
+  // Get current usage from MongoDB
+  const quota = await StorageQuota.findOne({ userId });
+  const used = quota?.used || 0;
 
   // Handle Infinity for enterprise plans
   const remaining = quotaLimit === Infinity ? Infinity : Math.max(0, quotaLimit - used);
@@ -93,30 +85,27 @@ export async function getStorageQuota(
 /**
  * Update user's storage quota
  */
-async function updateStorageQuota(
-  userId: string,
-  bytesChange: number
-): Promise<void> {
-  const quotaRef = adminDb.collection(QUOTA_COLLECTION).doc(userId);
+async function updateStorageQuota(userId: string, bytesChange: number): Promise<void> {
+  await connectDB();
 
-  await adminDb.runTransaction(async (transaction) => {
-    const quotaDoc = await transaction.get(quotaRef);
-    const currentUsed = quotaDoc.exists ? (quotaDoc.data()?.used || 0) : 0;
-    const newUsed = Math.max(0, currentUsed + bytesChange);
+  await StorageQuota.findOneAndUpdate(
+    { userId },
+    {
+      $inc: { used: bytesChange },
+      $setOnInsert: { userId },
+    },
+    { upsert: true, new: true }
+  );
 
-    transaction.set(
-      quotaRef,
-      {
-        used: newUsed,
-        updatedAt: new Date(),
-      },
-      { merge: true }
-    );
-  });
+  // Ensure used doesn't go negative
+  await StorageQuota.updateOne(
+    { userId, used: { $lt: 0 } },
+    { $set: { used: 0 } }
+  );
 }
 
 /**
- * Upload a file to cloud storage
+ * Upload a file to Cloudinary
  */
 export async function uploadFile(
   userId: string,
@@ -126,6 +115,8 @@ export async function uploadFile(
   mimeType: string
 ): Promise<UploadResult> {
   try {
+    await connectDB();
+
     // Check storage quota
     const quota = await getStorageQuota(userId, planType);
     const fileSize = fileBuffer.length;
@@ -153,40 +144,35 @@ export async function uploadFile(
       };
     }
 
-    const bucket = getBucket();
-    const filePath = generateFilePath(userId, filename);
-    const file = bucket.file(filePath);
+    // Determine resource type based on MIME type
+    const resourceType = mimeType.startsWith('image/') ? 'image' : 'raw';
 
-    // Upload to Firebase Storage
-    await file.save(fileBuffer, {
-      metadata: {
-        contentType: mimeType,
-        metadata: {
-          userId,
-          originalName: filename,
+    // Upload to Cloudinary
+    const uploadResult = await new Promise<{ secure_url: string; public_id: string }>((resolve, reject) => {
+      const uploadStream = cloudinary.uploader.upload_stream(
+        {
+          folder: `md2pdf/users/${userId}`,
+          public_id: `${Date.now()}_${filename.replace(/[^a-zA-Z0-9.-]/g, '_')}`,
+          resource_type: resourceType,
         },
-      },
+        (error, result) => {
+          if (error) reject(error);
+          else if (result) resolve(result);
+          else reject(new Error('Upload failed'));
+        }
+      );
+      uploadStream.end(fileBuffer);
     });
 
-    // Create file record in Firestore
-    const fileId = `${userId}_${Date.now()}`;
-    const now = new Date();
-    const storedFile: StoredFile = {
-      id: fileId,
+    // Create file record in MongoDB
+    const userFile = await UserFile.create({
       userId,
-      filename: filePath.split('/').pop() || filename,
+      filename: uploadResult.public_id.split('/').pop() || filename,
       originalName: filename,
       mimeType,
       size: fileSize,
-      path: filePath,
-      createdAt: now,
-      updatedAt: now,
-    };
-
-    await adminDb.collection(FILES_COLLECTION).doc(fileId).set({
-      ...storedFile,
-      createdAt: now.toISOString(),
-      updatedAt: now.toISOString(),
+      path: uploadResult.public_id,
+      url: uploadResult.secure_url,
     });
 
     // Update storage quota
@@ -194,7 +180,18 @@ export async function uploadFile(
 
     return {
       success: true,
-      file: storedFile,
+      file: {
+        id: userFile._id.toString(),
+        userId: userFile.userId,
+        filename: userFile.filename,
+        originalName: userFile.originalName,
+        mimeType: userFile.mimeType,
+        size: userFile.size,
+        path: userFile.path,
+        url: userFile.url,
+        createdAt: userFile.createdAt,
+        updatedAt: userFile.updatedAt,
+      },
     };
   } catch (error) {
     console.error('Upload error:', error);
@@ -213,32 +210,26 @@ export async function listFiles(
   planType: PlanType
 ): Promise<ListFilesResult> {
   try {
+    await connectDB();
+
     const quota = await getStorageQuota(userId, planType);
 
-    const snapshot = await adminDb
-      .collection(FILES_COLLECTION)
-      .where('userId', '==', userId)
-      .orderBy('createdAt', 'desc')
-      .get();
-
-    const files: StoredFile[] = snapshot.docs.map((doc) => {
-      const data = doc.data();
-      return {
-        id: data.id,
-        userId: data.userId,
-        filename: data.filename,
-        originalName: data.originalName,
-        mimeType: data.mimeType,
-        size: data.size,
-        path: data.path,
-        createdAt: new Date(data.createdAt),
-        updatedAt: new Date(data.updatedAt),
-      };
-    });
+    const files = await UserFile.find({ userId }).sort({ createdAt: -1 });
 
     return {
       success: true,
-      files,
+      files: files.map((f) => ({
+        id: f._id.toString(),
+        userId: f.userId,
+        filename: f.filename,
+        originalName: f.originalName,
+        mimeType: f.mimeType,
+        size: f.size,
+        path: f.path,
+        url: f.url,
+        createdAt: f.createdAt,
+        updatedAt: f.updatedAt,
+      })),
       quota,
     };
   } catch (error) {
@@ -258,17 +249,11 @@ export async function getFile(
   fileId: string
 ): Promise<{ success: boolean; file?: StoredFile; error?: string }> {
   try {
-    const doc = await adminDb.collection(FILES_COLLECTION).doc(fileId).get();
+    await connectDB();
 
-    if (!doc.exists) {
-      return {
-        success: false,
-        error: 'File not found',
-      };
-    }
+    const file = await UserFile.findById(fileId);
 
-    const data = doc.data();
-    if (!data) {
+    if (!file) {
       return {
         success: false,
         error: 'File not found',
@@ -276,7 +261,7 @@ export async function getFile(
     }
 
     // Verify ownership
-    if (data.userId !== userId) {
+    if (file.userId !== userId) {
       return {
         success: false,
         error: 'Access denied',
@@ -286,15 +271,16 @@ export async function getFile(
     return {
       success: true,
       file: {
-        id: data.id,
-        userId: data.userId,
-        filename: data.filename,
-        originalName: data.originalName,
-        mimeType: data.mimeType,
-        size: data.size,
-        path: data.path,
-        createdAt: new Date(data.createdAt),
-        updatedAt: new Date(data.updatedAt),
+        id: file._id.toString(),
+        userId: file.userId,
+        filename: file.filename,
+        originalName: file.originalName,
+        mimeType: file.mimeType,
+        size: file.size,
+        path: file.path,
+        url: file.url,
+        createdAt: file.createdAt,
+        updatedAt: file.updatedAt,
       },
     };
   } catch (error) {
@@ -322,13 +308,20 @@ export async function getDownloadUrl(
       };
     }
 
-    const bucket = getBucket();
-    const file = bucket.file(fileResult.file.path);
+    // For Cloudinary, we can generate a signed URL or just use the stored URL
+    // The stored URL is already accessible
+    if (fileResult.file.url) {
+      return {
+        success: true,
+        url: fileResult.file.url,
+      };
+    }
 
-    // Generate signed URL valid for 1 hour
-    const [url] = await file.getSignedUrl({
-      action: 'read',
-      expires: Date.now() + 60 * 60 * 1000, // 1 hour
+    // Generate a signed URL for raw files (valid for 1 hour)
+    const url = cloudinary.url(fileResult.file.path, {
+      type: 'authenticated',
+      sign_url: true,
+      expires_at: Math.floor(Date.now() / 1000) + 3600,
     });
 
     return {
@@ -360,14 +353,25 @@ export async function downloadFile(
       };
     }
 
-    const bucket = getBucket();
-    const file = bucket.file(fileResult.file.path);
-    const [buffer] = await file.download();
+    // Fetch file from Cloudinary URL
+    if (fileResult.file.url) {
+      const response = await fetch(fileResult.file.url);
+      if (!response.ok) {
+        throw new Error('Failed to download from Cloudinary');
+      }
+      const arrayBuffer = await response.arrayBuffer();
+      const buffer = Buffer.from(arrayBuffer);
+
+      return {
+        success: true,
+        buffer,
+        file: fileResult.file,
+      };
+    }
 
     return {
-      success: true,
-      buffer,
-      file: fileResult.file,
+      success: false,
+      error: 'File URL not available',
     };
   } catch (error) {
     console.error('Download file error:', error);
@@ -381,11 +385,10 @@ export async function downloadFile(
 /**
  * Delete a file
  */
-export async function deleteFile(
-  userId: string,
-  fileId: string
-): Promise<DeleteResult> {
+export async function deleteFile(userId: string, fileId: string): Promise<DeleteResult> {
   try {
+    await connectDB();
+
     const fileResult = await getFile(userId, fileId);
     if (!fileResult.success || !fileResult.file) {
       return {
@@ -394,14 +397,18 @@ export async function deleteFile(
       };
     }
 
-    const bucket = getBucket();
-    const file = bucket.file(fileResult.file.path);
+    // Delete from Cloudinary
+    try {
+      await cloudinary.uploader.destroy(fileResult.file.path, {
+        resource_type: fileResult.file.mimeType.startsWith('image/') ? 'image' : 'raw',
+      });
+    } catch (cloudinaryError) {
+      console.warn('Cloudinary delete warning:', cloudinaryError);
+      // Continue even if Cloudinary delete fails
+    }
 
-    // Delete from Storage
-    await file.delete();
-
-    // Delete from Firestore
-    await adminDb.collection(FILES_COLLECTION).doc(fileId).delete();
+    // Delete from MongoDB
+    await UserFile.findByIdAndDelete(fileId);
 
     // Update storage quota
     await updateStorageQuota(userId, -fileResult.file.size);
