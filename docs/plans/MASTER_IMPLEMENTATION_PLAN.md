@@ -1,0 +1,371 @@
+# Master Implementation Plan - Markdown to PDF
+
+**Created:** December 25, 2024
+**Status:** Active
+**Total Phases:** 6
+**Estimated Completion:** Production Ready
+
+---
+
+## Executive Summary
+
+This document provides a comprehensive roadmap to bring the Markdown-to-PDF application to full production readiness. The codebase is approximately **85% complete** with solid foundations in core features, payments, and authentication.
+
+---
+
+## Current State Analysis
+
+### Completed Features (85%)
+
+| Feature | Status | Test Coverage |
+|---------|--------|---------------|
+| Markdown → HTML → PDF Pipeline | ✅ Complete | 96% |
+| 8 Document Themes + Code Themes | ✅ Complete | 100% |
+| Authentication (NextAuth + GitHub) | ✅ Complete | Working |
+| 4-Tier Freemium System | ✅ Complete | 100% |
+| Stripe Payments | ✅ Complete | 93% |
+| Paymob Payments (Egypt) | ✅ Complete* | 98% |
+| PayTabs Payments (MENA) | ✅ Complete* | 98% |
+| Paddle Payments (EU) | ✅ Complete | 94% |
+| Rate Limiting | ✅ Complete | 30% |
+| Cloud Storage (Cloudinary) | ✅ Complete | 9% |
+| Team Management Service | ✅ Complete | 4% |
+| SSO/SAML Service | ✅ Complete | 2% |
+| Analytics Service | ✅ Complete | 0% |
+| Toast Notifications | ✅ Complete | Working |
+| i18n (en/ar with RTL) | ✅ Complete | Working |
+| Unit Tests | ✅ 816 Tests Passing | Working |
+
+*Note: Paymob/PayTabs subscription storage fixed in Stage 1.1 (December 25, 2024)
+
+### Incomplete Features (~8%)
+
+1. ~~**Critical:** Subscription persistence for Paymob/PayTabs~~ ✅ Fixed (Stage 1.1)
+2. ~~**Critical:** Email notification service~~ ✅ Fixed (Stage 1.2)
+3. ~~**High:** User profile management~~ ✅ Fixed (Stage 1.3)
+4. ~~**High:** Auto-save implementation~~ ✅ Fixed (Stage 2.1)
+5. **Medium:** Settings page UI
+6. **Medium:** Subscription dashboard
+7. **Medium:** Analytics dashboard UI
+8. **Low:** Team collaboration UI
+9. **Low:** Advanced account features
+
+---
+
+## Phase Overview
+
+| Phase | Name | Priority | Stages | Status |
+|-------|------|----------|--------|--------|
+| 1 | Critical Fixes | 🔴 Critical | 3 | ✅ Complete |
+| 2 | UI/UX Completion | 🟠 High | 5 | 2/5 Complete |
+| 3 | User Dashboard | 🟠 High | 4 | Pending |
+| 4 | Team Features | 🟡 Medium | 4 | Pending |
+| 5 | Account Management | 🟡 Medium | 4 | Pending |
+| 6 | Testing & Polish | 🟢 Final | 4 | Pending |
+
+---
+
+## Phase 1: Critical Fixes (Production Blockers)
+
+**Priority:** 🔴 Critical
+**Prompt File:** `docs/plans/prompts/PHASE-1-CRITICAL-FIXES.md`
+
+### Stage 1.1: Payment Subscription Persistence ✅ COMPLETE (December 25, 2024)
+- ✅ Fix Paymob in-memory subscription storage
+- ✅ Fix PayTabs in-memory subscription storage
+- ✅ Add MongoDB models for regional subscriptions (RegionalSubscription model)
+- ✅ Updated Paymob/PayTabs gateways to use MongoDB
+- ✅ Updated webhook handlers to use gateway's handleWebhook method
+- ✅ Unit tests (733 passing) and integration tests (16 passing) verified
+
+### Stage 1.2: Email Notification Service ✅ COMPLETE (December 25, 2024)
+- ✅ Implemented email service using nodemailer with SMTP
+- ✅ Created email templates (welcome, password reset, subscription, team invitation, email change)
+- ✅ Added email queue for reliability with retry logic
+- ✅ Integrated with auth flow
+- ✅ Unit tests passing
+
+### Stage 1.3: User Profile Endpoints ✅ COMPLETE (December 25, 2024)
+- ✅ Created `/api/users/profile` endpoint (GET/PATCH/DELETE)
+- ✅ Added password change functionality (`/api/users/change-password`)
+- ✅ Added email change with verification flow (`/api/users/change-email`, `/api/users/verify-email-change`)
+- ✅ Added EmailChangeToken model for secure email verification
+- ✅ Unit tests (810 passing) and integration tests (223 passing) verified
+
+---
+
+## Phase 2: UI/UX Completion
+
+**Priority:** 🟠 High
+**Prompt File:** `docs/plans/prompts/PHASE-2-UI-UX.md`
+
+### Stage 2.1: Auto-save Implementation ✅ COMPLETE (December 25, 2024)
+- ✅ Implemented debounced auto-save to localStorage (via Zustand persist middleware)
+- ✅ Added save status indicator (Saving.../Saved) in EditorStats
+- ✅ Added last saved timestamp with relative time display
+- ✅ Integrated with editor settings (autoSave, autoSaveInterval)
+- ✅ Added manual save button with Ctrl+S keyboard shortcut
+- ✅ Added recovery prompt for unsaved content on page load
+- ✅ Translations added (EN & AR)
+- ✅ Unit tests (816 passing)
+
+### Stage 2.2: Table of Contents Display ✅ COMPLETE (December 26, 2024)
+- ✅ TOC toggle button already exists in EditorToolbar
+- ✅ TOC sidebar renders in page.tsx (desktop: sidebar, mobile: collapsible)
+- ✅ Implemented smooth scroll navigation to headings
+- ✅ Added active heading highlight with IntersectionObserver
+- ✅ Created useActiveHeading hook
+- ✅ TOC state persisted in editor store
+- ✅ Translations added (EN & AR)
+- ✅ Unit tests (832 passing)
+
+### Stage 2.3: Fullscreen Mode
+- Implement fullscreen CSS styles
+- Add fullscreen toggle button
+- Hide header/footer in fullscreen
+- Add exit fullscreen overlay/button
+
+### Stage 2.4: Print Functionality
+- Add print button to ConvertButton
+- Implement print-specific CSS
+- Use window.print() with preview content
+- Add print media styles
+
+### Stage 2.5: Settings Page
+- Create `/[locale]/settings/page.tsx`
+- Add appearance settings (theme, language)
+- Add editor settings (fontSize, tabSize)
+- Add default export settings
+- Add reset to defaults
+
+---
+
+## Phase 3: User Dashboard
+
+**Priority:** 🟠 High
+**Prompt File:** `docs/plans/prompts/PHASE-3-USER-DASHBOARD.md`
+
+### Stage 3.1: Dashboard Layout
+- Create `/[locale]/dashboard/page.tsx`
+- Add dashboard navigation
+- Create dashboard layout component
+- Add responsive sidebar
+
+### Stage 3.2: Usage Overview
+- Display current plan info
+- Show usage statistics (conversions, storage)
+- Add usage progress bars
+- Show reset date for limits
+
+### Stage 3.3: Subscription Management
+- Display current subscription status
+- Add upgrade/downgrade buttons
+- Show payment history
+- Add cancel subscription flow
+- Integrate with all payment gateways
+
+### Stage 3.4: Analytics Dashboard
+- Show conversion analytics chart
+- Display daily/weekly/monthly views
+- Add export data functionality
+- Show top templates used
+
+---
+
+## Phase 4: Team Features
+
+**Priority:** 🟡 Medium
+**Prompt File:** `docs/plans/prompts/PHASE-4-TEAM-FEATURES.md`
+
+### Stage 4.1: Team Dashboard
+- Create `/[locale]/teams/page.tsx`
+- List user's teams
+- Show team member count
+- Add create team button
+
+### Stage 4.2: Team Management UI
+- Create `/[locale]/teams/[teamId]/page.tsx`
+- Display team members with roles
+- Add/remove member functionality
+- Change member roles
+- Team settings (name, description)
+
+### Stage 4.3: Team Invitations
+- Create invitation system
+- Email invitation flow
+- Invitation accept/decline
+- Pending invitations list
+
+### Stage 4.4: Team Activity
+- Show team activity log
+- Filter by member/action
+- Export activity data
+
+---
+
+## Phase 5: Account Management
+
+**Priority:** 🟡 Medium
+**Prompt File:** `docs/plans/prompts/PHASE-5-ACCOUNT-MANAGEMENT.md`
+
+### Stage 5.1: Profile Page
+- Create `/[locale]/profile/page.tsx`
+- Display user info
+- Profile picture upload
+- Update profile form
+
+### Stage 5.2: Security Settings
+- Password change form
+- Session management
+- Login history
+- Connected accounts (OAuth)
+
+### Stage 5.3: Email Verification
+- Send verification email on signup
+- Verification page
+- Resend verification
+- Email change with verification
+
+### Stage 5.4: Account Actions
+- Account deletion flow
+- Data export (GDPR)
+- Two-factor authentication (optional)
+
+---
+
+## Phase 6: Testing & Polish
+
+**Priority:** 🟢 Final
+**Prompt File:** `docs/plans/prompts/PHASE-6-TESTING-POLISH.md`
+
+### Stage 6.1: Service Layer Tests
+- SSO service tests (→ 90% coverage)
+- Teams service tests (→ 90% coverage)
+- Storage service tests (→ 90% coverage)
+- Analytics service tests (→ 90% coverage)
+
+### Stage 6.2: Integration Tests
+- Payment webhook tests
+- SSO login flow tests
+- Storage upload/quota tests
+- Team member operation tests
+
+### Stage 6.3: E2E Tests
+- New dashboard flows
+- Team management flows
+- Settings page tests
+- Profile management tests
+
+### Stage 6.4: Performance & Polish
+- Browser pool optimization
+- Image optimization in PDFs
+- Bundle size optimization
+- Accessibility audit
+- Security audit
+
+---
+
+## Definition of Done (Per Stage)
+
+Each stage must meet these criteria before completion:
+
+- [ ] Feature fully implemented
+- [ ] Unit tests written and passing
+- [ ] Integration tests (if API changes)
+- [ ] E2E tests (if UI changes)
+- [ ] Translations updated (EN & AR)
+- [ ] No TypeScript errors
+- [ ] ESLint passes
+- [ ] Manual testing complete
+- [ ] Code reviewed and merged
+
+---
+
+## File Structure for Prompts
+
+```
+docs/plans/prompts/
+├── PHASE-1-CRITICAL-FIXES.md
+│   ├── STAGE-1.1-PAYMENT-PERSISTENCE.md
+│   ├── STAGE-1.2-EMAIL-SERVICE.md
+│   └── STAGE-1.3-USER-PROFILE-API.md
+├── PHASE-2-UI-UX.md
+│   ├── STAGE-2.1-AUTO-SAVE.md
+│   ├── STAGE-2.2-TABLE-OF-CONTENTS.md
+│   ├── STAGE-2.3-FULLSCREEN-MODE.md
+│   ├── STAGE-2.4-PRINT-FUNCTIONALITY.md
+│   └── STAGE-2.5-SETTINGS-PAGE.md
+├── PHASE-3-USER-DASHBOARD.md
+│   ├── STAGE-3.1-DASHBOARD-LAYOUT.md
+│   ├── STAGE-3.2-USAGE-OVERVIEW.md
+│   ├── STAGE-3.3-SUBSCRIPTION-MANAGEMENT.md
+│   └── STAGE-3.4-ANALYTICS-DASHBOARD.md
+├── PHASE-4-TEAM-FEATURES.md
+│   ├── STAGE-4.1-TEAM-DASHBOARD.md
+│   ├── STAGE-4.2-TEAM-MANAGEMENT-UI.md
+│   ├── STAGE-4.3-TEAM-INVITATIONS.md
+│   └── STAGE-4.4-TEAM-ACTIVITY.md
+├── PHASE-5-ACCOUNT-MANAGEMENT.md
+│   ├── STAGE-5.1-PROFILE-PAGE.md
+│   ├── STAGE-5.2-SECURITY-SETTINGS.md
+│   ├── STAGE-5.3-EMAIL-VERIFICATION.md
+│   └── STAGE-5.4-ACCOUNT-ACTIONS.md
+└── PHASE-6-TESTING-POLISH.md
+    ├── STAGE-6.1-SERVICE-TESTS.md
+    ├── STAGE-6.2-INTEGRATION-TESTS.md
+    ├── STAGE-6.3-E2E-TESTS.md
+    └── STAGE-6.4-PERFORMANCE-POLISH.md
+```
+
+---
+
+## How to Use This Plan
+
+1. **Start with Phase 1** - These are production blockers
+2. **Follow stages in order** within each phase
+3. **Use the prompt files** - Each stage has a detailed prompt file
+4. **Run the prompt** - Copy the prompt file path and send it to Claude
+5. **Verify completion** - Use the Definition of Done checklist
+6. **Move to next stage** - Only after current stage is complete
+
+### Example Usage
+
+```
+User: Start with docs/plans/prompts/STAGE-1.1-PAYMENT-PERSISTENCE.md
+Claude: [Reads the file and implements the stage]
+```
+
+---
+
+## Progress Tracking
+
+| Phase | Stage | Status | Date Started | Date Completed |
+|-------|-------|--------|--------------|----------------|
+| 1 | 1.1 | ✅ Complete | Dec 25, 2024 | Dec 25, 2024 |
+| 1 | 1.2 | ✅ Complete | Dec 25, 2024 | Dec 25, 2024 |
+| 1 | 1.3 | ✅ Complete | Dec 25, 2024 | Dec 25, 2024 |
+| 2 | 2.1 | ✅ Complete | Dec 25, 2024 | Dec 25, 2024 |
+| 2 | 2.2 | ✅ Complete | Dec 26, 2024 | Dec 26, 2024 |
+| 2 | 2.3 | ⏳ Pending | - | - |
+| 2 | 2.4 | ⏳ Pending | - | - |
+| 2 | 2.5 | ⏳ Pending | - | - |
+| 3 | 3.1 | ⏳ Pending | - | - |
+| 3 | 3.2 | ⏳ Pending | - | - |
+| 3 | 3.3 | ⏳ Pending | - | - |
+| 3 | 3.4 | ⏳ Pending | - | - |
+| 4 | 4.1 | ⏳ Pending | - | - |
+| 4 | 4.2 | ⏳ Pending | - | - |
+| 4 | 4.3 | ⏳ Pending | - | - |
+| 4 | 4.4 | ⏳ Pending | - | - |
+| 5 | 5.1 | ⏳ Pending | - | - |
+| 5 | 5.2 | ⏳ Pending | - | - |
+| 5 | 5.3 | ⏳ Pending | - | - |
+| 5 | 5.4 | ⏳ Pending | - | - |
+| 6 | 6.1 | ⏳ Pending | - | - |
+| 6 | 6.2 | ⏳ Pending | - | - |
+| 6 | 6.3 | ⏳ Pending | - | - |
+| 6 | 6.4 | ⏳ Pending | - | - |
+
+---
+
+*Last Updated: December 25, 2024*

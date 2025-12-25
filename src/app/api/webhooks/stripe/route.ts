@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { stripe, isStripeConfigured } from '@/lib/stripe/config';
 import { connectDB } from '@/lib/db/mongodb';
 import { User } from '@/lib/db/models/User';
+import { emailService } from '@/lib/email/service';
+import { PlanType } from '@/lib/plans/config';
 import Stripe from 'stripe';
 
 const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
@@ -87,6 +89,7 @@ export async function POST(request: NextRequest) {
 async function handleCheckoutComplete(session: Stripe.Checkout.Session) {
   const userEmail = session.metadata?.userEmail;
   const plan = session.metadata?.plan as 'pro' | 'team' | 'enterprise';
+  const billing = session.metadata?.billing as 'monthly' | 'yearly' | undefined;
 
   if (!userEmail || !plan) {
     console.error('Missing user email or plan in checkout session metadata');
@@ -95,6 +98,9 @@ async function handleCheckoutComplete(session: Stripe.Checkout.Session) {
 
   try {
     await connectDB();
+
+    // Get user for name
+    const user = await User.findById(userEmail);
 
     // Update user's plan in MongoDB
     await User.findByIdAndUpdate(userEmail, {
@@ -106,6 +112,22 @@ async function handleCheckoutComplete(session: Stripe.Checkout.Session) {
     });
 
     console.log(`User ${userEmail} upgraded to ${plan} plan`);
+
+    // Send subscription confirmation email
+    if (emailService.isConfigured()) {
+      emailService.sendSubscriptionConfirmation(
+        { email: userEmail, name: user?.name || '' },
+        {
+          plan: plan as PlanType,
+          billing: billing || 'monthly',
+          amount: session.amount_total ? session.amount_total / 100 : undefined,
+          currency: session.currency?.toUpperCase(),
+          gateway: 'stripe',
+        }
+      ).catch((err) => {
+        console.error('Failed to send subscription confirmation email:', err);
+      });
+    }
   } catch (error) {
     console.error('Error updating user plan after checkout:', error);
   }
@@ -140,6 +162,7 @@ async function handleSubscriptionUpdate(subscription: Stripe.Subscription) {
 
 async function handleSubscriptionCanceled(subscription: Stripe.Subscription) {
   const userEmail = subscription.metadata?.userEmail;
+  const plan = subscription.metadata?.plan as 'pro' | 'team' | 'enterprise' | undefined;
 
   if (!userEmail) {
     console.error('Missing user email in subscription metadata');
@@ -148,6 +171,10 @@ async function handleSubscriptionCanceled(subscription: Stripe.Subscription) {
 
   try {
     await connectDB();
+
+    // Get user for name and current plan
+    const user = await User.findById(userEmail);
+    const previousPlan = plan || user?.plan || 'pro';
 
     // Downgrade user to free plan
     await User.findByIdAndUpdate(userEmail, {
@@ -158,6 +185,19 @@ async function handleSubscriptionCanceled(subscription: Stripe.Subscription) {
     });
 
     console.log(`Subscription canceled for ${userEmail}, downgraded to free`);
+
+    // Send subscription canceled email
+    if (emailService.isConfigured()) {
+      emailService.sendSubscriptionCanceled(
+        { email: userEmail, name: user?.name || '' },
+        {
+          plan: previousPlan as PlanType,
+          immediate: true,
+        }
+      ).catch((err) => {
+        console.error('Failed to send subscription canceled email:', err);
+      });
+    }
   } catch (error) {
     console.error('Error handling subscription cancellation:', error);
   }

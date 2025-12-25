@@ -30,9 +30,14 @@ npx vitest run __tests__/unit/lib/utils.test.ts -t "test name"  # Run specific t
 npm run format            # Prettier format all files
 npm run format:check      # Check formatting without changes
 
+# Database (MongoDB via Docker)
+npm run db:start          # Start MongoDB container
+npm run db:stop           # Stop MongoDB container
+npm run db:seed           # Seed database with sample data
+
 # Docker
-docker build -f docker/Dockerfile -t markdown-to-pdf .
-docker-compose -f docker/docker-compose.yml up
+docker-compose -f docker/docker-compose.yml up          # Start app with Docker
+docker-compose -f docker/docker-compose.prod.yml up     # Production mode
 ```
 
 ## Environment Variables
@@ -108,10 +113,11 @@ All stores use `persist` middleware to save to localStorage.
 
 ### Authentication
 
-Uses NextAuth.js (`src/lib/auth/config.ts`) with:
+Uses NextAuth.js (`src/lib/auth/config.ts`) with JWT session strategy:
 - GitHub OAuth provider
-- Firebase Adapter for session storage
-- Email/password authentication
+- Google OAuth provider
+- Email/password credentials (bcrypt)
+- MongoDB for user storage (not Firebase Adapter)
 
 ### Internationalization
 
@@ -180,6 +186,7 @@ Plan types in `src/lib/plans/config.ts`:
 ## Testing Structure
 
 - Unit tests: `__tests__/unit/` - Test utilities and pure functions
-- Integration tests: `__tests__/integration/` - API route testing
+- Integration tests: `__tests__/integration/` - API route testing (30s timeout)
 - E2E tests: `__tests__/e2e/` - Playwright browser tests
 - Test setup: `src/test/setup.ts` - jsdom environment with testing-library
+- Vitest globals enabled (`describe`, `it`, `expect` available without imports)

@@ -4,10 +4,13 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { connectDB } from '@/lib/db/mongodb';
-import { User } from '@/lib/db/models/User';
 import { isPayTabsConfigured } from '@/lib/payments/paytabs/config';
 import { paytabsClient, PayTabsCallbackData } from '@/lib/payments/paytabs/client';
+import { paytabsGateway } from '@/lib/payments/paytabs/gateway';
+import { emailService } from '@/lib/email/service';
+import { connectDB } from '@/lib/db/mongodb';
+import { User } from '@/lib/db/models/User';
+import { PlanType } from '@/lib/plans/config';
 
 /**
  * Handle POST request (callback from PayTabs)
@@ -43,50 +46,70 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // Parse callback data
-    const parsed = paytabsClient.parseCallbackData(callback);
+    // Use the gateway's handleWebhook method which includes subscription management
+    const result = await paytabsGateway.handleWebhook(callback, callback.signature || '');
 
-    // Handle successful payment
-    if (parsed.success) {
-      const userEmail = parsed.customerEmail;
-      const plan = parsed.plan;
+    console.log('PayTabs webhook processed:', {
+      event: result.event,
+      status: result.status,
+      userEmail: result.userEmail,
+      paymentId: result.paymentId,
+    });
 
-      if (userEmail && plan) {
-        try {
-          await connectDB();
+    // Send email notifications based on webhook result
+    if (emailService.isConfigured() && result.userEmail) {
+      try {
+        await connectDB();
+        const user = await User.findById(result.userEmail);
 
-          await User.findByIdAndUpdate(userEmail.toLowerCase(), {
-            $set: {
+        if (result.status === 'succeeded') {
+          // Get plan from cart description/metadata
+          const cartId = callback.cart_id || '';
+          const planMatch = cartId.match(/(pro|team|enterprise)/i);
+          const plan = (planMatch ? planMatch[1].toLowerCase() : 'pro') as PlanType;
+          const billingMatch = cartId.match(/(monthly|yearly)/i);
+          const billing = (billingMatch ? billingMatch[1].toLowerCase() : 'monthly') as 'monthly' | 'yearly';
+
+          emailService.sendSubscriptionConfirmation(
+            { email: result.userEmail, name: user?.name || '' },
+            {
               plan,
-              paytabsTransactionRef: parsed.transactionRef,
-              paytabsCartId: parsed.cartId,
-            },
+              billing,
+              amount: callback.cart_amount ? parseFloat(callback.cart_amount) : undefined,
+              currency: callback.cart_currency,
+              gateway: 'paytabs',
+            }
+          ).catch((err) => {
+            console.error('Failed to send subscription confirmation email:', err);
           });
-
-          console.log(`User ${userEmail} upgraded to ${plan} via PayTabs`);
-        } catch (error) {
-          console.error('Error updating user from PayTabs callback:', error);
+        } else if (result.status === 'canceled') {
+          const plan = (user?.plan as PlanType) || 'pro';
+          emailService.sendSubscriptionCanceled(
+            { email: result.userEmail, name: user?.name || '' },
+            { plan, immediate: true }
+          ).catch((err) => {
+            console.error('Failed to send subscription canceled email:', err);
+          });
         }
+      } catch (err) {
+        console.error('Error sending webhook email:', err);
       }
+    }
 
-      // Return success
+    // Return appropriate response
+    if (result.status === 'succeeded') {
       return NextResponse.json({
         received: true,
         status: 'success',
-        transactionRef: parsed.transactionRef,
+        transactionRef: result.paymentId,
       });
     }
 
     // Handle failed payment
-    console.log(`PayTabs payment failed: ${parsed.responseMessage}`, {
-      responseCode: parsed.responseCode,
-      responseStatus: parsed.responseStatus,
-    });
-
     return NextResponse.json({
       received: true,
       status: 'failed',
-      message: parsed.responseMessage,
+      message: result.error,
     });
   } catch (error) {
     console.error('PayTabs webhook error:', error);

@@ -24,6 +24,28 @@ vi.mock('@/lib/db/models/User', () => ({
   },
 }));
 
+// Mock RegionalSubscription model
+const mockSubFindByTransactionId = vi.fn();
+const mockSubFindActiveByUserId = vi.fn();
+const mockSubSave = vi.fn();
+const mockSubCancel = vi.fn();
+const mockSubRenew = vi.fn();
+
+vi.mock('@/lib/db/models/RegionalSubscription', () => ({
+  RegionalSubscription: {
+    findByTransactionId: (...args: unknown[]) => mockSubFindByTransactionId(...args),
+    findActiveByUserId: (...args: unknown[]) => mockSubFindActiveByUserId(...args),
+  },
+  createRegionalSubscription: vi.fn().mockResolvedValue({
+    userId: 'test@example.com',
+    gateway: 'paytabs',
+    gatewayTransactionId: 'txn_123',
+    plan: 'pro',
+    status: 'active',
+  }),
+  updateSubscriptionFromWebhook: vi.fn(),
+}));
+
 // Mock PayTabs client
 const mockCreateCheckoutSession = vi.fn();
 const mockVerifyCallbackSignature = vi.fn();
@@ -289,16 +311,22 @@ describe('PayTabs Gateway', () => {
   });
 
   describe('getSubscription', () => {
-    it('should return subscription for existing user', async () => {
+    it('should return subscription by transaction ID', async () => {
       const { paytabsGateway } = await import('@/lib/payments/paytabs/gateway');
 
-      const mockUser = {
-        _id: 'user-123',
-        email: 'sub@example.com',
+      const mockSubscription = {
+        userId: 'sub@example.com',
+        gateway: 'paytabs',
+        gatewayTransactionId: 'txn_ref_123',
         plan: 'pro',
+        billing: 'monthly',
+        status: 'active',
+        currentPeriodStart: new Date('2024-01-01'),
+        currentPeriodEnd: new Date('2024-02-01'),
+        cancelAtPeriodEnd: false,
         createdAt: new Date('2024-01-01'),
       };
-      mockFindOne.mockResolvedValue(mockUser);
+      mockSubFindByTransactionId.mockResolvedValue(mockSubscription);
 
       const result = await paytabsGateway.getSubscription('txn_ref_123');
 
@@ -307,12 +335,40 @@ describe('PayTabs Gateway', () => {
       expect(result?.gateway).toBe('paytabs');
       expect(result?.plan).toBe('pro');
       expect(result?.status).toBe('active');
+      expect(mockSubFindByTransactionId).toHaveBeenCalledWith('paytabs', 'txn_ref_123');
+    });
+
+    it('should return subscription by user ID if not found by transaction ID', async () => {
+      const { paytabsGateway } = await import('@/lib/payments/paytabs/gateway');
+
+      const mockSubscription = {
+        userId: 'user@example.com',
+        gateway: 'paytabs',
+        gatewayTransactionId: 'txn_456',
+        plan: 'team',
+        billing: 'yearly',
+        status: 'active',
+        currentPeriodStart: new Date('2024-01-01'),
+        currentPeriodEnd: new Date('2025-01-01'),
+        cancelAtPeriodEnd: false,
+        createdAt: new Date('2024-01-01'),
+      };
+      mockSubFindByTransactionId.mockResolvedValue(null);
+      mockSubFindActiveByUserId.mockResolvedValue(mockSubscription);
+
+      const result = await paytabsGateway.getSubscription('user@example.com');
+
+      expect(result).not.toBeNull();
+      expect(result?.id).toBe('txn_456');
+      expect(result?.plan).toBe('team');
+      expect(mockSubFindActiveByUserId).toHaveBeenCalledWith('user@example.com', 'paytabs');
     });
 
     it('should return null for non-existent subscription', async () => {
       const { paytabsGateway } = await import('@/lib/payments/paytabs/gateway');
 
-      mockFindOne.mockResolvedValue(null);
+      mockSubFindByTransactionId.mockResolvedValue(null);
+      mockSubFindActiveByUserId.mockResolvedValue(null);
 
       const result = await paytabsGateway.getSubscription('nonexistent');
 
@@ -322,7 +378,7 @@ describe('PayTabs Gateway', () => {
     it('should return null on database error', async () => {
       const { paytabsGateway } = await import('@/lib/payments/paytabs/gateway');
 
-      mockFindOne.mockRejectedValue(new Error('Database error'));
+      mockSubFindByTransactionId.mockRejectedValue(new Error('Database error'));
 
       const result = await paytabsGateway.getSubscription('error');
 
@@ -331,40 +387,71 @@ describe('PayTabs Gateway', () => {
   });
 
   describe('cancelSubscription', () => {
-    it('should cancel subscription immediately', async () => {
+    it('should cancel subscription immediately by transaction ID', async () => {
       const { paytabsGateway } = await import('@/lib/payments/paytabs/gateway');
 
-      mockFindOneAndUpdate.mockResolvedValue({});
+      const mockSubscription = {
+        userId: 'user@example.com',
+        cancel: mockSubCancel.mockResolvedValue(undefined),
+      };
+      mockSubFindByTransactionId.mockResolvedValue(mockSubscription);
+      mockFindByIdAndUpdate.mockResolvedValue({});
 
       await paytabsGateway.cancelSubscription('txn_cancel', true);
 
-      expect(mockFindOneAndUpdate).toHaveBeenCalledWith(
-        { paytabsTransactionRef: 'txn_cancel' },
-        {
-          $set: { plan: 'free', paytabsTransactionRef: null },
-        }
-      );
+      expect(mockSubFindByTransactionId).toHaveBeenCalledWith('paytabs', 'txn_cancel');
+      expect(mockSubCancel).toHaveBeenCalledWith(true);
+      expect(mockFindByIdAndUpdate).toHaveBeenCalledWith('user@example.com', {
+        $set: { plan: 'free' },
+      });
     });
 
     it('should cancel subscription at period end', async () => {
       const { paytabsGateway } = await import('@/lib/payments/paytabs/gateway');
 
-      mockFindOneAndUpdate.mockResolvedValue({});
+      const mockSubscription = {
+        userId: 'user@example.com',
+        cancel: mockSubCancel.mockResolvedValue(undefined),
+      };
+      mockSubFindByTransactionId.mockResolvedValue(mockSubscription);
 
       await paytabsGateway.cancelSubscription('txn_cancel_end');
 
-      expect(mockFindOneAndUpdate).toHaveBeenCalledWith(
-        { paytabsTransactionRef: 'txn_cancel_end' },
-        {
-          $set: { cancelAtPeriodEnd: true },
-        }
+      expect(mockSubCancel).toHaveBeenCalledWith(false);
+      expect(mockFindByIdAndUpdate).not.toHaveBeenCalled();
+    });
+
+    it('should cancel subscription by user ID if not found by transaction ID', async () => {
+      const { paytabsGateway } = await import('@/lib/payments/paytabs/gateway');
+
+      const mockSubscription = {
+        userId: 'user@example.com',
+        cancel: mockSubCancel.mockResolvedValue(undefined),
+      };
+      mockSubFindByTransactionId.mockResolvedValue(null);
+      mockSubFindActiveByUserId.mockResolvedValue(mockSubscription);
+
+      await paytabsGateway.cancelSubscription('user@example.com');
+
+      expect(mockSubFindActiveByUserId).toHaveBeenCalledWith('user@example.com', 'paytabs');
+      expect(mockSubCancel).toHaveBeenCalledWith(false);
+    });
+
+    it('should throw error when subscription not found', async () => {
+      const { paytabsGateway } = await import('@/lib/payments/paytabs/gateway');
+
+      mockSubFindByTransactionId.mockResolvedValue(null);
+      mockSubFindActiveByUserId.mockResolvedValue(null);
+
+      await expect(paytabsGateway.cancelSubscription('nonexistent')).rejects.toThrow(
+        'Failed to cancel subscription'
       );
     });
 
     it('should throw error on database failure', async () => {
       const { paytabsGateway } = await import('@/lib/payments/paytabs/gateway');
 
-      mockFindOneAndUpdate.mockRejectedValue(new Error('Database error'));
+      mockSubFindByTransactionId.mockRejectedValue(new Error('Database error'));
 
       await expect(paytabsGateway.cancelSubscription('txn_error')).rejects.toThrow(
         'Failed to cancel subscription'
