@@ -601,6 +601,28 @@
       "files": "الملفات",
       "analytics": "التحليلات",
       "settings": "الإعدادات"
+    },
+    "usage": {
+      "title": "الاستخدام",
+      "subtitle": "تتبع استخدامك مقابل حدود خطتك",
+      "plan": "الخطة",
+      "todaysUsage": "استخدام اليوم",
+      "dailyLimits": "الحدود اليومية",
+      "storage": "التخزين",
+      "conversions": "التحويلات",
+      "apiCalls": "استدعاءات API",
+      "storageUsed": "المساحة المستخدمة",
+      "used": "مستخدم",
+      "total": "الإجمالي",
+      "unlimited": "غير محدود",
+      "resetsNow": "يُعاد التعيين الآن",
+      "resetsIn": "يُعاد التعيين خلال {hours} ساعة و{minutes} دقيقة",
+      "resetsInMinutes": "يُعاد التعيين خلال {minutes} دقيقة",
+      "thisWeek": "هذا الأسبوع",
+      "noHistoryData": "لا توجد بيانات استخدام متاحة بعد",
+      "conversionsLabel": "تحويلات",
+      "totalConversions": "إجمالي التحويلات",
+      "totalApiCalls": "إجمالي استدعاءات API"
     }
   }
 }
