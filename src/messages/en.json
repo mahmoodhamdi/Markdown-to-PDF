@@ -601,6 +601,28 @@
       "files": "Files",
       "analytics": "Analytics",
       "settings": "Settings"
+    },
+    "usage": {
+      "title": "Usage",
+      "subtitle": "Track your usage against your plan limits",
+      "plan": "Plan",
+      "todaysUsage": "Today's Usage",
+      "dailyLimits": "Daily Limits",
+      "storage": "Storage",
+      "conversions": "Conversions",
+      "apiCalls": "API Calls",
+      "storageUsed": "Storage Used",
+      "used": "used",
+      "total": "total",
+      "unlimited": "Unlimited",
+      "resetsNow": "Resets now",
+      "resetsIn": "Resets in {hours}h {minutes}m",
+      "resetsInMinutes": "Resets in {minutes}m",
+      "thisWeek": "This Week",
+      "noHistoryData": "No usage data available yet",
+      "conversionsLabel": "conversions",
+      "totalConversions": "Total Conversions",
+      "totalApiCalls": "Total API Calls"
     }
   }
 }
