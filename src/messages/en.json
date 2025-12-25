@@ -569,5 +569,38 @@
     "upgradeTitle": "Unlock Custom CSS",
     "upgradeDescription": "Upgrade to Pro to add custom CSS styling to your PDFs.",
     "upgradeButton": "View Plans"
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "welcome": "Welcome back, {name}!",
+    "welcomeSubtitle": "Here's an overview of your account activity",
+    "user": "User",
+    "quickActions": "Quick Actions",
+    "actions": {
+      "newDocument": "New Document",
+      "uploadFiles": "Upload Files",
+      "browseTemplates": "Browse Templates"
+    },
+    "stats": {
+      "conversionsToday": "Conversions Today",
+      "apiCalls": "API Calls",
+      "storageUsed": "Storage Used",
+      "currentPlan": "Current Plan",
+      "today": "Today",
+      "of": "of"
+    },
+    "upgrade": {
+      "title": "Upgrade to Pro",
+      "description": "Get more conversions, larger files, and premium features.",
+      "button": "View Plans"
+    },
+    "nav": {
+      "overview": "Overview",
+      "usage": "Usage",
+      "subscription": "Subscription",
+      "files": "Files",
+      "analytics": "Analytics",
+      "settings": "Settings"
+    }
   }
 }
