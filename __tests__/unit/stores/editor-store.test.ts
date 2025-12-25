@@ -48,15 +48,29 @@ describe('Editor Store', () => {
   });
 
   describe('fullscreen', () => {
-    it('should set fullscreen', () => {
+    it('should have initial state as not fullscreen', () => {
+      expect(getStore().isFullscreen).toBe(false);
+    });
+
+    it('should set fullscreen to true', () => {
       getStore().setIsFullscreen(true);
       expect(getStore().isFullscreen).toBe(true);
     });
 
-    it('should toggle fullscreen', () => {
+    it('should set fullscreen to false', () => {
+      getStore().setIsFullscreen(true);
+      getStore().setIsFullscreen(false);
+      expect(getStore().isFullscreen).toBe(false);
+    });
+
+    it('should toggle fullscreen from false to true', () => {
       expect(getStore().isFullscreen).toBe(false);
       getStore().toggleFullscreen();
       expect(getStore().isFullscreen).toBe(true);
+    });
+
+    it('should toggle fullscreen from true to false', () => {
+      getStore().setIsFullscreen(true);
       getStore().toggleFullscreen();
       expect(getStore().isFullscreen).toBe(false);
     });

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useTranslations } from 'next-intl';
 import { Download, Loader2, FileText, FileCode, Printer } from 'lucide-react';
 import { toast } from 'sonner';
@@ -120,7 +120,7 @@ export function ConvertButton() {
     }
   };
 
-  const handlePrint = async () => {
+  const handlePrint = useCallback(async () => {
     if (!content.trim()) {
       toast.error(tErrors('emptyContent'));
       return;
@@ -158,7 +158,20 @@ export function ConvertButton() {
       console.error('Print error:', error);
       toast.error(tErrors('generic'));
     }
-  };
+  }, [content, documentTheme, t, tErrors]);
+
+  // Ctrl+P keyboard shortcut for print
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === 'p') {
+        e.preventDefault();
+        handlePrint();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [handlePrint]);
 
   return (
     <div className="flex items-center gap-2">

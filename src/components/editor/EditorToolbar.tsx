@@ -1,6 +1,7 @@
 'use client';
 
 import { useTranslations } from 'next-intl';
+import { useEffect, useCallback } from 'react';
 import {
   Bold,
   Italic,
@@ -19,11 +20,13 @@ import {
   Table,
   Minus,
   Columns,
-  Maximize,
+  Maximize2,
+  Minimize2,
   Eye,
   ListTree,
   Undo2,
   Redo2,
+  Save,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
@@ -33,6 +36,7 @@ import {
   TooltipTrigger,
 } from '@/components/ui/tooltip';
 import { useEditorStore } from '@/stores/editor-store';
+import { useAutoSave } from '@/hooks/useAutoSave';
 import { cn } from '@/lib/utils';
 
 interface ToolbarAction {
@@ -47,6 +51,7 @@ export function EditorToolbar() {
   const {
     viewMode,
     setViewMode,
+    isFullscreen,
     toggleFullscreen,
     showToc,
     toggleToc,
@@ -55,6 +60,24 @@ export function EditorToolbar() {
     undo,
     redo,
   } = useEditorStore();
+  const { saveNow, isDirty } = useAutoSave();
+
+  // Handle Ctrl+S keyboard shortcut
+  const handleSave = useCallback(() => {
+    saveNow();
+  }, [saveNow]);
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+        e.preventDefault();
+        handleSave();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [handleSave]);
 
   const insertAtCursor = (before: string, after: string = '') => {
     storeInsertAtCursor(before + after);
@@ -79,6 +102,12 @@ export function EditorToolbar() {
         icon: <Redo2 className="h-4 w-4" />,
         label: t('redo'),
         action: () => redo(),
+      },
+      {
+        icon: <Save className={cn('h-4 w-4', isDirty && 'text-yellow-500')} />,
+        label: `${t('save')} (Ctrl+S)`,
+        action: handleSave,
+        shortcut: 'Ctrl+S',
       },
     ],
     [
@@ -193,8 +222,8 @@ export function EditorToolbar() {
       action: () => toggleToc(),
     },
     {
-      icon: <Maximize className="h-4 w-4" />,
-      label: t('fullscreen'),
+      icon: isFullscreen ? <Minimize2 className="h-4 w-4" /> : <Maximize2 className="h-4 w-4" />,
+      label: isFullscreen ? t('exitFullscreen') : t('fullscreen'),
       action: () => toggleFullscreen(),
     },
   ];
@@ -241,7 +270,8 @@ export function EditorToolbar() {
                     'h-8 w-8',
                     (action.label === t('preview') && viewMode === 'preview') ||
                       (action.label === t('split') && viewMode === 'split') ||
-                      (action.label === t('toc') && showToc)
+                      (action.label === t('toc') && showToc) ||
+                      (action.label === t('exitFullscreen') && isFullscreen)
                       ? 'bg-accent'
                       : ''
                   )}
