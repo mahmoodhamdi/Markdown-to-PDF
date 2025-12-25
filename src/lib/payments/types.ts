@@ -31,7 +31,8 @@ export type SubscriptionStatus =
   | 'paused'
   | 'trialing'
   | 'incomplete'
-  | 'incomplete_expired';
+  | 'incomplete_expired'
+  | 'expired';
 
 /**
  * Options for creating a checkout session

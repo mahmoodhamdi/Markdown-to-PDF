@@ -91,6 +91,7 @@ export interface PaymobTransactionCallback {
       merchant: { id: number };
       amount_cents: number;
       currency: string;
+      shipping_data?: Record<string, unknown>;
     };
     created_at: string;
     currency: string;
