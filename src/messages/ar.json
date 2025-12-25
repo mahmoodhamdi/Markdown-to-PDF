@@ -569,5 +569,38 @@
     "upgradeTitle": "افتح CSS المخصص",
     "upgradeDescription": "قم بالترقية إلى Pro لإضافة تنسيق CSS مخصص لملفات PDF الخاصة بك.",
     "upgradeButton": "عرض الخطط"
+  },
+  "dashboard": {
+    "title": "لوحة التحكم",
+    "welcome": "مرحباً مجدداً، {name}!",
+    "welcomeSubtitle": "إليك نظرة عامة على نشاط حسابك",
+    "user": "المستخدم",
+    "quickActions": "إجراءات سريعة",
+    "actions": {
+      "newDocument": "مستند جديد",
+      "uploadFiles": "رفع ملفات",
+      "browseTemplates": "تصفح القوالب"
+    },
+    "stats": {
+      "conversionsToday": "التحويلات اليوم",
+      "apiCalls": "استدعاءات API",
+      "storageUsed": "المساحة المستخدمة",
+      "currentPlan": "الخطة الحالية",
+      "today": "اليوم",
+      "of": "من"
+    },
+    "upgrade": {
+      "title": "الترقية إلى Pro",
+      "description": "احصل على المزيد من التحويلات وملفات أكبر وميزات مميزة.",
+      "button": "عرض الخطط"
+    },
+    "nav": {
+      "overview": "نظرة عامة",
+      "usage": "الاستخدام",
+      "subscription": "الاشتراك",
+      "files": "الملفات",
+      "analytics": "التحليلات",
+      "settings": "الإعدادات"
+    }
   }
 }
