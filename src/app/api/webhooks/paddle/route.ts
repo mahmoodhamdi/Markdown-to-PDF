@@ -8,6 +8,8 @@ import { connectDB } from '@/lib/db/mongodb';
 import { User } from '@/lib/db/models/User';
 import { isPaddleConfigured, PADDLE_CONFIG } from '@/lib/payments/paddle/config';
 import { paddleClient } from '@/lib/payments/paddle/client';
+import { emailService } from '@/lib/email/service';
+import { PlanType } from '@/lib/plans/config';
 
 /**
  * Handle POST request (webhook from Paddle)
@@ -54,10 +56,12 @@ export async function POST(request: NextRequest) {
         const customData = data.custom_data || {};
         const userEmail = customData.userEmail;
         const plan = customData.plan;
+        const billing = customData.billing as 'monthly' | 'yearly' | undefined;
 
         if (userEmail && plan) {
           try {
             await connectDB();
+            const user = await User.findById(userEmail.toLowerCase());
             await User.findByIdAndUpdate(userEmail.toLowerCase(), {
               $set: {
                 plan,
@@ -66,6 +70,27 @@ export async function POST(request: NextRequest) {
               },
             });
             console.log(`User ${userEmail} upgraded to ${plan} via Paddle`);
+
+            // Send subscription confirmation email
+            if (emailService.isConfigured()) {
+              const amount = data.items?.[0]?.price?.unit_price?.amount
+                ? parseFloat(data.items[0].price.unit_price.amount) / 100
+                : undefined;
+              const currency = data.currency_code;
+
+              emailService.sendSubscriptionConfirmation(
+                { email: userEmail.toLowerCase(), name: user?.name || '' },
+                {
+                  plan: plan as PlanType,
+                  billing: billing || 'monthly',
+                  amount,
+                  currency,
+                  gateway: 'paddle',
+                }
+              ).catch((err) => {
+                console.error('Failed to send subscription confirmation email:', err);
+              });
+            }
           } catch (error) {
             console.error('Error updating user from Paddle webhook:', error);
           }
@@ -97,10 +122,14 @@ export async function POST(request: NextRequest) {
         const data = event.data;
         const customData = data.custom_data || {};
         const userEmail = customData.userEmail;
+        const plan = customData.plan;
 
         if (userEmail) {
           try {
             await connectDB();
+            const user = await User.findById(userEmail.toLowerCase());
+            const previousPlan = plan || user?.plan || 'pro';
+
             await User.findByIdAndUpdate(userEmail.toLowerCase(), {
               $set: {
                 plan: 'free',
@@ -108,6 +137,19 @@ export async function POST(request: NextRequest) {
               },
             });
             console.log(`User ${userEmail} subscription canceled via Paddle`);
+
+            // Send subscription canceled email
+            if (emailService.isConfigured()) {
+              emailService.sendSubscriptionCanceled(
+                { email: userEmail.toLowerCase(), name: user?.name || '' },
+                {
+                  plan: previousPlan as PlanType,
+                  immediate: true,
+                }
+              ).catch((err) => {
+                console.error('Failed to send subscription canceled email:', err);
+              });
+            }
           } catch (error) {
             console.error('Error canceling subscription from Paddle webhook:', error);
           }

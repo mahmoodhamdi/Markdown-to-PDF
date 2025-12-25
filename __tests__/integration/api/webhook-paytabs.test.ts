@@ -5,19 +5,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { NextRequest } from 'next/server';
 
-// Mock MongoDB connection
-vi.mock('@/lib/db/mongodb', () => ({
-  connectDB: vi.fn().mockResolvedValue(undefined),
-}));
-
-// Mock User model
-const mockFindByIdAndUpdate = vi.fn();
-vi.mock('@/lib/db/models/User', () => ({
-  User: {
-    findByIdAndUpdate: (...args: unknown[]) => mockFindByIdAndUpdate(...args),
-  },
-}));
-
 // Mock PayTabs config
 const mockIsPayTabsConfigured = vi.fn();
 vi.mock('@/lib/payments/paytabs/config', () => ({
@@ -26,11 +13,17 @@ vi.mock('@/lib/payments/paytabs/config', () => ({
 
 // Mock PayTabs client
 const mockVerifyCallbackSignature = vi.fn();
-const mockParseCallbackData = vi.fn();
 vi.mock('@/lib/payments/paytabs/client', () => ({
   paytabsClient: {
     verifyCallbackSignature: (...args: unknown[]) => mockVerifyCallbackSignature(...args),
-    parseCallbackData: (...args: unknown[]) => mockParseCallbackData(...args),
+  },
+}));
+
+// Mock PayTabs gateway
+const mockHandleWebhook = vi.fn();
+vi.mock('@/lib/payments/paytabs/gateway', () => ({
+  paytabsGateway: {
+    handleWebhook: (...args: unknown[]) => mockHandleWebhook(...args),
   },
 }));
 
@@ -96,15 +89,15 @@ describe('/api/webhooks/paytabs', () => {
 
     it('should handle successful payment', async () => {
       mockVerifyCallbackSignature.mockReturnValue(true);
-      mockParseCallbackData.mockReturnValue({
+      mockHandleWebhook.mockResolvedValue({
+        event: 'payment.success',
         success: true,
-        transactionRef: 'TST123',
-        cartId: 'cart_123',
-        customerEmail: 'test@example.com',
+        status: 'succeeded',
+        paymentId: 'TST123',
+        amount: 29900,
+        currency: 'SAR',
+        userEmail: 'test@example.com',
         plan: 'pro',
-        responseStatus: 'A',
-        responseCode: '000',
-        responseMessage: 'Approved',
       });
 
       const payload = {
@@ -133,27 +126,22 @@ describe('/api/webhooks/paytabs', () => {
       expect(data.received).toBe(true);
       expect(data.status).toBe('success');
       expect(data.transactionRef).toBe('TST123');
-      expect(mockFindByIdAndUpdate).toHaveBeenCalledWith(
-        'test@example.com',
+      expect(mockHandleWebhook).toHaveBeenCalledWith(
         expect.objectContaining({
-          $set: expect.objectContaining({
-            plan: 'pro',
-            paytabsTransactionRef: 'TST123',
-            paytabsCartId: 'cart_123',
-          }),
-        })
+          tran_ref: 'TST123',
+        }),
+        'valid_signature'
       );
     });
 
     it('should handle failed payment', async () => {
       mockVerifyCallbackSignature.mockReturnValue(true);
-      mockParseCallbackData.mockReturnValue({
-        success: false,
-        transactionRef: 'TST_FAIL',
-        cartId: 'cart_fail',
-        responseStatus: 'D',
-        responseCode: '101',
-        responseMessage: 'Declined',
+      mockHandleWebhook.mockResolvedValue({
+        event: 'payment.failed',
+        success: true,
+        status: 'failed',
+        paymentId: 'TST_FAIL',
+        error: 'Declined',
       });
 
       const payload = {
@@ -182,11 +170,12 @@ describe('/api/webhooks/paytabs', () => {
     });
 
     it('should process callback without signature verification', async () => {
-      mockParseCallbackData.mockReturnValue({
+      mockHandleWebhook.mockResolvedValue({
+        event: 'payment.success',
         success: true,
-        transactionRef: 'TST_NOSIG',
-        cartId: 'cart_nosig',
-        customerEmail: 'nosig@example.com',
+        status: 'succeeded',
+        paymentId: 'TST_NOSIG',
+        userEmail: 'nosig@example.com',
         plan: 'team',
       });
 

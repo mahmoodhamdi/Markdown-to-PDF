@@ -11,10 +11,21 @@ vi.mock('@/lib/db/mongodb', () => ({
 }));
 
 // Mock User model
+const mockFindById = vi.fn();
 const mockFindByIdAndUpdate = vi.fn();
 vi.mock('@/lib/db/models/User', () => ({
   User: {
+    findById: (...args: unknown[]) => mockFindById(...args),
     findByIdAndUpdate: (...args: unknown[]) => mockFindByIdAndUpdate(...args),
+  },
+}));
+
+// Mock email service
+vi.mock('@/lib/email/service', () => ({
+  emailService: {
+    isConfigured: vi.fn().mockReturnValue(false),
+    sendSubscriptionConfirmation: vi.fn().mockResolvedValue('sent'),
+    sendSubscriptionCanceled: vi.fn().mockResolvedValue('sent'),
   },
 }));
 
@@ -43,6 +54,28 @@ describe('/api/webhooks/paddle', () => {
     vi.resetModules();
     mockIsPaddleConfigured.mockReturnValue(true);
     mockVerifyWebhookSignature.mockReturnValue(true);
+    mockFindById.mockResolvedValue({ _id: 'test@example.com', name: 'Test User', plan: 'pro' });
+    mockFindByIdAndUpdate.mockResolvedValue(undefined);
+
+    // Re-mock after reset
+    vi.doMock('@/lib/db/mongodb', () => ({
+      connectDB: vi.fn().mockResolvedValue(undefined),
+    }));
+
+    vi.doMock('@/lib/db/models/User', () => ({
+      User: {
+        findById: (...args: unknown[]) => mockFindById(...args),
+        findByIdAndUpdate: (...args: unknown[]) => mockFindByIdAndUpdate(...args),
+      },
+    }));
+
+    vi.doMock('@/lib/email/service', () => ({
+      emailService: {
+        isConfigured: vi.fn().mockReturnValue(false),
+        sendSubscriptionConfirmation: vi.fn().mockResolvedValue('sent'),
+        sendSubscriptionCanceled: vi.fn().mockResolvedValue('sent'),
+      },
+    }));
 
     const module = await import('@/app/api/webhooks/paddle/route');
     POST = module.POST;

@@ -15,23 +15,11 @@ import { isPaymobConfigured, PAYMOB_CONFIG } from './config';
 import { paymobClient, PaymobTransactionCallback } from './client';
 import { connectDB } from '@/lib/db/mongodb';
 import { User } from '@/lib/db/models/User';
-
-// In-memory storage for subscriptions (in production, use a proper database)
-// Paymob doesn't have native subscription support, so we track it ourselves
-interface _PaymobSubscription {
-  id: string;
-  customerId: string;
-  userEmail: string;
-  plan: 'pro' | 'team' | 'enterprise';
-  billing: 'monthly' | 'yearly';
-  status: 'active' | 'canceled' | 'past_due';
-  currentPeriodStart: Date;
-  currentPeriodEnd: Date;
-  cancelAtPeriodEnd: boolean;
-  canceledAt?: Date;
-  createdAt: Date;
-  lastTransactionId?: string;
-}
+import {
+  RegionalSubscription,
+  createRegionalSubscription,
+  type IRegionalSubscription,
+} from '@/lib/db/models/RegionalSubscription';
 
 /**
  * Paymob Payment Gateway
@@ -106,24 +94,48 @@ export const paymobGateway: PaymentGateway = {
     }
 
     if (parsed.success && !parsed.isVoided && !parsed.isRefunded) {
-      // Payment successful - update user plan
+      // Payment successful - update user plan and create/update subscription
       result.status = 'succeeded';
 
       // Try to extract plan info from special reference or extras
-      // The special reference format is: userId_plan_billing_timestamp
       const extras = transactionPayload.obj?.data as Record<string, unknown> | undefined;
       const plan = (extras?.plan as string) || 'pro';
+      const billing = (extras?.billing as string) || 'monthly';
       const userEmail = result.userEmail;
 
       if (userEmail) {
         try {
           await connectDB();
+
+          // Update user plan
           await User.findByIdAndUpdate(userEmail, {
-            $set: {
-              plan,
-              paymobTransactionId: String(parsed.transactionId),
-            },
+            $set: { plan },
           });
+
+          // Create or update regional subscription
+          const existingSub = await RegionalSubscription.findActiveByUserId(userEmail, 'paymob');
+
+          if (existingSub) {
+            // Renew existing subscription
+            await existingSub.renew(
+              String(parsed.transactionId),
+              parsed.amount,
+              parsed.currency
+            );
+          } else {
+            // Create new subscription
+            await createRegionalSubscription({
+              userId: userEmail,
+              gateway: 'paymob',
+              gatewayTransactionId: String(parsed.transactionId),
+              plan: plan as 'pro' | 'team' | 'enterprise',
+              billing: billing as 'monthly' | 'yearly',
+              amount: parsed.amount,
+              currency: parsed.currency,
+              metadata: extras,
+            });
+          }
+
           result.plan = plan as WebhookResult['plan'];
         } catch (error) {
           console.error('Error updating user plan from Paymob webhook:', error);
@@ -132,62 +144,118 @@ export const paymobGateway: PaymentGateway = {
     } else if (parsed.isRefunded) {
       result.event = 'payment.refunded';
       result.status = 'refunded';
+
+      // Update subscription status
+      if (result.userEmail) {
+        try {
+          await connectDB();
+          const subscription = await RegionalSubscription.findByTransactionId(
+            'paymob',
+            String(parsed.transactionId)
+          );
+          if (subscription) {
+            subscription.status = 'canceled';
+            subscription.canceledAt = new Date();
+            await subscription.save();
+
+            // Downgrade user to free
+            await User.findByIdAndUpdate(result.userEmail, {
+              $set: { plan: 'free' },
+            });
+          }
+        } catch (error) {
+          console.error('Error handling Paymob refund:', error);
+        }
+      }
     } else if (parsed.isVoided) {
       result.event = 'payment.voided';
       result.status = 'canceled';
     } else if (parsed.errorOccurred) {
       result.event = 'payment.failed';
       result.status = 'failed';
+
+      // Update subscription status to past_due
+      if (result.userEmail) {
+        try {
+          await connectDB();
+          const subscription = await RegionalSubscription.findActiveByUserId(
+            result.userEmail,
+            'paymob'
+          );
+          if (subscription) {
+            subscription.status = 'past_due';
+            await subscription.save();
+          }
+        } catch (error) {
+          console.error('Error updating subscription status:', error);
+        }
+      }
     }
 
     return result;
   },
 
   async getSubscription(subscriptionId: string): Promise<Subscription | null> {
-    // Paymob doesn't have native subscription support
-    // We would need to store subscription data in our database
-    // For now, return null - in production, query from MongoDB
     try {
       await connectDB();
-      const user = await User.findOne({
-        paymobSubscriptionId: subscriptionId,
-      });
 
-      if (!user) {
+      // Try to find by transaction ID first
+      let subscription: IRegionalSubscription | null =
+        await RegionalSubscription.findByTransactionId('paymob', subscriptionId);
+
+      // If not found, try to find by user ID
+      if (!subscription) {
+        subscription = await RegionalSubscription.findActiveByUserId(subscriptionId, 'paymob');
+      }
+
+      if (!subscription) {
         return null;
       }
 
       return {
-        id: subscriptionId,
+        id: subscription.gatewayTransactionId,
         gateway: 'paymob',
-        customerId: user._id,
-        userEmail: user.email,
-        plan: user.plan,
-        status: 'active',
-        billing: 'monthly', // Default, should be stored
-        currentPeriodStart: new Date(),
-        currentPeriodEnd: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
-        cancelAtPeriodEnd: false,
-        createdAt: user.createdAt,
+        customerId: subscription.userId,
+        userEmail: subscription.userId,
+        plan: subscription.plan,
+        status: subscription.status,
+        billing: subscription.billing,
+        currentPeriodStart: subscription.currentPeriodStart,
+        currentPeriodEnd: subscription.currentPeriodEnd,
+        cancelAtPeriodEnd: subscription.cancelAtPeriodEnd,
+        createdAt: subscription.createdAt,
       };
-    } catch {
+    } catch (error) {
+      console.error('Error getting Paymob subscription:', error);
       return null;
     }
   },
 
   async cancelSubscription(subscriptionId: string, immediate = false): Promise<void> {
-    // Paymob doesn't have native subscription management
-    // We handle this by updating our database
     try {
       await connectDB();
-      await User.findOneAndUpdate(
-        { paymobSubscriptionId: subscriptionId },
-        {
-          $set: immediate
-            ? { plan: 'free', paymobSubscriptionId: null }
-            : { cancelAtPeriodEnd: true },
-        }
-      );
+
+      // Find subscription
+      let subscription = await RegionalSubscription.findByTransactionId('paymob', subscriptionId);
+
+      if (!subscription) {
+        // Try finding by user ID
+        subscription = await RegionalSubscription.findActiveByUserId(subscriptionId, 'paymob');
+      }
+
+      if (!subscription) {
+        throw new Error('Subscription not found');
+      }
+
+      // Cancel the subscription
+      await subscription.cancel(immediate);
+
+      // If immediate, downgrade user to free plan
+      if (immediate) {
+        await User.findByIdAndUpdate(subscription.userId, {
+          $set: { plan: 'free' },
+        });
+      }
     } catch (error) {
       console.error('Error canceling Paymob subscription:', error);
       throw new Error('Failed to cancel subscription');

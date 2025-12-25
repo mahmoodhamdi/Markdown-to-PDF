@@ -15,6 +15,11 @@ import { isPayTabsConfigured } from './config';
 import { paytabsClient, PayTabsCallbackData } from './client';
 import { connectDB } from '@/lib/db/mongodb';
 import { User } from '@/lib/db/models/User';
+import {
+  RegionalSubscription,
+  createRegionalSubscription,
+  type IRegionalSubscription,
+} from '@/lib/db/models/RegionalSubscription';
 
 /**
  * PayTabs Payment Gateway
@@ -82,16 +87,46 @@ export const paytabsGateway: PaymentGateway = {
     if (parsed.success) {
       result.status = 'succeeded';
 
-      // Update user plan in database
+      // Update user plan in database and create subscription
       if (parsed.customerEmail && parsed.plan) {
         try {
           await connectDB();
-          await User.findByIdAndUpdate(parsed.customerEmail.toLowerCase(), {
-            $set: {
-              plan: parsed.plan,
-              paytabsTransactionRef: parsed.transactionRef,
-            },
+
+          const userEmail = parsed.customerEmail.toLowerCase();
+          const billing = (parsed.billing as string) || 'monthly';
+
+          // Update user plan
+          await User.findByIdAndUpdate(userEmail, {
+            $set: { plan: parsed.plan },
           });
+
+          // Create or update regional subscription
+          const existingSub = await RegionalSubscription.findActiveByUserId(userEmail, 'paytabs');
+
+          if (existingSub) {
+            // Renew existing subscription
+            await existingSub.renew(
+              parsed.transactionRef,
+              parsed.amount * 100,
+              parsed.currency
+            );
+          } else {
+            // Create new subscription
+            await createRegionalSubscription({
+              userId: userEmail,
+              gateway: 'paytabs',
+              gatewayTransactionId: parsed.transactionRef,
+              plan: parsed.plan as 'pro' | 'team' | 'enterprise',
+              billing: billing as 'monthly' | 'yearly',
+              amount: parsed.amount * 100,
+              currency: parsed.currency,
+              metadata: {
+                userId: parsed.userId,
+                responseCode: parsed.responseCode,
+              },
+            });
+          }
+
           console.log(`User ${parsed.customerEmail} upgraded to ${parsed.plan} via PayTabs`);
         } catch (error) {
           console.error('Error updating user from PayTabs webhook:', error);
@@ -100,55 +135,89 @@ export const paytabsGateway: PaymentGateway = {
     } else {
       result.status = 'failed';
       result.error = parsed.responseMessage;
+
+      // Update subscription status to past_due if exists
+      if (parsed.customerEmail) {
+        try {
+          await connectDB();
+          const subscription = await RegionalSubscription.findActiveByUserId(
+            parsed.customerEmail.toLowerCase(),
+            'paytabs'
+          );
+          if (subscription) {
+            subscription.status = 'past_due';
+            await subscription.save();
+          }
+        } catch (error) {
+          console.error('Error updating subscription status:', error);
+        }
+      }
     }
 
     return result;
   },
 
   async getSubscription(subscriptionId: string): Promise<Subscription | null> {
-    // PayTabs doesn't have native subscription support
-    // Query our database instead
     try {
       await connectDB();
-      const user = await User.findOne({
-        paytabsTransactionRef: subscriptionId,
-      });
 
-      if (!user) {
+      // Try to find by transaction ID first
+      let subscription: IRegionalSubscription | null =
+        await RegionalSubscription.findByTransactionId('paytabs', subscriptionId);
+
+      // If not found, try to find by user ID
+      if (!subscription) {
+        subscription = await RegionalSubscription.findActiveByUserId(subscriptionId, 'paytabs');
+      }
+
+      if (!subscription) {
         return null;
       }
 
       return {
-        id: subscriptionId,
+        id: subscription.gatewayTransactionId,
         gateway: 'paytabs',
-        customerId: user._id,
-        userEmail: user.email,
-        plan: user.plan,
-        status: 'active',
-        billing: 'monthly', // Default, should be stored
-        currentPeriodStart: new Date(),
-        currentPeriodEnd: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
-        cancelAtPeriodEnd: false,
-        createdAt: user.createdAt,
+        customerId: subscription.userId,
+        userEmail: subscription.userId,
+        plan: subscription.plan,
+        status: subscription.status,
+        billing: subscription.billing,
+        currentPeriodStart: subscription.currentPeriodStart,
+        currentPeriodEnd: subscription.currentPeriodEnd,
+        cancelAtPeriodEnd: subscription.cancelAtPeriodEnd,
+        createdAt: subscription.createdAt,
       };
-    } catch {
+    } catch (error) {
+      console.error('Error getting PayTabs subscription:', error);
       return null;
     }
   },
 
   async cancelSubscription(subscriptionId: string, immediate = false): Promise<void> {
-    // PayTabs doesn't have native subscription management
-    // Update our database
     try {
       await connectDB();
-      await User.findOneAndUpdate(
-        { paytabsTransactionRef: subscriptionId },
-        {
-          $set: immediate
-            ? { plan: 'free', paytabsTransactionRef: null }
-            : { cancelAtPeriodEnd: true },
-        }
-      );
+
+      // Find subscription
+      let subscription = await RegionalSubscription.findByTransactionId('paytabs', subscriptionId);
+
+      if (!subscription) {
+        // Try finding by user ID
+        subscription = await RegionalSubscription.findActiveByUserId(subscriptionId, 'paytabs');
+      }
+
+      if (!subscription) {
+        throw new Error('Subscription not found');
+      }
+
+      // Cancel the subscription
+      await subscription.cancel(immediate);
+
+      // If immediate, downgrade user to free plan
+      if (immediate) {
+        await User.findByIdAndUpdate(subscription.userId, {
+          $set: { plan: 'free' },
+        });
+      }
     } catch (error) {
       console.error('Error canceling PayTabs subscription:', error);
       throw new Error('Failed to cancel subscription');

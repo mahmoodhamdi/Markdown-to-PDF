@@ -5,23 +5,18 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { NextRequest } from 'next/server';
 
-// Mock MongoDB connection
-vi.mock('@/lib/db/mongodb', () => ({
-  connectDB: vi.fn().mockResolvedValue(undefined),
-}));
-
-// Mock User model
-const mockFindByIdAndUpdate = vi.fn();
-vi.mock('@/lib/db/models/User', () => ({
-  User: {
-    findByIdAndUpdate: (...args: unknown[]) => mockFindByIdAndUpdate(...args),
-  },
-}));
-
 // Mock Paymob config
 vi.mock('@/lib/payments/paymob/config', () => ({
   PAYMOB_CONFIG: {
     hmacSecret: 'test_hmac_secret',
+  },
+}));
+
+// Mock Paymob gateway
+const mockHandleWebhook = vi.fn();
+vi.mock('@/lib/payments/paymob/gateway', () => ({
+  paymobGateway: {
+    handleWebhook: (...args: unknown[]) => mockHandleWebhook(...args),
   },
 }));
 
@@ -94,6 +89,18 @@ describe('/api/webhooks/paymob', () => {
     });
 
     it('should handle successful payment', async () => {
+      // Mock gateway returning successful result
+      mockHandleWebhook.mockResolvedValue({
+        event: 'payment.success',
+        success: true,
+        status: 'succeeded',
+        paymentId: 'txn_123',
+        amount: 29900,
+        currency: 'EGP',
+        userEmail: 'test@example.com',
+        plan: 'pro',
+      });
+
       const payload = {
         obj: {
           id: 'txn_123',
@@ -130,18 +137,27 @@ describe('/api/webhooks/paymob', () => {
 
       expect(response.status).toBe(200);
       expect(data.received).toBe(true);
-      expect(mockFindByIdAndUpdate).toHaveBeenCalledWith(
-        'test@example.com',
+      expect(mockHandleWebhook).toHaveBeenCalledWith(
         expect.objectContaining({
-          $set: expect.objectContaining({
-            plan: 'pro',
-            paymobTransactionId: 'txn_123',
+          obj: expect.objectContaining({
+            id: 'txn_123',
+            success: true,
           }),
-        })
+        }),
+        'valid_hmac_hash'
       );
     });
 
     it('should handle refunded payment', async () => {
+      // Mock gateway returning refund result
+      mockHandleWebhook.mockResolvedValue({
+        event: 'payment.refunded',
+        success: true,
+        status: 'refunded',
+        paymentId: 'txn_refund',
+        userEmail: 'refund@example.com',
+      });
+
       const payload = {
         obj: {
           id: 'txn_refund',
@@ -178,17 +194,26 @@ describe('/api/webhooks/paymob', () => {
 
       expect(response.status).toBe(200);
       expect(data.received).toBe(true);
-      expect(mockFindByIdAndUpdate).toHaveBeenCalledWith(
-        'refund@example.com',
+      expect(mockHandleWebhook).toHaveBeenCalledWith(
         expect.objectContaining({
-          $set: expect.objectContaining({
-            plan: 'free',
+          obj: expect.objectContaining({
+            is_refunded: true,
           }),
-        })
+        }),
+        'valid_hmac_hash'
       );
     });
 
     it('should handle voided payment', async () => {
+      // Mock gateway returning void result
+      mockHandleWebhook.mockResolvedValue({
+        event: 'payment.voided',
+        success: true,
+        status: 'canceled',
+        paymentId: 'txn_void',
+        userEmail: 'void@example.com',
+      });
+
       const payload = {
         obj: {
           id: 'txn_void',
@@ -225,13 +250,13 @@ describe('/api/webhooks/paymob', () => {
 
       expect(response.status).toBe(200);
       expect(data.received).toBe(true);
-      expect(mockFindByIdAndUpdate).toHaveBeenCalledWith(
-        'void@example.com',
+      expect(mockHandleWebhook).toHaveBeenCalledWith(
         expect.objectContaining({
-          $set: expect.objectContaining({
-            plan: 'free',
+          obj: expect.objectContaining({
+            is_voided: true,
           }),
-        })
+        }),
+        'valid_hmac_hash'
       );
     });
 

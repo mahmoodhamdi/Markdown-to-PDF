@@ -5,10 +5,13 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import crypto from 'crypto';
-import { connectDB } from '@/lib/db/mongodb';
-import { User } from '@/lib/db/models/User';
 import { PAYMOB_CONFIG } from '@/lib/payments/paymob/config';
 import { PaymobTransactionCallback } from '@/lib/payments/paymob/client';
+import { paymobGateway } from '@/lib/payments/paymob/gateway';
+import { emailService } from '@/lib/email/service';
+import { connectDB } from '@/lib/db/mongodb';
+import { User } from '@/lib/db/models/User';
+import { PlanType } from '@/lib/plans/config';
 
 /**
  * Verify HMAC signature for Paymob webhook
@@ -139,72 +142,50 @@ export async function POST(request: NextRequest) {
       currency: obj.currency,
     });
 
-    // Handle successful payment
-    if (obj.success && !obj.error_occured && !obj.is_voided && !obj.is_refunded) {
-      const userEmail = obj.billing_data?.email;
+    // Use the gateway's handleWebhook method which includes subscription management
+    const result = await paymobGateway.handleWebhook(payload, payload.hmac || '');
 
-      if (userEmail) {
-        try {
-          await connectDB();
+    console.log(`Paymob webhook processed:`, {
+      event: result.event,
+      status: result.status,
+      userEmail: result.userEmail,
+    });
 
-          // Extract plan from order metadata or use default
-          // In production, you'd store this when creating the payment
-          const plan = 'pro'; // Default plan
+    // Send email notifications based on webhook result
+    if (emailService.isConfigured() && result.userEmail) {
+      try {
+        await connectDB();
+        const user = await User.findById(result.userEmail);
 
-          await User.findByIdAndUpdate(userEmail.toLowerCase(), {
-            $set: {
+        if (result.event === 'payment.success' && result.status === 'succeeded') {
+          // Get plan from order metadata
+          const orderData = payload.obj.order?.shipping_data || {};
+          const plan = (orderData.plan as PlanType) || 'pro';
+          const billing = (orderData.billing as 'monthly' | 'yearly') || 'monthly';
+
+          emailService.sendSubscriptionConfirmation(
+            { email: result.userEmail, name: user?.name || '' },
+            {
               plan,
-              paymobTransactionId: String(obj.id),
-              paymobOrderId: String(obj.order.id),
-            },
+              billing,
+              amount: payload.obj.amount_cents / 100,
+              currency: payload.obj.currency,
+              gateway: 'paymob',
+            }
+          ).catch((err) => {
+            console.error('Failed to send subscription confirmation email:', err);
           });
-
-          console.log(`User ${userEmail} upgraded to ${plan} via Paymob`);
-        } catch (error) {
-          console.error('Error updating user from Paymob webhook:', error);
-        }
-      }
-    }
-
-    // Handle refund
-    if (obj.is_refunded) {
-      const userEmail = obj.billing_data?.email;
-
-      if (userEmail) {
-        try {
-          await connectDB();
-
-          await User.findByIdAndUpdate(userEmail.toLowerCase(), {
-            $set: {
-              plan: 'free',
-            },
+        } else if (result.event === 'subscription.canceled' || result.status === 'canceled') {
+          const plan = (user?.plan as PlanType) || 'pro';
+          emailService.sendSubscriptionCanceled(
+            { email: result.userEmail, name: user?.name || '' },
+            { plan, immediate: true }
+          ).catch((err) => {
+            console.error('Failed to send subscription canceled email:', err);
           });
-
-          console.log(`User ${userEmail} refunded, downgraded to free`);
-        } catch (error) {
-          console.error('Error handling Paymob refund:', error);
         }
-      }
-    }
-
-    // Handle voided transaction
-    if (obj.is_voided) {
-      const userEmail = obj.billing_data?.email;
-
-      if (userEmail) {
-        try {
-          await connectDB();
-
-          await User.findByIdAndUpdate(userEmail.toLowerCase(), {
-            $set: {
-              plan: 'free',
-            },
-          });
-
-          console.log(`User ${userEmail} voided, downgraded to free`);
-        } catch (error) {
-          console.error('Error handling Paymob void:', error);
-        }
+      } catch (err) {
+        console.error('Error sending webhook email:', err);
       }
     }
 

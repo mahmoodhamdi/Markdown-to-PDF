@@ -5,16 +5,27 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { NextRequest } from 'next/server';
 
-// Mock Firebase admin at the top level
-const mockUpdate = vi.fn();
-vi.mock('@/lib/firebase/admin', () => ({
-  adminAuth: {},
-  adminDb: {
-    collection: vi.fn().mockReturnValue({
-      doc: vi.fn().mockReturnValue({
-        update: (...args: unknown[]) => mockUpdate(...args),
-      }),
-    }),
+// Mock MongoDB
+const mockFindById = vi.fn();
+const mockFindByIdAndUpdate = vi.fn();
+
+vi.mock('@/lib/db/mongodb', () => ({
+  connectDB: vi.fn().mockResolvedValue(undefined),
+}));
+
+vi.mock('@/lib/db/models/User', () => ({
+  User: {
+    findById: mockFindById,
+    findByIdAndUpdate: mockFindByIdAndUpdate,
+  },
+}));
+
+// Mock email service
+vi.mock('@/lib/email/service', () => ({
+  emailService: {
+    isConfigured: vi.fn().mockReturnValue(false),
+    sendSubscriptionConfirmation: vi.fn().mockResolvedValue('sent'),
+    sendSubscriptionCanceled: vi.fn().mockResolvedValue('sent'),
   },
 }));
 
@@ -35,7 +46,8 @@ describe('/api/webhooks/stripe', () => {
 
   beforeEach(async () => {
     vi.clearAllMocks();
-    mockUpdate.mockResolvedValue(undefined);
+    mockFindById.mockResolvedValue({ _id: 'test@example.com', name: 'Test User', plan: 'pro' });
+    mockFindByIdAndUpdate.mockResolvedValue(undefined);
 
     // Set webhook secret before importing
     process.env.STRIPE_WEBHOOK_SECRET = 'whsec_test123';
@@ -44,14 +56,22 @@ describe('/api/webhooks/stripe', () => {
     vi.resetModules();
 
     // Re-mock after reset
-    vi.doMock('@/lib/firebase/admin', () => ({
-      adminAuth: {},
-      adminDb: {
-        collection: vi.fn().mockReturnValue({
-          doc: vi.fn().mockReturnValue({
-            update: (...args: unknown[]) => mockUpdate(...args),
-          }),
-        }),
+    vi.doMock('@/lib/db/mongodb', () => ({
+      connectDB: vi.fn().mockResolvedValue(undefined),
+    }));
+
+    vi.doMock('@/lib/db/models/User', () => ({
+      User: {
+        findById: mockFindById,
+        findByIdAndUpdate: mockFindByIdAndUpdate,
+      },
+    }));
+
+    vi.doMock('@/lib/email/service', () => ({
+      emailService: {
+        isConfigured: vi.fn().mockReturnValue(false),
+        sendSubscriptionConfirmation: vi.fn().mockResolvedValue('sent'),
+        sendSubscriptionCanceled: vi.fn().mockResolvedValue('sent'),
       },
     }));
 
@@ -122,6 +142,8 @@ describe('/api/webhooks/stripe', () => {
             },
             customer: 'cus_123',
             subscription: 'sub_456',
+            amount_total: 500,
+            currency: 'usd',
           },
         },
       });
@@ -139,12 +161,14 @@ describe('/api/webhooks/stripe', () => {
 
       expect(response.status).toBe(200);
       expect(data.received).toBe(true);
-      expect(mockUpdate).toHaveBeenCalledWith(
+      expect(mockFindByIdAndUpdate).toHaveBeenCalledWith(
+        'test@example.com',
         expect.objectContaining({
-          plan: 'pro',
-          stripeCustomerId: 'cus_123',
-          stripeSubscriptionId: 'sub_456',
-          subscriptionStatus: 'active',
+          $set: expect.objectContaining({
+            plan: 'pro',
+            stripeCustomerId: 'cus_123',
+            stripeSubscriptionId: 'sub_456',
+          }),
         })
       );
     });
@@ -175,7 +199,7 @@ describe('/api/webhooks/stripe', () => {
       expect(response.status).toBe(200);
       expect(data.received).toBe(true);
       // Should not update when metadata is missing
-      expect(mockUpdate).not.toHaveBeenCalled();
+      expect(mockFindByIdAndUpdate).not.toHaveBeenCalled();
     });
 
     it('should handle customer.subscription.updated event', async () => {
@@ -205,10 +229,12 @@ describe('/api/webhooks/stripe', () => {
 
       expect(response.status).toBe(200);
       expect(data.received).toBe(true);
-      expect(mockUpdate).toHaveBeenCalledWith(
+      expect(mockFindByIdAndUpdate).toHaveBeenCalledWith(
+        'test@example.com',
         expect.objectContaining({
-          subscriptionStatus: 'active',
-          plan: 'team',
+          $set: expect.objectContaining({
+            plan: 'team',
+          }),
         })
       );
     });
@@ -239,10 +265,12 @@ describe('/api/webhooks/stripe', () => {
       const data = await response.json();
 
       expect(response.status).toBe(200);
-      expect(mockUpdate).toHaveBeenCalledWith(
+      expect(mockFindByIdAndUpdate).toHaveBeenCalledWith(
+        'test@example.com',
         expect.objectContaining({
-          subscriptionStatus: 'past_due',
-          plan: 'free',
+          $set: expect.objectContaining({
+            plan: 'free',
+          }),
         })
       );
     });
@@ -254,6 +282,7 @@ describe('/api/webhooks/stripe', () => {
           object: {
             metadata: {
               userEmail: 'test@example.com',
+              plan: 'pro',
             },
           },
         },
@@ -271,40 +300,13 @@ describe('/api/webhooks/stripe', () => {
       const data = await response.json();
 
       expect(response.status).toBe(200);
-      expect(mockUpdate).toHaveBeenCalledWith(
+      expect(mockFindByIdAndUpdate).toHaveBeenCalledWith(
+        'test@example.com',
         expect.objectContaining({
-          plan: 'free',
-          subscriptionStatus: 'canceled',
-          stripeSubscriptionId: null,
-        })
-      );
-    });
-
-    it('should handle invoice.payment_failed event', async () => {
-      mockConstructEvent.mockReturnValue({
-        type: 'invoice.payment_failed',
-        data: {
-          object: {
-            customer_email: 'test@example.com',
-          },
-        },
-      });
-
-      const request = new NextRequest('http://localhost:3000/api/webhooks/stripe', {
-        method: 'POST',
-        body: JSON.stringify({}),
-        headers: {
-          'stripe-signature': 'valid_signature',
-        },
-      });
-
-      const response = await POST(request);
-      const data = await response.json();
-
-      expect(response.status).toBe(200);
-      expect(mockUpdate).toHaveBeenCalledWith(
-        expect.objectContaining({
-          subscriptionStatus: 'past_due',
+          $set: expect.objectContaining({
+            plan: 'free',
+            stripeSubscriptionId: null,
+          }),
         })
       );
     });
@@ -332,6 +334,32 @@ describe('/api/webhooks/stripe', () => {
 
       expect(response.status).toBe(200);
       expect(data.received).toBe(true);
+    });
+
+    it('should handle invoice.payment_failed event', async () => {
+      mockConstructEvent.mockReturnValue({
+        type: 'invoice.payment_failed',
+        data: {
+          object: {
+            customer_email: 'test@example.com',
+          },
+        },
+      });
+
+      const request = new NextRequest('http://localhost:3000/api/webhooks/stripe', {
+        method: 'POST',
+        body: JSON.stringify({}),
+        headers: {
+          'stripe-signature': 'valid_signature',
+        },
+      });
+
+      const response = await POST(request);
+      const data = await response.json();
+
+      expect(response.status).toBe(200);
+      expect(data.received).toBe(true);
+      // invoice.payment_failed is just logged, doesn't update user
     });
 
     it('should handle unhandled event types gracefully', async () => {

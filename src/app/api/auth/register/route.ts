@@ -9,6 +9,7 @@ import { User } from '@/lib/db/models/User';
 import bcrypt from 'bcryptjs';
 import { z } from 'zod';
 import { checkRateLimit, getRateLimitHeaders } from '@/lib/rate-limit';
+import { emailService } from '@/lib/email/service';
 
 const registerSchema = z.object({
   name: z.string().min(1, 'Name is required'),
@@ -72,6 +73,13 @@ export async function POST(request: NextRequest) {
         lastReset: new Date().toISOString().split('T')[0],
       },
     });
+
+    // Send welcome email (non-blocking)
+    if (emailService.isConfigured()) {
+      emailService.sendWelcomeEmail({ email: email.toLowerCase(), name }).catch((err) => {
+        console.error('Failed to send welcome email:', err);
+      });
+    }
 
     return NextResponse.json({
       success: true,
