@@ -1,21 +1,24 @@
 'use client';
 
 import { useTranslations } from 'next-intl';
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef, useCallback } from 'react';
+import { Minimize2 } from 'lucide-react';
 import { MarkdownEditor } from '@/components/editor/MarkdownEditor';
 import { EditorToolbar } from '@/components/editor/EditorToolbar';
 import { EditorStats } from '@/components/editor/EditorStats';
+import { RecoveryPrompt } from '@/components/editor/RecoveryPrompt';
 import { MarkdownPreview } from '@/components/preview/MarkdownPreview';
 import { TableOfContents } from '@/components/preview/TableOfContents';
 import { ConvertButton } from '@/components/converter/ConvertButton';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Button } from '@/components/ui/button';
 import { useEditorStore } from '@/stores/editor-store';
 import { cn } from '@/lib/utils';
 
 export default function HomePage() {
   const t = useTranslations('editor');
   const tPreview = useTranslations('preview');
-  const { viewMode, content, setContent, showToc, isFullscreen, setIsFullscreen } = useEditorStore();
+  const { viewMode, content, setContent, showToc, isFullscreen, setIsFullscreen, toggleFullscreen } = useEditorStore();
   const [isMobile, setIsMobile] = useState(false);
   const hasInitialized = useRef(false);
 
@@ -39,21 +42,39 @@ export default function HomePage() {
     }
   }, [content, setContent, t]);
 
-  // Handle ESC key to exit fullscreen
+  // Add/remove fullscreen-active class to body
   useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && isFullscreen) {
-        setIsFullscreen(false);
-      }
-    };
+    if (isFullscreen) {
+      document.body.classList.add('fullscreen-active');
+    } else {
+      document.body.classList.remove('fullscreen-active');
+    }
+    return () => document.body.classList.remove('fullscreen-active');
+  }, [isFullscreen]);
+
+  // Handle keyboard shortcuts (ESC to exit, F11 to toggle)
+  const handleKeyDown = useCallback((e: KeyboardEvent) => {
+    // F11 to toggle fullscreen
+    if (e.key === 'F11') {
+      e.preventDefault();
+      toggleFullscreen();
+    }
+    // Escape to exit fullscreen
+    if (e.key === 'Escape' && isFullscreen) {
+      setIsFullscreen(false);
+    }
+  }, [isFullscreen, setIsFullscreen, toggleFullscreen]);
+
+  useEffect(() => {
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isFullscreen, setIsFullscreen]);
+  }, [handleKeyDown]);
 
   // Mobile view with tabs
   if (isMobile) {
     return (
       <div className="flex flex-col h-[calc(100vh-3.5rem-4rem)]">
+        <RecoveryPrompt />
         <Tabs defaultValue="editor" className="flex-1 flex flex-col">
           <div className="border-b bg-background p-2">
             <div className="flex items-center justify-between">
@@ -100,6 +121,21 @@ export default function HomePage() {
           : 'h-[calc(100vh-3.5rem-4rem)]'
       )}
     >
+      {/* Exit fullscreen overlay button */}
+      {isFullscreen && (
+        <div className="fixed top-4 right-4 z-[60] opacity-0 hover:opacity-100 transition-opacity duration-200">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setIsFullscreen(false)}
+            className="shadow-lg bg-background/80 backdrop-blur-sm"
+          >
+            <Minimize2 className="h-4 w-4 me-2" />
+            {t('toolbar.exitFullscreen')}
+          </Button>
+        </div>
+      )}
+      <RecoveryPrompt />
       <div className="border-b bg-background p-2 flex items-center justify-between">
         <EditorToolbar />
         <ConvertButton />
