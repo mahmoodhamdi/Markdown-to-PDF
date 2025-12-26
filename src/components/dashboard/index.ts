@@ -11,3 +11,4 @@ export { AnalyticsChart } from './AnalyticsChart';
 export { ConversionStats } from './ConversionStats';
 export { ThemeUsage } from './ThemeUsage';
 export { TemplateUsage } from './TemplateUsage';
+export { EmailVerificationBanner } from './EmailVerificationBanner';

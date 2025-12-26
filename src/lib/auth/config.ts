@@ -25,6 +25,7 @@ declare module 'next-auth' {
       email?: string | null;
       image?: string | null;
       plan: 'free' | 'pro' | 'team' | 'enterprise';
+      emailVerified: boolean;
       usage: {
         conversions: number;
         apiCalls: number;
@@ -36,6 +37,7 @@ declare module 'next-auth' {
   interface User {
     id: string;
     plan?: 'free' | 'pro' | 'team' | 'enterprise';
+    emailVerified?: boolean;
     usage?: {
       conversions: number;
       apiCalls: number;
@@ -48,6 +50,7 @@ declare module 'next-auth/jwt' {
   interface JWT {
     id: string;
     plan: 'free' | 'pro' | 'team' | 'enterprise';
+    emailVerified: boolean;
     usage: {
       conversions: number;
       apiCalls: number;
@@ -101,6 +104,7 @@ async function getOrCreateUser(email: string, name?: string | null, image?: stri
     return {
       email,
       plan: 'free' as const,
+      emailVerified: false,
       usage: getDefaultUsage(),
     };
   }
@@ -187,12 +191,25 @@ export const authOptions: NextAuthOptions = {
       }
       return true;
     },
-    async jwt({ token, user }) {
+    async jwt({ token, user, trigger }) {
       if (user?.email) {
         const userData = await getOrCreateUser(user.email, user.name, user.image);
         token.id = user.id || user.email;
         token.plan = userData?.plan || 'free';
+        token.emailVerified = !!userData?.emailVerified;
         token.usage = userData?.usage || getDefaultUsage();
+      }
+      // Refresh emailVerified on session update
+      if (trigger === 'update' && token.id) {
+        try {
+          await connectDB();
+          const userData = await User.findById(token.id);
+          if (userData) {
+            token.emailVerified = !!userData.emailVerified;
+          }
+        } catch (error) {
+          console.error('Error refreshing emailVerified:', error);
+        }
       }
       return token;
     },
@@ -200,6 +217,7 @@ export const authOptions: NextAuthOptions = {
       if (session.user) {
         session.user.id = token.id;
         session.user.plan = token.plan;
+        session.user.emailVerified = token.emailVerified;
         session.user.usage = token.usage;
       }
       return session;

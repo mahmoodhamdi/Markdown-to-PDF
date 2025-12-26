@@ -39,3 +39,37 @@ export {
   countRecentResetRequests,
   type IPasswordResetToken,
 } from './PasswordResetToken';
+export {
+  EmailChangeToken,
+  type IEmailChangeToken,
+} from './EmailChangeToken';
+export {
+  EmailVerificationToken,
+  generateVerificationToken,
+  hashVerificationToken,
+  createEmailVerificationToken,
+  verifyEmailVerificationToken,
+  markVerificationTokenAsUsed,
+  hasPendingVerification,
+  countRecentVerificationRequests,
+  type IEmailVerificationToken,
+} from './EmailVerificationToken';
+export {
+  TeamInvitation,
+  type ITeamInvitation,
+  type InvitationStatus,
+} from './TeamInvitation';
+export {
+  TeamActivity,
+  type ITeamActivity,
+  type TeamActivityAction,
+} from './TeamActivity';
+export {
+  Session,
+  type ISession,
+} from './Session';
+export {
+  Account,
+  type IAccount,
+  type OAuthProvider,
+} from './Account';

@@ -59,8 +59,8 @@ This document provides a comprehensive roadmap to bring the Markdown-to-PDF appl
 | 1 | Critical Fixes | 🔴 Critical | 3 | ✅ Complete |
 | 2 | UI/UX Completion | 🟠 High | 5 | ✅ Complete |
 | 3 | User Dashboard | 🟠 High | 4 | ✅ Complete |
-| 4 | Team Features | 🟡 Medium | 4 | 1/4 Complete |
-| 5 | Account Management | 🟡 Medium | 4 | Pending |
+| 4 | Team Features | 🟡 Medium | 4 | ✅ Complete |
+| 5 | Account Management | 🟡 Medium | 4 | 3/4 Complete |
 | 6 | Testing & Polish | 🟢 Final | 4 | Pending |
 
 ---
@@ -210,23 +210,58 @@ This document provides a comprehensive roadmap to bring the Markdown-to-PDF appl
 - ✅ Translations added (EN & AR)
 - ✅ Unit tests (990 passing)
 
-### Stage 4.2: Team Management UI
-- Create `/[locale]/teams/[teamId]/page.tsx`
-- Display team members with roles
-- Add/remove member functionality
-- Change member roles
-- Team settings (name, description)
+### Stage 4.2: Team Management UI ✅ COMPLETE (December 26, 2024)
+- ✅ Created `/[locale]/dashboard/teams/[teamId]/page.tsx`
+- ✅ Created TeamMembers component with member list and role badges
+- ✅ Created AddMemberDialog for inviting members via email
+- ✅ Created TeamSettings component with:
+  - Team name editing
+  - Member invite settings
+  - Default role configuration
+  - Shared storage/templates toggles
+  - Team deletion (owner only)
+- ✅ Role change functionality (make admin/remove admin)
+- ✅ Remove member with confirmation
+- ✅ Leave team functionality
+- ✅ Created alert-dialog UI component
+- ✅ Translations added (EN & AR)
+- ✅ Unit tests (990 passing)
 
-### Stage 4.3: Team Invitations
-- Create invitation system
-- Email invitation flow
-- Invitation accept/decline
-- Pending invitations list
+### Stage 4.3: Team Invitations ✅ COMPLETE (December 26, 2024)
+- ✅ Created TeamInvitation model with token, status, expiration
+- ✅ Created invitation-service.ts with:
+  - createInvitation - Creates invitation and sends email
+  - getInvitationByToken - Retrieves invitation details
+  - acceptInvitation - Adds user to team
+  - declineInvitation - Marks invitation as declined
+  - getTeamInvitations - Lists pending invitations for a team
+  - getUserInvitations - Lists pending invitations for a user
+  - cancelInvitation - Revokes an invitation
+  - resendInvitation - Resends invitation email
+- ✅ Created invitation APIs:
+  - GET/POST `/api/teams/[teamId]/invitations` - List/create invitations
+  - DELETE `/api/teams/[teamId]/invitations/[invitationId]` - Cancel invitation
+  - POST `.../[invitationId]/resend` - Resend invitation
+  - GET `/api/invitations/[token]` - Get invitation by token
+  - POST `/api/invitations/[token]/accept` - Accept invitation
+  - POST `/api/invitations/[token]/decline` - Decline invitation
+  - GET `/api/invitations` - Get user's pending invitations
+- ✅ Created `/[locale]/invitation/[token]/page.tsx` accept/decline page
+- ✅ Email already uses team-invitation template
+- ✅ Translations added (EN & AR)
+- ✅ Unit tests (990 passing)
 
-### Stage 4.4: Team Activity
-- Show team activity log
-- Filter by member/action
-- Export activity data
+### Stage 4.4: Team Activity ✅ COMPLETE (December 26, 2024)
+- ✅ Created TeamActivity model with action types
+- ✅ Created activity-service.ts with logging and query functions
+- ✅ Created `/api/teams/[teamId]/activity` API with pagination and CSV export
+- ✅ Created ActivityLog and ActivityItem components
+- ✅ Added activity tab to team detail page
+- ✅ Integrated activity logging into team and invitation services
+- ✅ Added filter by action type
+- ✅ Added CSV export for admins/owners
+- ✅ Translations added (EN & AR)
+- ✅ Unit tests (990 passing)
 
 ---
 
@@ -235,23 +270,38 @@ This document provides a comprehensive roadmap to bring the Markdown-to-PDF appl
 **Priority:** 🟡 Medium
 **Prompt File:** `docs/plans/prompts/PHASE-5-ACCOUNT-MANAGEMENT.md`
 
-### Stage 5.1: Profile Page
-- Create `/[locale]/profile/page.tsx`
-- Display user info
-- Profile picture upload
-- Update profile form
+### Stage 5.1: Profile Page ✅ COMPLETE (December 26, 2024)
+- ✅ Created `/[locale]/dashboard/profile/page.tsx`
+- ✅ Created ProfileHeader component with avatar and user info
+- ✅ Created ProfileForm component with name editing and email change
+- ✅ Created AvatarUpload component with drag/drop and preview
+- ✅ Created Avatar UI component
+- ✅ Created `/api/storage/avatar` endpoint with Cloudinary resizing
+- ✅ Email change triggers verification flow
+- ✅ Translations added (EN & AR)
+- ✅ Unit tests (990 passing)
 
-### Stage 5.2: Security Settings
-- Password change form
-- Session management
-- Login history
-- Connected accounts (OAuth)
+### Stage 5.2: Security Settings ✅ COMPLETE (December 26, 2024)
+- ✅ Created `/[locale]/dashboard/security/page.tsx`
+- ✅ Created PasswordChange component with strength indicator
+- ✅ Created SessionList component with device info and revocation
+- ✅ Created ConnectedAccounts component for OAuth connections
+- ✅ Created Session and Account MongoDB models
+- ✅ Created `/api/users/sessions` endpoint (list, revoke, revoke all)
+- ✅ Created `/api/users/accounts` endpoint (list, disconnect)
+- ✅ Translations added (EN & AR)
+- ✅ Unit tests (990 passing)
 
-### Stage 5.3: Email Verification
-- Send verification email on signup
-- Verification page
-- Resend verification
-- Email change with verification
+### Stage 5.3: Email Verification ✅ COMPLETE (December 26, 2024)
+- ✅ Created EmailVerificationToken model with secure token hashing
+- ✅ Created `/api/auth/verify-email` endpoint for token verification
+- ✅ Created `/api/auth/resend-verification` endpoint with rate limiting
+- ✅ Created `/[locale]/verify-email/[token]/page.tsx` verification page
+- ✅ Updated registration flow to send verification email
+- ✅ Created EmailVerificationBanner component for dashboard
+- ✅ Extended NextAuth session to include emailVerified status
+- ✅ Translations added (EN & AR)
+- ✅ Unit tests (830 passing)
 
 ### Stage 5.4: Account Actions
 - Account deletion flow
@@ -381,12 +431,12 @@ Claude: [Reads the file and implements the stage]
 | 3 | 3.3 | ✅ Complete | Dec 26, 2024 | Dec 26, 2024 |
 | 3 | 3.4 | ✅ Complete | Dec 26, 2024 | Dec 26, 2024 |
 | 4 | 4.1 | ✅ Complete | Dec 26, 2024 | Dec 26, 2024 |
-| 4 | 4.2 | ⏳ Pending | - | - |
-| 4 | 4.3 | ⏳ Pending | - | - |
-| 4 | 4.4 | ⏳ Pending | - | - |
-| 5 | 5.1 | ⏳ Pending | - | - |
-| 5 | 5.2 | ⏳ Pending | - | - |
-| 5 | 5.3 | ⏳ Pending | - | - |
+| 4 | 4.2 | ✅ Complete | Dec 26, 2024 | Dec 26, 2024 |
+| 4 | 4.3 | ✅ Complete | Dec 26, 2024 | Dec 26, 2024 |
+| 4 | 4.4 | ✅ Complete | Dec 26, 2024 | Dec 26, 2024 |
+| 5 | 5.1 | ✅ Complete | Dec 26, 2024 | Dec 26, 2024 |
+| 5 | 5.2 | ✅ Complete | Dec 26, 2024 | Dec 26, 2024 |
+| 5 | 5.3 | ✅ Complete | Dec 26, 2024 | Dec 26, 2024 |
 | 5 | 5.4 | ⏳ Pending | - | - |
 | 6 | 6.1 | ⏳ Pending | - | - |
 | 6 | 6.2 | ⏳ Pending | - | - |
@@ -395,4 +445,4 @@ Claude: [Reads the file and implements the stage]
 
 ---
 
-*Last Updated: December 26, 2024*
+*Last Updated: December 26, 2024 - Stage 5.3 Complete*

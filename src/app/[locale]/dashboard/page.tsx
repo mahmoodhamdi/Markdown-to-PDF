@@ -31,6 +31,7 @@ export default function DashboardPage() {
       storageUsed="0 MB"
       storageLimit="100 MB"
       plan={user?.plan || 'free'}
+      emailVerified={user?.emailVerified ?? true}
     />
   );
 }
