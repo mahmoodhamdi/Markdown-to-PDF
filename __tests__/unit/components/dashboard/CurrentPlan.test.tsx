@@ -5,7 +5,7 @@ import { CurrentPlan } from '@/components/dashboard/CurrentPlan';
 // Mock next-intl
 vi.mock('next-intl', () => ({
   useTranslations: (namespace: string) => {
-    const translations: Record<string, Record<string, string>> = {
+    const translations: Record<string, Record<string, string | string[]>> = {
       'dashboard.subscription': {
         currentPlan: 'Current Plan',
         plan: 'Plan',
@@ -37,10 +37,10 @@ vi.mock('next-intl', () => ({
       },
     };
 
-    const t = (key: string, params?: Record<string, string>) => {
+    const t = (key: string, params?: Record<string, string>): string => {
       const ns = namespace;
-      const keys = key.split('.');
-      let value = translations[ns]?.[key] || key;
+      const rawValue = translations[ns]?.[key];
+      let value = typeof rawValue === 'string' ? rawValue : key;
       if (params) {
         Object.entries(params).forEach(([k, v]) => {
           value = value.replace(`{${k}}`, v);

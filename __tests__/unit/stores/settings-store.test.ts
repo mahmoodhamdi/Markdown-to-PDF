@@ -101,7 +101,7 @@ describe('Settings Store', () => {
 
     it('should update header footer settings', () => {
       getStore().setPageSettings({
-        headerFooter: { showHeader: true, headerText: 'My Header' },
+        headerFooter: { showHeader: true, headerText: 'My Header', showFooter: false, footerText: '' },
       });
       expect(getStore().pageSettings.headerFooter.showHeader).toBe(true);
       expect(getStore().pageSettings.headerFooter.headerText).toBe('My Header');

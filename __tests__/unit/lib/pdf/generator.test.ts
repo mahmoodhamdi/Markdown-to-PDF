@@ -24,7 +24,7 @@ vi.mock('@/lib/markdown/parser', () => ({
 
 // Mock theme manager - use factory functions
 const mockGetThemeCss = vi.fn((theme: string) => `.theme-${theme} { color: black; }`);
-const mockGetCodeThemeStylesheet = vi.fn(() => 'https://cdn.example.com/highlight.css');
+const mockGetCodeThemeStylesheet = vi.fn((_codeTheme: string) => 'https://cdn.example.com/highlight.css');
 
 vi.mock('@/lib/themes/manager', () => ({
   getThemeCss: (theme: string) => mockGetThemeCss(theme),
@@ -192,10 +192,9 @@ describe('PDF Generator', () => {
       const pageSettings = {
         ...defaultPageSettings,
         watermark: {
-          enabled: true,
+          show: true,
           text: 'DRAFT',
           opacity: 0.1,
-          position: 'center' as const,
         },
       };
 

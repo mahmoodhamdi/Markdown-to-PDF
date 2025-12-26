@@ -27,7 +27,7 @@ describe('Templates', () => {
     });
 
     it('should have templates in all categories', () => {
-      const categories = [...new Set(templates.map((t) => t.category))];
+      const categories = Array.from(new Set(templates.map((t) => t.category)));
       expect(categories).toContain('business');
       expect(categories).toContain('academic');
       expect(categories).toContain('personal');
