@@ -3,10 +3,57 @@
  */
 
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import mongoose from 'mongoose';
 
 // Mock MongoDB connection first (must be before any imports that use it)
 vi.mock('@/lib/db/mongodb', () => ({
   connectDB: vi.fn().mockResolvedValue(undefined),
+}));
+
+// Mock activity service
+vi.mock('@/lib/teams/activity-service', () => ({
+  logTeamCreated: vi.fn().mockResolvedValue(undefined),
+  logTeamUpdated: vi.fn().mockResolvedValue(undefined),
+  logSettingsUpdated: vi.fn().mockResolvedValue(undefined),
+  logTeamDeleted: vi.fn().mockResolvedValue(undefined),
+  logMemberRemoved: vi.fn().mockResolvedValue(undefined),
+  logMemberLeft: vi.fn().mockResolvedValue(undefined),
+  logRoleChanged: vi.fn().mockResolvedValue(undefined),
+}));
+
+// Mock Team model
+const mockTeamFindOne = vi.fn();
+const mockTeamFindById = vi.fn();
+const mockTeamFind = vi.fn();
+const mockTeamCreate = vi.fn();
+const mockTeamFindByIdAndUpdate = vi.fn();
+const mockTeamFindByIdAndDelete = vi.fn();
+const mockTeamFindOneAndUpdate = vi.fn();
+
+// Mock TeamMemberLookup model
+const mockMemberLookupCreate = vi.fn();
+const mockMemberLookupFind = vi.fn();
+const mockMemberLookupDeleteMany = vi.fn();
+const mockMemberLookupDeleteOne = vi.fn();
+const mockMemberLookupUpdateOne = vi.fn();
+
+vi.mock('@/lib/db/models/Team', () => ({
+  Team: {
+    findOne: (...args: unknown[]) => mockTeamFindOne(...args),
+    findById: (...args: unknown[]) => mockTeamFindById(...args),
+    find: (...args: unknown[]) => mockTeamFind(...args),
+    create: (...args: unknown[]) => mockTeamCreate(...args),
+    findByIdAndUpdate: (...args: unknown[]) => mockTeamFindByIdAndUpdate(...args),
+    findByIdAndDelete: (...args: unknown[]) => mockTeamFindByIdAndDelete(...args),
+    findOneAndUpdate: (...args: unknown[]) => mockTeamFindOneAndUpdate(...args),
+  },
+  TeamMemberLookup: {
+    create: (...args: unknown[]) => mockMemberLookupCreate(...args),
+    find: (...args: unknown[]) => mockMemberLookupFind(...args),
+    deleteMany: (...args: unknown[]) => mockMemberLookupDeleteMany(...args),
+    deleteOne: (...args: unknown[]) => mockMemberLookupDeleteOne(...args),
+    updateOne: (...args: unknown[]) => mockMemberLookupUpdateOne(...args),
+  },
 }));
 
 import {
@@ -15,34 +62,21 @@ import {
   isTeamOwner,
   isTeamAdmin,
   getUserTeamRole,
-  Team,
-  TeamMember,
+  createTeam,
+  getTeam,
+  getTeamsForUser,
+  updateTeam,
+  deleteTeam,
+  addTeamMember,
+  removeTeamMember,
+  updateMemberRole,
+  type TeamData,
+  type TeamMember,
 } from '@/lib/teams/service';
-
-// Mock Firebase Admin
-vi.mock('@/lib/firebase/admin', () => ({
-  adminDb: {
-    collection: vi.fn(() => ({
-      doc: vi.fn(() => ({
-        get: vi.fn(() => ({ exists: false, data: () => null })),
-        set: vi.fn(),
-        update: vi.fn(),
-        delete: vi.fn(),
-      })),
-      where: vi.fn(() => ({
-        get: vi.fn(() => ({ empty: true, docs: [] })),
-      })),
-    })),
-    batch: vi.fn(() => ({
-      delete: vi.fn(),
-      commit: vi.fn(),
-    })),
-  },
-}));
 
 describe('Teams Service - Utility Functions', () => {
   // Create a mock team for testing
-  const createMockTeam = (overrides: Partial<Team> = {}): Team => ({
+  const createMockTeam = (overrides: Partial<TeamData> = {}): TeamData => ({
     id: 'team-123',
     name: 'Test Team',
     ownerId: 'owner-456',
@@ -232,9 +266,9 @@ describe('Teams Service - Data Structures', () => {
     });
   });
 
-  describe('Team interface', () => {
+  describe('TeamData interface', () => {
     it('should have all required fields', () => {
-      const team: Team = {
+      const team: TeamData = {
         id: 'team-123',
         name: 'Test Team',
         ownerId: 'owner-456',
@@ -321,6 +355,355 @@ describe('Teams Service - Plan Permissions', () => {
 
     it('enterprise plan should allow team creation', () => {
       expect(getTeamMemberLimit('enterprise')).toBeGreaterThan(0);
+    });
+  });
+});
+
+describe('Teams Service - CRUD Operations', () => {
+  const mockObjectId = new mongoose.Types.ObjectId();
+
+  const createMockTeamDoc = (overrides = {}) => ({
+    _id: mockObjectId,
+    name: 'Test Team',
+    ownerId: 'owner-456',
+    ownerEmail: 'owner@example.com',
+    plan: 'team',
+    members: [
+      {
+        userId: 'owner-456',
+        email: 'owner@example.com',
+        name: 'Team Owner',
+        role: 'owner',
+        joinedAt: new Date(),
+      },
+    ],
+    settings: {
+      allowMemberInvites: false,
+      defaultMemberRole: 'member',
+      sharedStorageEnabled: true,
+      sharedTemplatesEnabled: true,
+    },
+    createdAt: new Date(),
+    updatedAt: new Date(),
+    ...overrides,
+  });
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  afterEach(() => {
+    vi.clearAllMocks();
+  });
+
+  describe('createTeam', () => {
+    it('should create a new team successfully', async () => {
+      const mockTeam = createMockTeamDoc();
+      mockTeamFindOne.mockResolvedValue(null); // No existing team
+      mockTeamCreate.mockResolvedValue(mockTeam);
+      mockMemberLookupCreate.mockResolvedValue({});
+
+      const result = await createTeam({
+        name: 'Test Team',
+        ownerId: 'owner-456',
+        ownerEmail: 'owner@example.com',
+        ownerName: 'Team Owner',
+        plan: 'team',
+      });
+
+      expect(result.success).toBe(true);
+      expect(result.team).toBeDefined();
+      expect(mockTeamCreate).toHaveBeenCalled();
+      expect(mockMemberLookupCreate).toHaveBeenCalled();
+    });
+
+    it('should return error if user already owns a team', async () => {
+      mockTeamFindOne.mockResolvedValue(createMockTeamDoc());
+
+      const result = await createTeam({
+        name: 'Another Team',
+        ownerId: 'owner-456',
+        ownerEmail: 'owner@example.com',
+        ownerName: 'Team Owner',
+        plan: 'team',
+      });
+
+      expect(result.success).toBe(false);
+      expect(result.error).toContain('already own a team');
+    });
+  });
+
+  describe('getTeam', () => {
+    it('should return team for member', async () => {
+      const mockTeam = createMockTeamDoc();
+      mockTeamFindById.mockResolvedValue(mockTeam);
+
+      const result = await getTeam(mockObjectId.toString(), 'owner-456');
+
+      expect(result.success).toBe(true);
+      expect(result.team).toBeDefined();
+      expect(mockTeamFindById).toHaveBeenCalledWith(mockObjectId.toString());
+    });
+
+    it('should return error for non-existent team', async () => {
+      mockTeamFindById.mockResolvedValue(null);
+
+      const result = await getTeam('non-existent-id', 'user-123');
+
+      expect(result.success).toBe(false);
+      expect(result.error).toBe('Team not found');
+    });
+
+    it('should deny access for non-members', async () => {
+      const mockTeam = createMockTeamDoc();
+      mockTeamFindById.mockResolvedValue(mockTeam);
+
+      const result = await getTeam(mockObjectId.toString(), 'non-member-user');
+
+      expect(result.success).toBe(false);
+      expect(result.error).toBe('Access denied');
+    });
+  });
+
+  describe('getTeamsForUser', () => {
+    it('should return teams where user is a member', async () => {
+      const mockLookups = [
+        { teamId: 'team-1', role: 'owner' },
+        { teamId: 'team-2', role: 'member' },
+      ];
+      const mockTeams = [
+        createMockTeamDoc({ _id: new mongoose.Types.ObjectId(), name: 'Team 1' }),
+        createMockTeamDoc({ _id: new mongoose.Types.ObjectId(), name: 'Team 2' }),
+      ];
+
+      mockMemberLookupFind.mockResolvedValue(mockLookups);
+      mockTeamFind.mockResolvedValue(mockTeams);
+
+      const result = await getTeamsForUser('user-123');
+
+      expect(result.success).toBe(true);
+      expect(result.teams).toHaveLength(2);
+    });
+
+    it('should return empty array for user with no teams', async () => {
+      mockMemberLookupFind.mockResolvedValue([]);
+
+      const result = await getTeamsForUser('lonely-user');
+
+      expect(result.success).toBe(true);
+      expect(result.teams).toEqual([]);
+    });
+  });
+
+  describe('updateTeam', () => {
+    it('should update team name when user is owner', async () => {
+      const mockTeam = createMockTeamDoc();
+      const updatedTeam = createMockTeamDoc({ name: 'Updated Team Name' });
+      mockTeamFindById.mockResolvedValue(mockTeam);
+      mockTeamFindByIdAndUpdate.mockResolvedValue(updatedTeam);
+
+      const result = await updateTeam('team-123', 'owner-456', { name: 'Updated Team Name' });
+
+      expect(result.success).toBe(true);
+      expect(result.team?.name).toBe('Updated Team Name');
+    });
+
+    it('should deny update for non-admin member', async () => {
+      const mockTeam = createMockTeamDoc({
+        members: [
+          { userId: 'owner-456', email: 'owner@example.com', role: 'owner', joinedAt: new Date() },
+          { userId: 'member-123', email: 'member@example.com', role: 'member', joinedAt: new Date() },
+        ],
+      });
+      mockTeamFindById.mockResolvedValue(mockTeam);
+
+      const result = await updateTeam('team-123', 'member-123', { name: 'New Name' });
+
+      expect(result.success).toBe(false);
+      expect(result.error).toContain('Only team owners and admins');
+    });
+  });
+
+  describe('deleteTeam', () => {
+    it('should delete team when user is owner', async () => {
+      const mockTeam = createMockTeamDoc();
+      mockTeamFindById.mockResolvedValue(mockTeam);
+      mockTeamFindByIdAndDelete.mockResolvedValue(mockTeam);
+      mockMemberLookupDeleteMany.mockResolvedValue({ deletedCount: 1 });
+
+      const result = await deleteTeam(mockObjectId.toString(), 'owner-456');
+
+      expect(result.success).toBe(true);
+      expect(mockMemberLookupDeleteMany).toHaveBeenCalled();
+    });
+
+    it('should deny deletion for non-owner', async () => {
+      const mockTeam = createMockTeamDoc();
+      mockTeamFindById.mockResolvedValue(mockTeam);
+
+      const result = await deleteTeam(mockObjectId.toString(), 'not-owner');
+
+      expect(result.success).toBe(false);
+      expect(result.error).toContain('Only the team owner');
+    });
+
+    it('should return error for non-existent team', async () => {
+      mockTeamFindById.mockResolvedValue(null);
+
+      const result = await deleteTeam('non-existent', 'owner');
+
+      expect(result.success).toBe(false);
+      expect(result.error).toBe('Team not found');
+    });
+  });
+
+  describe('addTeamMember', () => {
+    it('should add a new member when inviter is owner', async () => {
+      const mockTeam = createMockTeamDoc();
+      mockTeamFindById.mockResolvedValue(mockTeam);
+      mockTeamFindByIdAndUpdate.mockResolvedValue(mockTeam);
+      mockMemberLookupCreate.mockResolvedValue({});
+
+      const result = await addTeamMember(mockObjectId.toString(), 'owner-456', {
+        email: 'new@example.com',
+        name: 'New Member',
+        invitedBy: 'owner-456',
+      });
+
+      expect(result.success).toBe(true);
+      expect(result.member).toBeDefined();
+    });
+
+    it('should return error when team is at member limit', async () => {
+      const fullTeam = createMockTeamDoc({
+        members: Array(5).fill(null).map((_, i) => ({
+          userId: `member-${i}`,
+          email: `member${i}@example.com`,
+          role: i === 0 ? 'owner' : 'member',
+          joinedAt: new Date(),
+        })),
+      });
+      mockTeamFindById.mockResolvedValue(fullTeam);
+
+      const result = await addTeamMember(mockObjectId.toString(), 'member-0', {
+        email: 'onemore@example.com',
+        name: 'One More',
+        invitedBy: 'member-0',
+      });
+
+      expect(result.success).toBe(false);
+      expect(result.error).toContain('limit reached');
+    });
+
+    it('should deny access for non-members', async () => {
+      const mockTeam = createMockTeamDoc();
+      mockTeamFindById.mockResolvedValue(mockTeam);
+
+      const result = await addTeamMember(mockObjectId.toString(), 'non-member', {
+        email: 'new@example.com',
+        invitedBy: 'non-member',
+      });
+
+      expect(result.success).toBe(false);
+      expect(result.error).toBe('Access denied');
+    });
+  });
+
+  describe('removeTeamMember', () => {
+    it('should remove a member when remover is owner', async () => {
+      const mockTeam = createMockTeamDoc({
+        members: [
+          { userId: 'owner-456', email: 'owner@example.com', role: 'owner', joinedAt: new Date() },
+          { userId: 'member-to-remove', email: 'remove@example.com', role: 'member', joinedAt: new Date() },
+        ],
+      });
+      mockTeamFindById.mockResolvedValue(mockTeam);
+      mockTeamFindByIdAndUpdate.mockResolvedValue(mockTeam);
+      mockMemberLookupDeleteOne.mockResolvedValue({ deletedCount: 1 });
+
+      const result = await removeTeamMember(mockObjectId.toString(), 'owner-456', 'member-to-remove');
+
+      expect(result.success).toBe(true);
+      expect(mockMemberLookupDeleteOne).toHaveBeenCalled();
+    });
+
+    it('should prevent removing team owner', async () => {
+      const mockTeam = createMockTeamDoc();
+      mockTeamFindById.mockResolvedValue(mockTeam);
+
+      const result = await removeTeamMember(mockObjectId.toString(), 'owner-456', 'owner-456');
+
+      expect(result.success).toBe(false);
+      expect(result.error).toContain('Cannot remove team owner');
+    });
+
+    it('should return error for non-existent team', async () => {
+      mockTeamFindById.mockResolvedValue(null);
+
+      const result = await removeTeamMember('non-existent', 'user', 'member');
+
+      expect(result.success).toBe(false);
+      expect(result.error).toBe('Team not found');
+    });
+  });
+
+  describe('updateMemberRole', () => {
+    it('should update member role when user is owner', async () => {
+      const mockTeam = createMockTeamDoc({
+        members: [
+          { userId: 'owner-456', email: 'owner@example.com', role: 'owner', joinedAt: new Date() },
+          { userId: 'member-123', email: 'member@example.com', role: 'member', joinedAt: new Date() },
+        ],
+      });
+      mockTeamFindById.mockResolvedValue(mockTeam);
+      mockTeamFindOneAndUpdate.mockResolvedValue({
+        ...mockTeam,
+        members: [
+          mockTeam.members[0],
+          { ...mockTeam.members[1], role: 'admin' },
+        ],
+      });
+      mockMemberLookupUpdateOne.mockResolvedValue({ modifiedCount: 1 });
+
+      const result = await updateMemberRole(mockObjectId.toString(), 'owner-456', 'member-123', 'admin');
+
+      expect(result.success).toBe(true);
+      expect(mockMemberLookupUpdateOne).toHaveBeenCalled();
+    });
+
+    it('should prevent changing owner role', async () => {
+      const mockTeam = createMockTeamDoc();
+      mockTeamFindById.mockResolvedValue(mockTeam);
+
+      const result = await updateMemberRole(mockObjectId.toString(), 'owner-456', 'owner-456', 'admin');
+
+      expect(result.success).toBe(false);
+      expect(result.error).toContain('Cannot change owner role');
+    });
+
+    it('should deny role change for non-owners', async () => {
+      const mockTeam = createMockTeamDoc({
+        members: [
+          { userId: 'owner-456', email: 'owner@example.com', role: 'owner', joinedAt: new Date() },
+          { userId: 'admin-user', email: 'admin@example.com', role: 'admin', joinedAt: new Date() },
+          { userId: 'member-123', email: 'member@example.com', role: 'member', joinedAt: new Date() },
+        ],
+      });
+      mockTeamFindById.mockResolvedValue(mockTeam);
+
+      const result = await updateMemberRole(mockObjectId.toString(), 'admin-user', 'member-123', 'admin');
+
+      expect(result.success).toBe(false);
+      expect(result.error).toContain('Only the team owner');
+    });
+
+    it('should return error for non-existent team', async () => {
+      mockTeamFindById.mockResolvedValue(null);
+
+      const result = await updateMemberRole('non-existent', 'user', 'member', 'admin');
+
+      expect(result.success).toBe(false);
+      expect(result.error).toBe('Team not found');
     });
   });
 });
