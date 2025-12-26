@@ -10,6 +10,7 @@ const mockGetServerSession = vi.fn();
 const mockFindById = vi.fn();
 const mockFindByIdAndUpdate = vi.fn();
 const mockFindByIdAndDelete = vi.fn();
+const mockBcryptCompare = vi.fn();
 
 vi.mock('next-auth', () => ({
   getServerSession: (...args: unknown[]) => mockGetServerSession(...args),
@@ -23,11 +24,37 @@ vi.mock('@/lib/db/mongodb', () => ({
   connectDB: vi.fn().mockResolvedValue(undefined),
 }));
 
-vi.mock('@/lib/db/models/User', () => ({
+vi.mock('@/lib/db/models', () => ({
   User: {
     findById: (...args: unknown[]) => mockFindById(...args),
     findByIdAndUpdate: (...args: unknown[]) => mockFindByIdAndUpdate(...args),
     findByIdAndDelete: (...args: unknown[]) => mockFindByIdAndDelete(...args),
+  },
+  UserFile: { find: vi.fn().mockResolvedValue([]), deleteMany: vi.fn().mockResolvedValue(undefined) },
+  UsageEvent: { deleteMany: vi.fn().mockResolvedValue(undefined) },
+  DailyUsage: { deleteMany: vi.fn().mockResolvedValue(undefined) },
+  Team: { find: vi.fn().mockResolvedValue([]), updateMany: vi.fn().mockResolvedValue(undefined) },
+  TeamMemberLookup: { deleteMany: vi.fn().mockResolvedValue(undefined) },
+  TeamActivity: { deleteMany: vi.fn().mockResolvedValue(undefined) },
+  TeamInvitation: { deleteMany: vi.fn().mockResolvedValue(undefined) },
+  RegionalSubscription: { find: vi.fn().mockResolvedValue([]), updateMany: vi.fn().mockResolvedValue(undefined) },
+  Session: { deleteMany: vi.fn().mockResolvedValue(undefined) },
+  Account: { deleteMany: vi.fn().mockResolvedValue(undefined) },
+  PasswordResetToken: { deleteMany: vi.fn().mockResolvedValue(undefined) },
+  EmailVerificationToken: { deleteMany: vi.fn().mockResolvedValue(undefined) },
+  EmailChangeToken: { deleteMany: vi.fn().mockResolvedValue(undefined) },
+}));
+
+vi.mock('bcryptjs', () => ({
+  default: {
+    compare: (...args: unknown[]) => mockBcryptCompare(...args),
+  },
+}));
+
+vi.mock('@/lib/email/service', () => ({
+  emailService: {
+    isConfigured: vi.fn().mockReturnValue(false),
+    sendAccountDeletion: vi.fn().mockResolvedValue(undefined),
   },
 }));
 
@@ -196,14 +223,14 @@ describe('/api/users/profile', () => {
 
       const request = new NextRequest('http://localhost:3000/api/users/profile', {
         method: 'DELETE',
-        body: JSON.stringify({ confirm: true }),
+        body: JSON.stringify({ confirm: true, password: 'password123' }),
       });
       const response = await DELETE(request);
 
       expect(response.status).toBe(401);
     });
 
-    it('should return 400 without confirmation', async () => {
+    it('should return 400 without confirmation and password', async () => {
       const request = new NextRequest('http://localhost:3000/api/users/profile', {
         method: 'DELETE',
         body: JSON.stringify({}),
@@ -212,16 +239,10 @@ describe('/api/users/profile', () => {
       const data = await response.json();
 
       expect(response.status).toBe(400);
-      expect(data.code).toBe('confirmation_required');
+      expect(data.code).toBe('validation_error');
     });
 
-    it('should return 400 when user has active subscription', async () => {
-      mockFindById.mockResolvedValue({
-        ...mockUser,
-        stripeSubscriptionId: 'sub_123',
-        plan: 'pro',
-      });
-
+    it('should return 400 without password', async () => {
       const request = new NextRequest('http://localhost:3000/api/users/profile', {
         method: 'DELETE',
         body: JSON.stringify({ confirm: true }),
@@ -230,20 +251,44 @@ describe('/api/users/profile', () => {
       const data = await response.json();
 
       expect(response.status).toBe(400);
-      expect(data.code).toBe('active_subscription');
+      expect(data.code).toBe('validation_error');
     });
 
-    it('should delete account with confirmation and no subscription', async () => {
+    it('should return 401 with wrong password', async () => {
+      mockBcryptCompare.mockResolvedValue(false);
+
       mockFindById.mockResolvedValue({
         ...mockUser,
         stripeSubscriptionId: null,
         plan: 'free',
+        password: 'hashed-password',
+      });
+
+      const request = new NextRequest('http://localhost:3000/api/users/profile', {
+        method: 'DELETE',
+        body: JSON.stringify({ confirm: true, password: 'wrong-password' }),
+      });
+      const response = await DELETE(request);
+      const data = await response.json();
+
+      expect(response.status).toBe(401);
+      expect(data.code).toBe('invalid_password');
+    });
+
+    it('should delete account with confirmation and correct password', async () => {
+      mockBcryptCompare.mockResolvedValue(true);
+
+      mockFindById.mockResolvedValue({
+        ...mockUser,
+        stripeSubscriptionId: null,
+        plan: 'free',
+        password: 'hashed-password',
       });
       mockFindByIdAndDelete.mockResolvedValue(undefined);
 
       const request = new NextRequest('http://localhost:3000/api/users/profile', {
         method: 'DELETE',
-        body: JSON.stringify({ confirm: true }),
+        body: JSON.stringify({ confirm: true, password: 'correct-password' }),
       });
       const response = await DELETE(request);
       const data = await response.json();

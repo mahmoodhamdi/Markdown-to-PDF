@@ -334,11 +334,15 @@ This document provides a comprehensive roadmap to bring the Markdown-to-PDF appl
 - ✅ Analytics service tests (38 tests) - event tracking, daily limits, history
 - ✅ Unit tests (1166 passing) verified
 
-### Stage 6.2: Integration Tests
-- Payment webhook tests
-- SSO login flow tests
-- Storage upload/quota tests
-- Team member operation tests
+### Stage 6.2: Integration Tests ✅ COMPLETE (December 26, 2024)
+- ✅ Payment webhook tests (Stripe, Paymob, PayTabs, Paddle - comprehensive)
+- ✅ SSO authentication tests (config, metadata, domain routes)
+- ✅ Storage upload/quota tests (21 tests - upload, list, delete, download, quota)
+- ✅ Team member operation tests (15+ tests - CRUD, members, roles)
+- ✅ User profile tests (14 tests - GET/PATCH/DELETE with password verification)
+- ✅ Fixed users-profile tests to match API's password-required deletion flow
+- ✅ Fixed SSO tests for Next.js 15 Promise-based params
+- ✅ Integration tests (234 passing, 18 skipped for complex service dependencies)
 
 ### Stage 6.3: E2E Tests
 - New dashboard flows
@@ -452,10 +456,10 @@ Claude: [Reads the file and implements the stage]
 | 5 | 5.3 | ✅ Complete | Dec 26, 2024 | Dec 26, 2024 |
 | 5 | 5.4 | ✅ Complete | Dec 26, 2024 | Dec 26, 2024 |
 | 6 | 6.1 | ✅ Complete | Dec 26, 2024 | Dec 26, 2024 |
-| 6 | 6.2 | ⏳ Pending | - | - |
+| 6 | 6.2 | ✅ Complete | Dec 26, 2024 | Dec 26, 2024 |
 | 6 | 6.3 | ⏳ Pending | - | - |
 | 6 | 6.4 | ⏳ Pending | - | - |
 
 ---
 
-*Last Updated: December 26, 2024 - Stage 6.1 Complete (Service Layer Tests - 1166 tests passing)*
+*Last Updated: December 26, 2024 - Stage 6.2 Complete (Integration Tests - 1166 unit + 234 integration tests passing)*
