@@ -44,8 +44,8 @@ This document provides a comprehensive roadmap to bring the Markdown-to-PDF appl
 2. ~~**Critical:** Email notification service~~ ✅ Fixed (Stage 1.2)
 3. ~~**High:** User profile management~~ ✅ Fixed (Stage 1.3)
 4. ~~**High:** Auto-save implementation~~ ✅ Fixed (Stage 2.1)
-5. **Medium:** Settings page UI
-6. **Medium:** Subscription dashboard
+5. ~~**Medium:** Settings page UI~~ ✅ Fixed (Stage 2.5)
+6. ~~**Medium:** Subscription dashboard~~ ✅ Fixed (Stage 3.3)
 7. **Medium:** Analytics dashboard UI
 8. **Low:** Team collaboration UI
 9. **Low:** Advanced account features
@@ -57,8 +57,8 @@ This document provides a comprehensive roadmap to bring the Markdown-to-PDF appl
 | Phase | Name | Priority | Stages | Status |
 |-------|------|----------|--------|--------|
 | 1 | Critical Fixes | 🔴 Critical | 3 | ✅ Complete |
-| 2 | UI/UX Completion | 🟠 High | 5 | 2/5 Complete |
-| 3 | User Dashboard | 🟠 High | 4 | Pending |
+| 2 | UI/UX Completion | 🟠 High | 5 | ✅ Complete |
+| 3 | User Dashboard | 🟠 High | 4 | ✅ Complete |
 | 4 | Team Features | 🟡 Medium | 4 | Pending |
 | 5 | Account Management | 🟡 Medium | 4 | Pending |
 | 6 | Testing & Polish | 🟢 Final | 4 | Pending |
@@ -119,24 +119,30 @@ This document provides a comprehensive roadmap to bring the Markdown-to-PDF appl
 - ✅ Translations added (EN & AR)
 - ✅ Unit tests (832 passing)
 
-### Stage 2.3: Fullscreen Mode
-- Implement fullscreen CSS styles
-- Add fullscreen toggle button
-- Hide header/footer in fullscreen
-- Add exit fullscreen overlay/button
+### Stage 2.3: Fullscreen Mode ✅ COMPLETE (December 26, 2024)
+- ✅ Implemented fullscreen CSS styles in globals.css
+- ✅ Added F11/ESC keyboard shortcuts
+- ✅ Hide header/footer in fullscreen mode
+- ✅ Added exit fullscreen overlay button
+- ✅ Dynamic Maximize2/Minimize2 icons in toolbar
+- ✅ Translations added (EN & AR)
+- ✅ Unit tests (867 passing)
 
-### Stage 2.4: Print Functionality
-- Add print button to ConvertButton
-- Implement print-specific CSS
-- Use window.print() with preview content
-- Add print media styles
+### Stage 2.4: Print Functionality ✅ COMPLETE (December 26, 2024)
+- ✅ Added Ctrl+P keyboard shortcut to ConvertButton
+- ✅ Created print styles utility (src/lib/print/styles.ts)
+- ✅ Enhanced print CSS in globals.css
+- ✅ Translations added (EN & AR)
+- ✅ Unit tests passing
 
-### Stage 2.5: Settings Page
-- Create `/[locale]/settings/page.tsx`
-- Add appearance settings (theme, language)
-- Add editor settings (fontSize, tabSize)
-- Add default export settings
-- Add reset to defaults
+### Stage 2.5: Settings Page ✅ COMPLETE (December 26, 2024)
+- ✅ Refactored settings page into modular components
+- ✅ Created AppearanceSettings (theme mode, document/code theme, language)
+- ✅ Created EditorSettings (font size, font family, tab size, toggles)
+- ✅ Created ExportSettings (page size, orientation)
+- ✅ Created ResetSettings with confirmation
+- ✅ Created SettingRow helper component
+- ✅ Unit tests (887 passing)
 
 ---
 
@@ -145,30 +151,48 @@ This document provides a comprehensive roadmap to bring the Markdown-to-PDF appl
 **Priority:** 🟠 High
 **Prompt File:** `docs/plans/prompts/PHASE-3-USER-DASHBOARD.md`
 
-### Stage 3.1: Dashboard Layout
-- Create `/[locale]/dashboard/page.tsx`
-- Add dashboard navigation
-- Create dashboard layout component
-- Add responsive sidebar
+### Stage 3.1: Dashboard Layout ✅ COMPLETE (December 26, 2024)
+- ✅ Created `/[locale]/dashboard/page.tsx` with auth protection
+- ✅ Created dashboard layout with sidebar navigation
+- ✅ Created DashboardSidebar with 6 nav items
+- ✅ Created DashboardOverview with welcome and quick actions
+- ✅ Created QuickStats component
+- ✅ Translations added (EN & AR)
+- ✅ Unit tests (887 passing)
 
-### Stage 3.2: Usage Overview
-- Display current plan info
-- Show usage statistics (conversions, storage)
-- Add usage progress bars
-- Show reset date for limits
+### Stage 3.2: Usage Overview ✅ COMPLETE (December 26, 2024)
+- ✅ Created `/[locale]/dashboard/usage/page.tsx`
+- ✅ Created UsageProgress component with color-coded bars
+- ✅ Created UsageStats component with daily limits
+- ✅ Created UsageHistory component with weekly chart
+- ✅ Added Badge UI component
+- ✅ Translations added (EN & AR)
+- ✅ Unit tests (911 passing)
 
-### Stage 3.3: Subscription Management
-- Display current subscription status
-- Add upgrade/downgrade buttons
-- Show payment history
-- Add cancel subscription flow
-- Integrate with all payment gateways
+### Stage 3.3: Subscription Management ✅ COMPLETE (December 26, 2024)
+- ✅ Created `/[locale]/dashboard/subscription/page.tsx`
+- ✅ Created CurrentPlan component (status, billing, actions)
+- ✅ Created PlanComparison component (upgrade/downgrade with billing toggle)
+- ✅ Created BillingHistory component (invoices with status badges)
+- ✅ Created Dialog UI component
+- ✅ Created subscription API endpoints:
+  - GET `/api/subscriptions` - Get current subscription
+  - POST `/api/subscriptions/cancel` - Cancel subscription
+  - GET `/api/subscriptions/invoices` - Get billing history
+- ✅ Integrated with regional subscriptions (Paymob/PayTabs) and Stripe
+- ✅ Translations added (EN & AR)
+- ✅ Unit tests (957 passing)
 
-### Stage 3.4: Analytics Dashboard
-- Show conversion analytics chart
-- Display daily/weekly/monthly views
-- Add export data functionality
-- Show top templates used
+### Stage 3.4: Analytics Dashboard ✅ COMPLETE (December 26, 2024)
+- ✅ Created `/[locale]/dashboard/analytics/page.tsx`
+- ✅ Created AnalyticsChart component with CSS-based bar charts
+- ✅ Created ConversionStats component (today's conversions, API calls, uploads, downloads)
+- ✅ Created ThemeUsage component (top themes with percentage bars)
+- ✅ Created TemplateUsage component (top templates with usage counts)
+- ✅ Added date range filter (7/14/30 days)
+- ✅ Added CSV export functionality
+- ✅ Translations added (EN & AR)
+- ✅ Unit tests (970 passing)
 
 ---
 
@@ -346,13 +370,13 @@ Claude: [Reads the file and implements the stage]
 | 1 | 1.3 | ✅ Complete | Dec 25, 2024 | Dec 25, 2024 |
 | 2 | 2.1 | ✅ Complete | Dec 25, 2024 | Dec 25, 2024 |
 | 2 | 2.2 | ✅ Complete | Dec 26, 2024 | Dec 26, 2024 |
-| 2 | 2.3 | ⏳ Pending | - | - |
-| 2 | 2.4 | ⏳ Pending | - | - |
-| 2 | 2.5 | ⏳ Pending | - | - |
-| 3 | 3.1 | ⏳ Pending | - | - |
-| 3 | 3.2 | ⏳ Pending | - | - |
-| 3 | 3.3 | ⏳ Pending | - | - |
-| 3 | 3.4 | ⏳ Pending | - | - |
+| 2 | 2.3 | ✅ Complete | Dec 26, 2024 | Dec 26, 2024 |
+| 2 | 2.4 | ✅ Complete | Dec 26, 2024 | Dec 26, 2024 |
+| 2 | 2.5 | ✅ Complete | Dec 26, 2024 | Dec 26, 2024 |
+| 3 | 3.1 | ✅ Complete | Dec 26, 2024 | Dec 26, 2024 |
+| 3 | 3.2 | ✅ Complete | Dec 26, 2024 | Dec 26, 2024 |
+| 3 | 3.3 | ✅ Complete | Dec 26, 2024 | Dec 26, 2024 |
+| 3 | 3.4 | ✅ Complete | Dec 26, 2024 | Dec 26, 2024 |
 | 4 | 4.1 | ⏳ Pending | - | - |
 | 4 | 4.2 | ⏳ Pending | - | - |
 | 4 | 4.3 | ⏳ Pending | - | - |
@@ -368,4 +392,4 @@ Claude: [Reads the file and implements the stage]
 
 ---
 
-*Last Updated: December 25, 2024*
+*Last Updated: December 26, 2024*
