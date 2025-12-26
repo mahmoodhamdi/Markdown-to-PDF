@@ -59,7 +59,7 @@ This document provides a comprehensive roadmap to bring the Markdown-to-PDF appl
 | 1 | Critical Fixes | 🔴 Critical | 3 | ✅ Complete |
 | 2 | UI/UX Completion | 🟠 High | 5 | ✅ Complete |
 | 3 | User Dashboard | 🟠 High | 4 | ✅ Complete |
-| 4 | Team Features | 🟡 Medium | 4 | Pending |
+| 4 | Team Features | 🟡 Medium | 4 | 1/4 Complete |
 | 5 | Account Management | 🟡 Medium | 4 | Pending |
 | 6 | Testing & Polish | 🟢 Final | 4 | Pending |
 
@@ -201,11 +201,14 @@ This document provides a comprehensive roadmap to bring the Markdown-to-PDF appl
 **Priority:** 🟡 Medium
 **Prompt File:** `docs/plans/prompts/PHASE-4-TEAM-FEATURES.md`
 
-### Stage 4.1: Team Dashboard
-- Create `/[locale]/teams/page.tsx`
-- List user's teams
-- Show team member count
-- Add create team button
+### Stage 4.1: Team Dashboard ✅ COMPLETE (December 26, 2024)
+- ✅ Created `/[locale]/dashboard/teams/page.tsx`
+- ✅ Created TeamList component
+- ✅ Created TeamCard component with role badges
+- ✅ Created CreateTeamDialog component
+- ✅ Shows upgrade prompt for free/pro users
+- ✅ Translations added (EN & AR)
+- ✅ Unit tests (990 passing)
 
 ### Stage 4.2: Team Management UI
 - Create `/[locale]/teams/[teamId]/page.tsx`
@@ -377,7 +380,7 @@ Claude: [Reads the file and implements the stage]
 | 3 | 3.2 | ✅ Complete | Dec 26, 2024 | Dec 26, 2024 |
 | 3 | 3.3 | ✅ Complete | Dec 26, 2024 | Dec 26, 2024 |
 | 3 | 3.4 | ✅ Complete | Dec 26, 2024 | Dec 26, 2024 |
-| 4 | 4.1 | ⏳ Pending | - | - |
+| 4 | 4.1 | ✅ Complete | Dec 26, 2024 | Dec 26, 2024 |
 | 4 | 4.2 | ⏳ Pending | - | - |
 | 4 | 4.3 | ⏳ Pending | - | - |
 | 4 | 4.4 | ⏳ Pending | - | - |
