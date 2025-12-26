@@ -701,6 +701,35 @@
         "description": "For large organizations"
       }
     },
+    "teams": {
+      "title": "Teams",
+      "description": "Manage your teams and collaborate with others",
+      "createTeam": "Create Team",
+      "noTeams": "No teams yet",
+      "noTeamsDescription": "You're not a member of any teams. Create a team or get invited to one to start collaborating.",
+      "upgradeRequired": "Team features require a Team or Enterprise plan",
+      "upgradeDescription": "Upgrade your plan to create and manage teams with shared settings and storage.",
+      "viewPlans": "View Plans",
+      "member": "member",
+      "members": "members",
+      "created": "Created",
+      "joined": "Joined",
+      "manage": "Manage",
+      "view": "View",
+      "role": {
+        "owner": "Owner",
+        "admin": "Admin",
+        "member": "Member"
+      },
+      "createTeamTitle": "Create a new team",
+      "createTeamDescription": "Teams allow you to collaborate with others and share settings, templates, and storage.",
+      "teamName": "Team name",
+      "teamNamePlaceholder": "My awesome team",
+      "nameRequired": "Team name is required",
+      "createError": "Failed to create team. Please try again.",
+      "cancel": "Cancel",
+      "create": "Create Team"
+    },
     "analytics": {
       "title": "Analytics",
       "description": "View your usage patterns and conversion metrics",
