@@ -49,8 +49,8 @@ next-env.d.ts
 *.swp
 *.swo
 
-# screenshots - keep app screenshots for README
-!/screenshots/*.png
+# screenshots - E2E test screenshots are generated
+/screenshots/
 
 # Google OAuth credentials
 client_secret*.json
