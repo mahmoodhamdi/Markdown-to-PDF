@@ -9,9 +9,26 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth/config';
 import { connectDB } from '@/lib/db/mongodb';
-import { User } from '@/lib/db/models/User';
+import {
+  User,
+  UserFile,
+  UsageEvent,
+  DailyUsage,
+  Team,
+  TeamMemberLookup,
+  TeamActivity,
+  TeamInvitation,
+  RegionalSubscription,
+  Session,
+  Account,
+  PasswordResetToken,
+  EmailVerificationToken,
+  EmailChangeToken,
+} from '@/lib/db/models';
 import { checkRateLimit, getRateLimitHeaders } from '@/lib/rate-limit';
+import { emailService } from '@/lib/email/service';
 import { z } from 'zod';
+import bcrypt from 'bcryptjs';
 
 // Validation schema for profile updates
 const updateProfileSchema = z.object({
@@ -169,6 +186,12 @@ export async function PATCH(request: NextRequest) {
   }
 }
 
+// Validation schema for account deletion
+const deleteAccountSchema = z.object({
+  confirm: z.literal(true),
+  password: z.string().min(1, 'Password is required'),
+});
+
 /**
  * DELETE /api/users/profile
  * Delete the current user's account
@@ -184,8 +207,10 @@ export async function DELETE(request: NextRequest) {
       );
     }
 
+    const userEmail = session.user.email;
+
     // Rate limit (very strict for deletion)
-    const rateLimitResult = checkRateLimit(`profile:delete:${session.user.email}`, 3, 3600000);
+    const rateLimitResult = checkRateLimit(`profile:delete:${userEmail}`, 3, 3600000);
     if (!rateLimitResult.success) {
       return NextResponse.json(
         { error: 'Too many requests. Please try again later.' },
@@ -193,7 +218,7 @@ export async function DELETE(request: NextRequest) {
       );
     }
 
-    // Parse request body for confirmation
+    // Parse request body
     let body;
     try {
       body = await request.json();
@@ -201,22 +226,25 @@ export async function DELETE(request: NextRequest) {
       body = {};
     }
 
-    // Require explicit confirmation
-    if (body.confirm !== true) {
+    // Validate request body
+    const validation = deleteAccountSchema.safeParse(body);
+    if (!validation.success) {
       return NextResponse.json(
         {
-          error: 'Account deletion requires confirmation',
-          code: 'confirmation_required',
-          message: 'Please provide { "confirm": true } to confirm account deletion',
+          error: 'Account deletion requires confirmation and password',
+          code: 'validation_error',
+          details: validation.error.flatten().fieldErrors,
         },
         { status: 400 }
       );
     }
 
+    const { password } = validation.data;
+
     await connectDB();
 
     // Find user first to check if they exist
-    const user = await User.findById(session.user.email);
+    const user = await User.findById(userEmail);
     if (!user) {
       return NextResponse.json(
         { error: 'User not found', code: 'not_found' },
@@ -224,21 +252,52 @@ export async function DELETE(request: NextRequest) {
       );
     }
 
-    // Check if user has an active paid subscription
-    if (user.stripeSubscriptionId || user.plan !== 'free') {
-      return NextResponse.json(
-        {
-          error: 'Please cancel your subscription before deleting your account',
-          code: 'active_subscription',
-        },
-        { status: 400 }
-      );
+    // Verify password
+    if (user.password) {
+      const isValidPassword = await bcrypt.compare(password, user.password);
+      if (!isValidPassword) {
+        return NextResponse.json(
+          { error: 'Invalid password', code: 'invalid_password' },
+          { status: 401 }
+        );
+      }
+    } else {
+      // User signed up with OAuth, check if they provided their email as password (simple verification)
+      if (password !== userEmail) {
+        return NextResponse.json(
+          {
+            error: 'For OAuth accounts, please enter your email address to confirm deletion',
+            code: 'invalid_confirmation',
+          },
+          { status: 401 }
+        );
+      }
     }
 
-    // Delete user
-    await User.findByIdAndDelete(session.user.email);
+    // Store user info for confirmation email before deletion
+    const userName = user.name || 'User';
 
-    // TODO: Clean up related data (files, tokens, etc.)
+    // Cancel any active subscriptions
+    await cancelUserSubscriptions(userEmail, user);
+
+    // Remove user from teams and transfer ownership or delete teams
+    await handleTeamMemberships(userEmail);
+
+    // Delete all user-related data
+    await deleteUserData(userEmail);
+
+    // Delete user
+    await User.findByIdAndDelete(userEmail);
+
+    // Send confirmation email
+    if (emailService.isConfigured()) {
+      try {
+        await emailService.sendAccountDeletion({ email: userEmail, name: userName });
+      } catch (emailError) {
+        console.error('Failed to send deletion confirmation email:', emailError);
+        // Don't fail the deletion if email fails
+      }
+    }
 
     return NextResponse.json({
       success: true,
@@ -251,4 +310,151 @@ export async function DELETE(request: NextRequest) {
       { status: 500 }
     );
   }
+}
+
+/**
+ * Cancel any active subscriptions for the user
+ */
+async function cancelUserSubscriptions(userEmail: string, user: { stripeSubscriptionId?: string; plan: string }) {
+  // Cancel Stripe subscription
+  if (user.stripeSubscriptionId) {
+    try {
+      // Import Stripe gateway dynamically to avoid circular dependencies
+      const { stripeGateway } = await import('@/lib/payments/stripe/gateway');
+      if (stripeGateway.isConfigured()) {
+        await stripeGateway.cancelSubscription(user.stripeSubscriptionId);
+      }
+    } catch (error) {
+      console.error('Failed to cancel Stripe subscription:', error);
+    }
+  }
+
+  // Cancel regional subscriptions (Paymob, PayTabs, Paddle)
+  const regionalSubs = await RegionalSubscription.find({
+    userId: userEmail,
+    status: { $in: ['active', 'trialing'] },
+  });
+
+  for (const sub of regionalSubs) {
+    try {
+      if (sub.gateway === 'paymob') {
+        const { paymobGateway } = await import('@/lib/payments/paymob/gateway');
+        if (paymobGateway.isConfigured()) {
+          await paymobGateway.cancelSubscription(sub.gatewayTransactionId);
+        }
+      } else if (sub.gateway === 'paytabs') {
+        const { paytabsGateway } = await import('@/lib/payments/paytabs/gateway');
+        if (paytabsGateway.isConfigured()) {
+          await paytabsGateway.cancelSubscription(sub.gatewayTransactionId);
+        }
+      }
+    } catch (error) {
+      console.error(`Failed to cancel ${sub.gateway} subscription:`, error);
+    }
+  }
+
+  // Mark all regional subscriptions as canceled
+  await RegionalSubscription.updateMany(
+    { userId: userEmail },
+    { $set: { status: 'canceled', canceledAt: new Date() } }
+  );
+}
+
+/**
+ * Handle team memberships - remove user or transfer/delete teams
+ */
+async function handleTeamMemberships(userEmail: string) {
+  // Find teams owned by the user
+  const ownedTeams = await Team.find({ ownerId: userEmail });
+
+  for (const team of ownedTeams) {
+    // Check if there are other admins (all members in the array are active)
+    const admins = team.members.filter(
+      (m) => m.role === 'admin' && m.userId !== userEmail
+    );
+
+    if (admins.length > 0) {
+      // Transfer ownership to the first admin
+      const newOwner = admins[0];
+      await Team.findByIdAndUpdate(team._id, {
+        $set: { ownerId: newOwner.userId },
+        $pull: { members: { userId: userEmail } },
+      });
+
+      // Log the ownership transfer
+      await TeamActivity.create({
+        teamId: team._id.toString(),
+        userId: 'system',
+        action: 'ownership_transferred',
+        details: {
+          from: userEmail,
+          to: newOwner.userId,
+          reason: 'account_deletion',
+        },
+      });
+    } else {
+      // No admins - delete the team
+      const teamIdStr = team._id.toString();
+      await Team.findByIdAndDelete(team._id);
+      await TeamMemberLookup.deleteMany({ teamId: teamIdStr });
+      await TeamActivity.deleteMany({ teamId: teamIdStr });
+      await TeamInvitation.deleteMany({ teamId: teamIdStr });
+    }
+  }
+
+  // Remove user from teams where they're a member (not owner)
+  await Team.updateMany(
+    { 'members.userId': userEmail, ownerId: { $ne: userEmail } },
+    { $pull: { members: { userId: userEmail } } }
+  );
+
+  // Delete member lookups
+  await TeamMemberLookup.deleteMany({ memberId: userEmail });
+}
+
+/**
+ * Delete all user-related data
+ */
+async function deleteUserData(userEmail: string) {
+  // Delete files (note: actual storage files should be deleted via Cloudinary/Firebase)
+  const files = await UserFile.find({ userId: userEmail });
+  if (files.length > 0) {
+    try {
+      // Import storage service to delete actual files
+      const { deleteFile } = await import('@/lib/storage/service');
+      for (const file of files) {
+        try {
+          await deleteFile(userEmail, file._id.toString());
+        } catch (err) {
+          console.error(`Failed to delete file ${file._id}:`, err);
+        }
+      }
+    } catch (error) {
+      console.error('Failed to delete storage files:', error);
+    }
+  }
+  await UserFile.deleteMany({ userId: userEmail });
+
+  // Delete usage data
+  await UsageEvent.deleteMany({ userId: userEmail });
+  await DailyUsage.deleteMany({ userId: userEmail });
+
+  // Delete team activity (user's actions)
+  await TeamActivity.deleteMany({ userId: userEmail });
+
+  // Delete invitations (both sent and received)
+  await TeamInvitation.deleteMany({
+    $or: [{ invitedBy: userEmail }, { email: userEmail }],
+  });
+
+  // Delete sessions
+  await Session.deleteMany({ userId: userEmail });
+
+  // Delete connected accounts
+  await Account.deleteMany({ userId: userEmail });
+
+  // Delete tokens
+  await PasswordResetToken.deleteMany({ userId: userEmail });
+  await EmailVerificationToken.deleteMany({ userId: userEmail });
+  await EmailChangeToken.deleteMany({ userId: userEmail });
 }
