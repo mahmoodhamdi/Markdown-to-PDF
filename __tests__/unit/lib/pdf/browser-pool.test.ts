@@ -20,6 +20,7 @@ const mockBrowser = {
   newPage: vi.fn().mockResolvedValue(mockPage),
   close: vi.fn().mockResolvedValue(undefined),
   pages: vi.fn().mockResolvedValue([mockPage]),
+  on: vi.fn(),
 };
 
 vi.mock('puppeteer', () => ({

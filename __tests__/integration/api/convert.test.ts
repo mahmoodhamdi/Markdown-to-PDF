@@ -4,13 +4,18 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 vi.mock('puppeteer', () => ({
   default: {
     launch: vi.fn().mockResolvedValue({
+      connected: true,
       newPage: vi.fn().mockResolvedValue({
         setContent: vi.fn().mockResolvedValue(undefined),
+        setViewport: vi.fn().mockResolvedValue(undefined),
         evaluate: vi.fn().mockResolvedValue(undefined),
         waitForFunction: vi.fn().mockResolvedValue(undefined),
         pdf: vi.fn().mockResolvedValue(Buffer.from('PDF content')),
+        close: vi.fn().mockResolvedValue(undefined),
+        isClosed: vi.fn().mockReturnValue(false),
       }),
       close: vi.fn().mockResolvedValue(undefined),
+      on: vi.fn(),
     }),
   },
 }));
