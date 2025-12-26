@@ -10,6 +10,10 @@ import {
   FolderOpen,
   LineChart,
   Settings,
+  User,
+  Shield,
+  UserCog,
+  Users,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -25,7 +29,11 @@ const navItems: NavItem[] = [
   { href: '/dashboard/usage', labelKey: 'usage', icon: BarChart3 },
   { href: '/dashboard/subscription', labelKey: 'subscription', icon: CreditCard },
   { href: '/dashboard/files', labelKey: 'files', icon: FolderOpen },
-  { href: '/dashboard/analytics', labelKey: 'analytics', icon: LineChart, dividerAfter: true },
+  { href: '/dashboard/analytics', labelKey: 'analytics', icon: LineChart },
+  { href: '/dashboard/teams', labelKey: 'teams', icon: Users, dividerAfter: true },
+  { href: '/dashboard/profile', labelKey: 'profile', icon: User },
+  { href: '/dashboard/security', labelKey: 'security', icon: Shield },
+  { href: '/dashboard/account', labelKey: 'account', icon: UserCog, dividerAfter: true },
   { href: '/settings', labelKey: 'settings', icon: Settings },
 ];
 

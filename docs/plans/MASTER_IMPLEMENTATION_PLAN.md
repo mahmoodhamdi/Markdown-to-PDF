@@ -60,7 +60,7 @@ This document provides a comprehensive roadmap to bring the Markdown-to-PDF appl
 | 2 | UI/UX Completion | 🟠 High | 5 | ✅ Complete |
 | 3 | User Dashboard | 🟠 High | 4 | ✅ Complete |
 | 4 | Team Features | 🟡 Medium | 4 | ✅ Complete |
-| 5 | Account Management | 🟡 Medium | 4 | 3/4 Complete |
+| 5 | Account Management | 🟡 Medium | 4 | ✅ Complete |
 | 6 | Testing & Polish | 🟢 Final | 4 | Pending |
 
 ---
@@ -303,10 +303,21 @@ This document provides a comprehensive roadmap to bring the Markdown-to-PDF appl
 - ✅ Translations added (EN & AR)
 - ✅ Unit tests (830 passing)
 
-### Stage 5.4: Account Actions
-- Account deletion flow
-- Data export (GDPR)
-- Two-factor authentication (optional)
+### Stage 5.4: Account Actions ✅ COMPLETE (December 26, 2024)
+- ✅ Created `/[locale]/dashboard/account/page.tsx` account page
+- ✅ Created DataExport component with ZIP download
+- ✅ Created DeleteAccount component with confirmation dialog
+- ✅ Created `/api/users/export` API (GDPR data export as ZIP)
+- ✅ Enhanced `/api/users/profile` DELETE to properly clean up:
+  - Cancel all subscriptions (Stripe, Paymob, PayTabs)
+  - Remove from teams or transfer ownership
+  - Delete all files from storage
+  - Delete all user data (usage, sessions, tokens)
+  - Send confirmation email
+- ✅ Created account deletion email template
+- ✅ Updated dashboard sidebar to include profile, security, account
+- ✅ Translations added (EN & AR)
+- ✅ Unit tests (990 passing)
 
 ---
 
@@ -437,7 +448,7 @@ Claude: [Reads the file and implements the stage]
 | 5 | 5.1 | ✅ Complete | Dec 26, 2024 | Dec 26, 2024 |
 | 5 | 5.2 | ✅ Complete | Dec 26, 2024 | Dec 26, 2024 |
 | 5 | 5.3 | ✅ Complete | Dec 26, 2024 | Dec 26, 2024 |
-| 5 | 5.4 | ⏳ Pending | - | - |
+| 5 | 5.4 | ✅ Complete | Dec 26, 2024 | Dec 26, 2024 |
 | 6 | 6.1 | ⏳ Pending | - | - |
 | 6 | 6.2 | ⏳ Pending | - | - |
 | 6 | 6.3 | ⏳ Pending | - | - |
@@ -445,4 +456,4 @@ Claude: [Reads the file and implements the stage]
 
 ---
 
-*Last Updated: December 26, 2024 - Stage 5.3 Complete*
+*Last Updated: December 26, 2024 - Phase 5 Complete (All Account Management stages)*

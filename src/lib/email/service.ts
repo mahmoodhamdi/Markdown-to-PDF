@@ -13,6 +13,7 @@ import {
   getSubscriptionCanceledEmail,
   getTeamInvitationEmail,
   getEmailVerificationEmail,
+  getAccountDeletionEmail,
 } from './templates';
 import { PlanType } from '@/lib/plans/config';
 
@@ -238,6 +239,26 @@ export const emailService = {
       html,
       text,
     });
+  },
+
+  /**
+   * Send account deletion confirmation email
+   */
+  async sendAccountDeletion(user: UserEmailParams): Promise<string> {
+    const { subject, html, text } = getAccountDeletionEmail({
+      name: user.name || '',
+      email: user.email,
+    });
+
+    // Send immediately since account is being deleted
+    await sendEmailDirect({
+      to: user.email,
+      subject,
+      html,
+      text,
+    });
+
+    return 'sent';
   },
 
   /**

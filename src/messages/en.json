@@ -619,6 +619,10 @@
       "subscription": "Subscription",
       "files": "Files",
       "analytics": "Analytics",
+      "teams": "Teams",
+      "profile": "Profile",
+      "security": "Security",
+      "account": "Account",
       "settings": "Settings"
     },
     "usage": {
@@ -985,6 +989,48 @@
       "cannotDisconnect": "Last login method",
       "cancel": "Cancel",
       "confirm": "Disconnect"
+    }
+  },
+  "account": {
+    "title": "Account",
+    "description": "Manage your account settings and data",
+    "export": {
+      "title": "Export Data",
+      "description": "Download a copy of all your data",
+      "includes": "Includes",
+      "items": {
+        "profile": "Profile information",
+        "files": "Stored files and documents",
+        "conversions": "Conversion history",
+        "analytics": "Usage analytics",
+        "teams": "Team memberships"
+      },
+      "button": "Export My Data",
+      "exporting": "Preparing export...",
+      "success": "Download started!"
+    },
+    "delete": {
+      "title": "Delete Account",
+      "description": "Permanently delete your account and all associated data",
+      "warning": "Deleting your account will:",
+      "consequences": {
+        "subscriptions": "Cancel any active subscriptions",
+        "teams": "Remove you from all teams",
+        "files": "Delete all your stored files",
+        "data": "Permanently delete all your data"
+      },
+      "button": "Delete Account",
+      "dialog": {
+        "title": "Delete Account",
+        "description": "Are you sure you want to delete your account? This action cannot be undone.",
+        "confirmLabel": "Type \"DELETE\" to confirm:",
+        "confirmError": "Please type DELETE exactly",
+        "passwordLabel": "Enter your password:",
+        "passwordPlaceholder": "Your password",
+        "cancel": "Cancel",
+        "confirm": "Delete Account",
+        "deleting": "Deleting..."
+      }
     }
   },
   "invitation": {
