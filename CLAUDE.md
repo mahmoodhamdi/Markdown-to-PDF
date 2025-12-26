@@ -92,6 +92,7 @@ Database uses MongoDB with Mongoose (`src/lib/db/mongodb.ts`), Storage uses Fire
 - **Team Management** (`src/lib/teams/service.ts`): Teams with roles (owner/admin/member), invitations, shared settings
 - **Usage Analytics** (`src/lib/analytics/service.ts`): Event tracking, daily aggregation, usage summaries
 - **SSO/SAML** (`src/lib/sso/`): Enterprise SSO with SAML, OIDC, Azure AD, Okta, Google Workspace support
+- **Email Service** (`src/lib/email/`): Nodemailer-based email with templates for welcome, password reset, subscription, team invitations, email change
 
 ### Payment Gateways
 
@@ -125,6 +126,15 @@ Uses NextAuth.js (`src/lib/auth/config.ts`) with JWT session strategy:
 - Supported locales: `en`, `ar` (with RTL support)
 - Translation files: `src/messages/{en,ar}.json`
 - Routes are prefixed with locale: `/en/`, `/ar/`
+
+### Dashboard Pages
+
+User dashboard at `/[locale]/dashboard/`:
+- `page.tsx` - Main dashboard with overview cards
+- `usage/` - Usage metrics and limits visualization
+- `subscription/` - Subscription management and plan switching
+- `analytics/` - Conversion analytics with charts
+- `teams/` - Team dashboard (for team/enterprise plans)
 
 ### API Routes
 
@@ -190,3 +200,9 @@ Plan types in `src/lib/plans/config.ts`:
 - E2E tests: `__tests__/e2e/` - Playwright browser tests
 - Test setup: `src/test/setup.ts` - jsdom environment with testing-library
 - Vitest globals enabled (`describe`, `it`, `expect` available without imports)
+
+## Documentation
+
+- `docs/architecture.md` - System architecture diagrams and data flow
+- `docs/plans/` - Feature implementation plans with staged prompts
+- `docs/plans/MASTER_IMPLEMENTATION_PLAN.md` - Overview of all planned stages

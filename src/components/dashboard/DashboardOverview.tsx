@@ -5,6 +5,7 @@ import { Link } from '@/i18n/routing';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { QuickStats } from './QuickStats';
+import { EmailVerificationBanner } from './EmailVerificationBanner';
 import { FileText, Upload, BookOpen, ArrowRight } from 'lucide-react';
 
 interface QuickAction {
@@ -27,6 +28,7 @@ interface DashboardOverviewProps {
   storageUsed: string;
   storageLimit: string;
   plan: 'free' | 'pro' | 'team' | 'enterprise';
+  emailVerified?: boolean;
 }
 
 export function DashboardOverview({
@@ -36,11 +38,15 @@ export function DashboardOverview({
   storageUsed,
   storageLimit,
   plan,
+  emailVerified = true,
 }: DashboardOverviewProps) {
   const t = useTranslations('dashboard');
 
   return (
     <div className="space-y-6">
+      {/* Email Verification Banner */}
+      {!emailVerified && <EmailVerificationBanner />}
+
       {/* Welcome Section */}
       <div>
         <h1 className="text-3xl font-bold">

@@ -23,7 +23,7 @@ export function getTeamInvitationEmail(params: TeamInvitationParams): {
 } {
   const { recipientEmail, teamName, inviterName, inviterEmail, role, invitationToken } = params;
   const baseUrl = getBaseUrl();
-  const acceptUrl = `${baseUrl}/teams/accept?token=${invitationToken}`;
+  const acceptUrl = `${baseUrl}/en/invitation/${invitationToken}`;
   const roleText = role === 'admin' ? 'an administrator' : 'a member';
 
   const content = `

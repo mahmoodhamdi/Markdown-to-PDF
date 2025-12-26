@@ -10,3 +10,4 @@ export { getEmailChangeEmail } from './email-change';
 export { getSubscriptionConfirmationEmail } from './subscription-confirmation';
 export { getSubscriptionCanceledEmail } from './subscription-canceled';
 export { getTeamInvitationEmail } from './team-invitation';
+export { getEmailVerificationEmail } from './email-verification';

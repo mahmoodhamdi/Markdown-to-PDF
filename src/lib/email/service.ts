@@ -12,6 +12,7 @@ import {
   getSubscriptionConfirmationEmail,
   getSubscriptionCanceledEmail,
   getTeamInvitationEmail,
+  getEmailVerificationEmail,
 } from './templates';
 import { PlanType } from '@/lib/plans/config';
 
@@ -95,6 +96,32 @@ export const emailService = {
     });
 
     // Send password reset emails immediately for security
+    await sendEmailDirect({
+      to: user.email,
+      subject,
+      html,
+      text,
+    });
+
+    return 'sent';
+  },
+
+  /**
+   * Send email verification email (for new registrations)
+   */
+  async sendEmailVerification(
+    user: UserEmailParams,
+    token: string,
+    expiresInHours = 24
+  ): Promise<string> {
+    const { subject, html, text } = getEmailVerificationEmail({
+      name: user.name || '',
+      email: user.email,
+      token,
+      expiresInHours,
+    });
+
+    // Send verification emails immediately
     await sendEmailDirect({
       to: user.email,
       subject,

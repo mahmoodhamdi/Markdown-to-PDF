@@ -10,6 +10,7 @@ import bcrypt from 'bcryptjs';
 import { z } from 'zod';
 import { checkRateLimit, getRateLimitHeaders } from '@/lib/rate-limit';
 import { emailService } from '@/lib/email/service';
+import { createEmailVerificationToken } from '@/lib/db/models/EmailVerificationToken';
 
 const registerSchema = z.object({
   name: z.string().min(1, 'Name is required'),
@@ -59,7 +60,7 @@ export async function POST(request: NextRequest) {
     // Hash password
     const hashedPassword = await bcrypt.hash(password, 12);
 
-    // Create user
+    // Create user with emailVerified undefined (not verified yet)
     await User.create({
       _id: email.toLowerCase(),
       email: email.toLowerCase(),
@@ -67,6 +68,7 @@ export async function POST(request: NextRequest) {
       image: `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(email)}`,
       plan: 'free',
       password: hashedPassword,
+      // emailVerified is undefined by default (not verified)
       usage: {
         conversions: 0,
         apiCalls: 0,
@@ -74,16 +76,24 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    // Send welcome email (non-blocking)
+    // Create verification token and send verification email
     if (emailService.isConfigured()) {
-      emailService.sendWelcomeEmail({ email: email.toLowerCase(), name }).catch((err) => {
-        console.error('Failed to send welcome email:', err);
-      });
+      try {
+        const { token } = await createEmailVerificationToken(email.toLowerCase(), 24);
+        await emailService.sendEmailVerification(
+          { email: email.toLowerCase(), name },
+          token,
+          24
+        );
+      } catch (err) {
+        console.error('Failed to send verification email:', err);
+        // Still return success, user can resend verification later
+      }
     }
 
     return NextResponse.json({
       success: true,
-      message: 'Registration successful',
+      message: 'Registration successful. Please check your email to verify your account.',
     });
   } catch (error) {
     console.error('Registration error:', error);

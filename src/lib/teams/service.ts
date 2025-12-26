@@ -7,6 +7,15 @@
 import { connectDB } from '@/lib/db/mongodb';
 import { Team, TeamMemberLookup, type ITeam, type ITeamMember, type TeamRole } from '@/lib/db/models/Team';
 import { getPlanLimits, PlanType } from '@/lib/plans/config';
+import {
+  logTeamCreated,
+  logTeamUpdated,
+  logSettingsUpdated,
+  logTeamDeleted,
+  logMemberRemoved,
+  logMemberLeft,
+  logRoleChanged,
+} from './activity-service';
 
 export type { TeamRole } from '@/lib/db/models/Team';
 
@@ -159,6 +168,15 @@ export async function createTeam(input: CreateTeamInput): Promise<TeamResult> {
       status: 'active',
     });
 
+    // Log activity
+    await logTeamCreated(
+      team._id.toString(),
+      input.name,
+      input.ownerId,
+      input.ownerEmail,
+      input.ownerName
+    );
+
     return {
       success: true,
       team: toTeamData(team),
@@ -295,6 +313,28 @@ export async function updateTeam(
       };
     }
 
+    // Log activity
+    if (updates.name) {
+      await logTeamUpdated(
+        teamId,
+        updatedTeam.name,
+        userId,
+        member.email,
+        member.name,
+        { name: updates.name }
+      );
+    }
+    if (updates.settings) {
+      await logSettingsUpdated(
+        teamId,
+        updatedTeam.name,
+        userId,
+        member.email,
+        member.name,
+        updates.settings
+      );
+    }
+
     return {
       success: true,
       team: toTeamData(updatedTeam),
@@ -330,6 +370,17 @@ export async function deleteTeam(teamId: string, userId: string): Promise<{ succ
         error: 'Only the team owner can delete the team',
       };
     }
+
+    const owner = team.members.find((m: ITeamMember) => m.userId === userId);
+
+    // Log activity before deleting
+    await logTeamDeleted(
+      teamId,
+      team.name,
+      userId,
+      owner?.email || '',
+      owner?.name
+    );
 
     // Delete all member records
     await TeamMemberLookup.deleteMany({ teamId });
@@ -524,6 +575,29 @@ export async function removeTeamMember(
     // Remove member lookup record
     await TeamMemberLookup.deleteOne({ teamId, userId: memberIdToRemove });
 
+    // Log activity
+    if (userId === memberIdToRemove) {
+      // Member left the team
+      await logMemberLeft(
+        teamId,
+        team.name,
+        userId,
+        remover.email,
+        remover.name
+      );
+    } else {
+      // Member was removed by someone else
+      await logMemberRemoved(
+        teamId,
+        team.name,
+        userId,
+        remover.email,
+        remover.name,
+        memberToRemove.email,
+        memberToRemove.name
+      );
+    }
+
     return { success: true };
   } catch (error) {
     console.error('Remove team member error:', error);
@@ -599,6 +673,23 @@ export async function updateMemberRole(
     );
 
     const updatedMember = updatedTeam.members.find((m: ITeamMember) => m.userId === memberIdToUpdate);
+    const owner = team.members.find((m: ITeamMember) => m.userId === userId);
+    const oldRole = team.members[memberIndex].role;
+
+    // Log activity
+    if (owner && updatedMember) {
+      await logRoleChanged(
+        teamId,
+        team.name,
+        userId,
+        owner.email,
+        owner.name,
+        updatedMember.email,
+        updatedMember.name,
+        oldRole,
+        newRole
+      );
+    }
 
     return {
       success: true,
