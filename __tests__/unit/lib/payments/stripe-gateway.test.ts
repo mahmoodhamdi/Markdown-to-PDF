@@ -622,7 +622,7 @@ describe('Stripe Gateway', () => {
 
       mockSubscriptionsUpdate.mockResolvedValue({});
 
-      await stripeGateway.pauseSubscription('sub_pause123');
+      await stripeGateway.pauseSubscription!('sub_pause123');
 
       expect(mockSubscriptionsUpdate).toHaveBeenCalledWith('sub_pause123', {
         pause_collection: {
@@ -638,7 +638,7 @@ describe('Stripe Gateway', () => {
 
       mockSubscriptionsUpdate.mockResolvedValue({});
 
-      await stripeGateway.resumeSubscription('sub_resume123');
+      await stripeGateway.resumeSubscription!('sub_resume123');
 
       expect(mockSubscriptionsUpdate).toHaveBeenCalledWith('sub_resume123', {
         pause_collection: '',
@@ -681,7 +681,7 @@ describe('Stripe Gateway', () => {
         created: mockDate - 86400 * 30,
       });
 
-      const result = await stripeGateway.updateSubscription('sub_update123', 'team', 'yearly');
+      const result = await stripeGateway.updateSubscription!('sub_update123', 'team', 'yearly');
 
       expect(result.id).toBe('sub_update123');
       expect(result.plan).toBe('team');
@@ -704,7 +704,7 @@ describe('Stripe Gateway', () => {
         url: 'https://billing.stripe.com/portal/session123',
       });
 
-      const result = await stripeGateway.getCustomerPortalUrl(
+      const result = await stripeGateway.getCustomerPortalUrl!(
         'cus_portal123',
         'https://example.com/account'
       );
@@ -722,7 +722,7 @@ describe('Stripe Gateway', () => {
       const { stripeGateway } = await import('@/lib/payments/stripe/gateway');
 
       await expect(
-        stripeGateway.getCustomerPortalUrl('cus_123', 'https://example.com')
+        stripeGateway.getCustomerPortalUrl!('cus_123', 'https://example.com')
       ).rejects.toThrow('Stripe is not configured');
     });
   });

@@ -32,13 +32,16 @@ vi.mock('mongoose', () => {
     constructor() {}
   }
 
-  const MockModel = vi.fn((data: Record<string, unknown>) => createMockModelInstance(data));
-  MockModel.findOne = mockFindOne;
-  MockModel.findOneAndUpdate = mockFindOneAndUpdate;
-  MockModel.updateMany = mockUpdateMany;
-  MockModel.findByUserId = mockFindOne;
-  MockModel.findByTransactionId = mockFindOne;
-  MockModel.findActiveByUserId = mockFindOne;
+  // Create mock model with proper typing
+  const MockModelFn = (data: Record<string, unknown>) => createMockModelInstance(data);
+  const MockModel = Object.assign(MockModelFn, {
+    findOne: mockFindOne,
+    findOneAndUpdate: mockFindOneAndUpdate,
+    updateMany: mockUpdateMany,
+    findByUserId: mockFindOne,
+    findByTransactionId: mockFindOne,
+    findActiveByUserId: mockFindOne,
+  });
 
   const actualMongoose = {
     Schema: MockSchema,
