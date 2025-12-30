@@ -5,6 +5,55 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.0] - 2025-12-30
+
+### Added
+- **API Key Management**: Full API key CRUD operations with dashboard UI
+- **Files Management**: Dashboard page for managing uploaded files
+- **Subscription Actions**: Pause, resume, and cancel subscription functionality
+- **Payment Method Management**: Add/remove payment methods
+- **Promo Code Support**: Apply promotional codes at checkout
+- **Webhook Event Logging**: Track all payment webhook events
+- **Login Attempt Tracking**: Security audit logging for authentication
+
+### Improved
+- **Accessibility (WCAG 2.1 AA)**:
+  - Added skip link for keyboard navigation
+  - Added aria-labels to navigation elements
+  - Added aria-expanded/aria-controls for mobile menu
+  - Improved form accessibility with aria-describedby and aria-invalid
+  - Added role="alert" for error messages
+  - Added show/hide password accessibility labels
+- **E2E Test Coverage**:
+  - Added 25+ authentication E2E tests
+  - Added 30+ conversion flow E2E tests
+  - Added multi-browser testing (Chromium, Firefox, WebKit)
+  - Enhanced accessibility test suite with skip link and navigation tests
+- **Component Test Coverage**:
+  - Fixed 32+ failing component tests
+  - Added tests for dashboard components (Analytics, Billing, Usage)
+  - Added tests for editor components (EditorToolbar, MarkdownEditor)
+  - Added tests for team components (AddMember, CreateTeam)
+- **API Integration Tests**:
+  - Improved test reliability with better mocking
+  - Added tests for analytics, auth, checkout, SSO endpoints
+  - 87%+ test pass rate achieved
+
+### Fixed
+- Fixed analytics service timezone handling
+- Fixed storage quota display in dashboard
+- Fixed email queue processing race conditions
+- Fixed rate limiting Redis connection handling
+- Fixed browser pool cleanup on server shutdown
+- Fixed PDF generator memory leak on large documents
+- Fixed sanitization of user input in markdown parser
+
+### Documentation
+- Created comprehensive deployment guide
+- Created troubleshooting guide
+- Updated CLAUDE.md with accurate function references
+- Updated CHANGELOG with recent changes
+
 ## [1.1.0] - 2024-12-16
 
 ### Added
@@ -77,6 +126,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 | Version | Date | Description |
 |---------|------|-------------|
+| 1.2.0 | 2025-12-30 | Accessibility, testing, and documentation improvements |
 | 1.1.0 | 2024-12-16 | Code quality, testing, and performance improvements |
 | 1.0.0 | 2024-12-15 | Feature complete release with editor enhancements |
 | 0.1.0 | 2024-12-14 | Initial release |

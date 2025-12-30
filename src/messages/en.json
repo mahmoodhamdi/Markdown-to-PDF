@@ -1214,7 +1214,9 @@
       "reqUppercase": "One uppercase letter",
       "reqLowercase": "One lowercase letter",
       "reqNumber": "One number",
-      "reqSpecial": "One special character"
+      "reqSpecial": "One special character",
+      "showPassword": "Show password",
+      "hidePassword": "Hide password"
     },
     "sessions": {
       "title": "Active Sessions",
