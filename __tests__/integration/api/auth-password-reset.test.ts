@@ -44,6 +44,10 @@ vi.mock('@/lib/rate-limit', () => ({
   getRateLimitHeaders: vi.fn().mockReturnValue({}),
 }));
 
+vi.mock('@/lib/auth/session-service', () => ({
+  invalidateAllUserSessions: vi.fn().mockResolvedValue(undefined),
+}));
+
 vi.mock('bcryptjs', () => ({
   default: {
     hash: vi.fn().mockResolvedValue('hashed-password'),
@@ -182,7 +186,7 @@ describe('POST /api/auth/reset-password', () => {
       method: 'POST',
       body: JSON.stringify({
         token: 'valid-reset-token',
-        password: 'newpassword123',
+        password: 'NewPassword123', // Must meet password requirements: uppercase, lowercase, number
       }),
     });
 
@@ -202,7 +206,7 @@ describe('POST /api/auth/reset-password', () => {
       method: 'POST',
       body: JSON.stringify({
         token: 'invalid-token',
-        password: 'newpassword123',
+        password: 'NewPassword123', // Must meet password requirements
       }),
     });
 
@@ -233,7 +237,7 @@ describe('POST /api/auth/reset-password', () => {
     const request = new NextRequest('http://localhost:3000/api/auth/reset-password', {
       method: 'POST',
       body: JSON.stringify({
-        password: 'newpassword123',
+        password: 'NewPassword123',
       }),
     });
 
@@ -250,7 +254,7 @@ describe('POST /api/auth/reset-password', () => {
       method: 'POST',
       body: JSON.stringify({
         token: 'valid-token',
-        password: 'newpassword123',
+        password: 'NewPassword123',
       }),
     });
 

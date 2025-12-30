@@ -2,56 +2,47 @@
  * Integration tests for PayTabs webhook handler
  */
 
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { NextRequest } from 'next/server';
 
-// Mock PayTabs config
-const mockIsPayTabsConfigured = vi.fn();
+// Define mock functions at module level
+const mockIsPayTabsConfigured = vi.fn().mockReturnValue(true);
+const mockVerifyCallbackSignature = vi.fn();
+const mockHandleWebhook = vi.fn();
+
+// Mock all dependencies before any imports
 vi.mock('@/lib/payments/paytabs/config', () => ({
   isPayTabsConfigured: () => mockIsPayTabsConfigured(),
 }));
 
-// Mock PayTabs client
-const mockVerifyCallbackSignature = vi.fn();
 vi.mock('@/lib/payments/paytabs/client', () => ({
   paytabsClient: {
     verifyCallbackSignature: (...args: unknown[]) => mockVerifyCallbackSignature(...args),
   },
 }));
 
-// Mock PayTabs gateway
-const mockHandleWebhook = vi.fn();
 vi.mock('@/lib/payments/paytabs/gateway', () => ({
   paytabsGateway: {
     handleWebhook: (...args: unknown[]) => mockHandleWebhook(...args),
   },
 }));
 
-// Mock webhooks service (idempotency)
 vi.mock('@/lib/webhooks', () => ({
   checkAndMarkProcessing: vi.fn().mockResolvedValue({ isNew: true }),
   markProcessed: vi.fn().mockResolvedValue(undefined),
   markFailed: vi.fn().mockResolvedValue(undefined),
   markSkipped: vi.fn().mockResolvedValue(undefined),
   webhookLog: vi.fn(),
+  generateEventId: vi.fn().mockReturnValue('paytabs-test-event'),
 }));
 
+// Import the routes after mocks are set up
+import { POST, GET } from '@/app/api/webhooks/paytabs/route';
+
 describe('/api/webhooks/paytabs', () => {
-  let POST: typeof import('@/app/api/webhooks/paytabs/route').POST;
-  let GET: typeof import('@/app/api/webhooks/paytabs/route').GET;
-
-  beforeEach(async () => {
+  beforeEach(() => {
     vi.clearAllMocks();
-    vi.resetModules();
     mockIsPayTabsConfigured.mockReturnValue(true);
-
-    const module = await import('@/app/api/webhooks/paytabs/route');
-    POST = module.POST;
-    GET = module.GET;
-  });
-
-  afterEach(() => {
-    vi.resetModules();
   });
 
   describe('POST /api/webhooks/paytabs', () => {
