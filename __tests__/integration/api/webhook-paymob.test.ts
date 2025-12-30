@@ -31,6 +31,15 @@ vi.mock('crypto', () => ({
   },
 }));
 
+// Mock webhooks service (idempotency)
+vi.mock('@/lib/webhooks', () => ({
+  checkAndMarkProcessing: vi.fn().mockResolvedValue({ isNew: true }),
+  markProcessed: vi.fn().mockResolvedValue(undefined),
+  markFailed: vi.fn().mockResolvedValue(undefined),
+  markSkipped: vi.fn().mockResolvedValue(undefined),
+  webhookLog: vi.fn(),
+}));
+
 describe('/api/webhooks/paymob', () => {
   let POST: typeof import('@/app/api/webhooks/paymob/route').POST;
   let GET: typeof import('@/app/api/webhooks/paymob/route').GET;

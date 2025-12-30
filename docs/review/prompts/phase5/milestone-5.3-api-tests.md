@@ -1,8 +1,9 @@
 # Milestone 5.3: API Integration Tests
 
-## Status: ⬜ Not Started
+## Status: 🔄 In Progress (87% passing)
 ## Priority: MEDIUM
 ## Estimated Scope: Large
+## Last Updated: 2025-12-30
 
 ---
 
@@ -254,17 +255,21 @@ afterEach(async () => {
 
 ## Files to Create/Modify
 
-### Create:
-1. `__tests__/integration/api/auth-register.test.ts`
-2. `__tests__/integration/api/auth-verify-email.test.ts`
-3. `__tests__/integration/api/users-sessions.test.ts`
-4. `__tests__/integration/api/storage-upload.test.ts`
-5. `__tests__/integration/setup.ts`
+### Created ✅:
+1. ✅ `__tests__/integration/api/auth-register.test.ts` - 5 tests
+2. ✅ `__tests__/integration/api/auth-verify-email.test.ts` - 5 tests
+3. ✅ `__tests__/integration/api/users-sessions.test.ts` - 6 tests
 
-### Modify:
-1. `__tests__/integration/api/convert.test.ts` - Add more cases
-2. `__tests__/integration/api/teams.test.ts` - Add more cases
-3. `vitest.integration.config.ts` - Add setup file
+### Already Existed:
+4. ✅ `__tests__/integration/api/storage.test.ts` - Comprehensive storage tests
+5. N/A `__tests__/integration/setup.ts` - Using `src/test/setup.ts` instead
+
+### Modified ✅:
+1. ✅ `__tests__/integration/api/convert.test.ts` - Fixed browser pool mocking
+2. ✅ `__tests__/integration/api/webhook-stripe.test.ts` - Added webhooks service mock
+3. ✅ `__tests__/integration/api/webhook-paddle.test.ts` - Added webhooks service mock
+4. ✅ `__tests__/integration/api/webhook-paymob.test.ts` - Added webhooks service mock
+5. ✅ `__tests__/integration/api/webhook-paytabs.test.ts` - Added webhooks service mock
 
 ---
 
@@ -285,14 +290,19 @@ npx vitest run --coverage --config vitest.integration.config.ts
 
 ## Acceptance Criteria
 
-- [ ] All Priority 1 endpoints tested
-- [ ] All Priority 2 endpoints tested
-- [ ] Each endpoint tests success case
-- [ ] Each endpoint tests auth failure
-- [ ] Each endpoint tests validation failure
-- [ ] Rate limiting tested
-- [ ] All tests pass
-- [ ] No flaky tests
+- [x] All Priority 1 endpoints tested
+- [x] All Priority 2 endpoints tested
+- [x] Each endpoint tests success case
+- [x] Each endpoint tests auth failure
+- [x] Each endpoint tests validation failure
+- [x] Rate limiting tested
+- [ ] All tests pass (234/268 passing - 87%)
+- [x] No flaky tests
+
+### Progress Summary
+- **Total Tests:** 268 (234 passing, 16 failing, 18 skipped)
+- **Test Files:** 23 files (19 passing, 4 failing)
+- **Remaining Issues:** 4 test files need `vi.doMock` fixes for webhooks module after `vi.resetModules()`
 
 ---
 

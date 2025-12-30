@@ -46,6 +46,15 @@ vi.mock('@/lib/payments/paddle/client', () => ({
   },
 }));
 
+// Mock webhooks service (idempotency)
+vi.mock('@/lib/webhooks', () => ({
+  checkAndMarkProcessing: vi.fn().mockResolvedValue({ isNew: true }),
+  markProcessed: vi.fn().mockResolvedValue(undefined),
+  markFailed: vi.fn().mockResolvedValue(undefined),
+  markSkipped: vi.fn().mockResolvedValue(undefined),
+  webhookLog: vi.fn(),
+}));
+
 describe('/api/webhooks/paddle', () => {
   let POST: typeof import('@/app/api/webhooks/paddle/route').POST;
 
@@ -75,6 +84,14 @@ describe('/api/webhooks/paddle', () => {
         sendSubscriptionConfirmation: vi.fn().mockResolvedValue('sent'),
         sendSubscriptionCanceled: vi.fn().mockResolvedValue('sent'),
       },
+    }));
+
+    vi.doMock('@/lib/webhooks', () => ({
+      checkAndMarkProcessing: vi.fn().mockResolvedValue({ isNew: true }),
+      markProcessed: vi.fn().mockResolvedValue(undefined),
+      markFailed: vi.fn().mockResolvedValue(undefined),
+      markSkipped: vi.fn().mockResolvedValue(undefined),
+      webhookLog: vi.fn(),
     }));
 
     const module = await import('@/app/api/webhooks/paddle/route');
