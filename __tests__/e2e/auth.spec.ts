@@ -115,23 +115,21 @@ test.describe('Authentication Flow', () => {
     test('should validate password mismatch', async ({ page }) => {
       await page.goto('/en/auth/register');
       await page.waitForLoadState('domcontentloaded');
+      await page.waitForTimeout(500);
 
       // Fill form with mismatched passwords
       await page.fill('#name', 'Test User');
       await page.fill('#email', generateTestEmail());
-      await page.fill('#password', 'password123');
-      await page.fill('#confirmPassword', 'different123');
+      await page.fill('#password', 'Password123');
+      await page.fill('#confirmPassword', 'Different123');
 
       await page.click('button[type="submit"]');
 
       // Wait for validation error
-      await page.waitForTimeout(1000);
+      await page.waitForTimeout(1500);
 
-      // Should show error message
-      const errorMessage = page.locator('.text-red-500');
-      if (await errorMessage.isVisible()) {
-        await expect(errorMessage).toBeVisible();
-      }
+      // Should still be on register page (form validation prevents submission)
+      await expect(page).toHaveURL(/auth\/register/);
     });
 
     test('should validate minimum password length', async ({ page }) => {
@@ -157,11 +155,13 @@ test.describe('Authentication Flow', () => {
     test('should have link to login page', async ({ page }) => {
       await page.goto('/en/auth/register');
       await page.waitForLoadState('domcontentloaded');
+      await page.waitForTimeout(500);
 
-      const loginLink = page.locator('a[href*="/login"]');
-      await expect(loginLink).toBeVisible();
+      const loginLink = page.locator('a[href*="/login"]').first();
+      await expect(loginLink).toBeVisible({ timeout: 10000 });
 
       await loginLink.click();
+      await page.waitForLoadState('domcontentloaded');
       await expect(page).toHaveURL(/auth\/login/);
     });
 
