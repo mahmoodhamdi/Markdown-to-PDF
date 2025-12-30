@@ -181,8 +181,8 @@ describe('PasswordChange', () => {
       const newPasswordInput = screen.getByLabelText('New Password');
       expect(newPasswordInput).toHaveAttribute('type', 'password');
 
-      // Find toggle buttons (there are 3 - one for each password field)
-      const toggleButtons = screen.getAllByRole('button', { name: '' });
+      // Find toggle buttons by their aria-label (added for accessibility)
+      const toggleButtons = screen.getAllByRole('button', { name: /password\.showPassword|password\.hidePassword/i });
       fireEvent.click(toggleButtons[1]); // Second toggle is for new password
 
       expect(newPasswordInput).toHaveAttribute('type', 'text');
