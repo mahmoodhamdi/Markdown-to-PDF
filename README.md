@@ -1,5 +1,9 @@
 # Markdown to PDF Converter
 
+[![Version](https://img.shields.io/badge/version-1.2.0-blue.svg)](https://github.com/mahmoodhamdi/Markdown-to-PDF/releases/tag/v1.2.0)
+[![Tests](https://img.shields.io/badge/tests-1500%2B%20passing-brightgreen.svg)](https://github.com/mahmoodhamdi/Markdown-to-PDF/actions)
+[![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+
 A production-ready Markdown to PDF converter web application built with Next.js 14, TypeScript, and Tailwind CSS. Features a freemium model with user authentication, team management, and enterprise SSO support.
 
 ![Editor Screenshot](screenshots/editor-en.png)
@@ -16,16 +20,18 @@ A production-ready Markdown to PDF converter web application built with Next.js 
 - **15+ Document Templates** - Resume, Thesis, README, Meeting Notes, and more
 - **Bilingual Support** - English and Arabic with full RTL support
 - **Responsive Design** - Works on mobile, tablet, and desktop
+- **Accessible** - WCAG 2.1 AA compliant with keyboard navigation
 - **Docker Support** - Easy deployment with Docker
 - **REST API** - Programmatic access to conversion features
 
 ### Premium Features
 - **User Authentication** - GitHub, Google, and email login
-- **Cloud Storage** - Save documents in the cloud
+- **API Key Authentication** - Programmatic access with rate limiting
+- **Cloud Storage** - Save and manage documents in the cloud
 - **Custom CSS** - Style your documents with custom CSS
 - **Team Management** - Collaborate with team members
-- **Usage Analytics** - Track conversion metrics
-- **Priority Rendering** - Faster PDF generation
+- **Usage Analytics** - Track conversion metrics with charts
+- **Priority Rendering** - Faster PDF generation with browser pooling
 - **No Watermark** - Remove watermark from PDFs
 
 ### Enterprise Features
@@ -90,7 +96,7 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 - **Diagrams**: Mermaid
 - **State Management**: Zustand
 - **Internationalization**: next-intl
-- **Testing**: Vitest + Playwright (709 tests)
+- **Testing**: Vitest + Playwright (1500+ tests)
 - **UI Components**: Radix UI
 - **Authentication**: NextAuth.js
 - **Database**: MongoDB (Mongoose)
@@ -98,6 +104,21 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 - **Payments**: Multi-gateway (Stripe, Paymob, PayTabs, Paddle)
 
 ## API Documentation
+
+### Authentication
+
+API endpoints support two authentication methods:
+
+**Session-based (Web App)**
+- Automatic via cookies for logged-in users
+
+**API Key (Programmatic)**
+```bash
+curl -X POST https://your-domain.com/api/convert \
+  -H "Authorization: Bearer mk_your_api_key_here" \
+  -H "Content-Type: application/json" \
+  -d '{"markdown": "# Hello"}'
+```
 
 ### Convert to PDF
 
@@ -210,6 +231,23 @@ GET /api/analytics/summary
 GET /api/analytics/history
 ```
 
+### API Keys
+
+```bash
+# List API keys
+GET /api/api-keys
+
+# Create API key
+POST /api/api-keys
+{
+  "name": "Production Key",
+  "permissions": ["convert", "preview", "batch"]
+}
+
+# Revoke API key
+DELETE /api/api-keys/[keyId]
+```
+
 ## Testing
 
 ```bash
@@ -318,9 +356,13 @@ See [CREDENTIALS.md](CREDENTIALS.md) for detailed setup instructions.
 | Team Members | - | - | 5 | Unlimited |
 | SSO | - | - | - | Yes |
 
-## Self-Hosting
+## Documentation
 
-See [SELF_HOSTING.md](SELF_HOSTING.md) for detailed deployment instructions.
+- [Deployment Guide](docs/DEPLOYMENT.md) - Production deployment options
+- [Troubleshooting](docs/TROUBLESHOOTING.md) - Common issues and solutions
+- [Self-Hosting](SELF_HOSTING.md) - Deploy on your own infrastructure
+- [Contributing](CONTRIBUTING.md) - How to contribute
+- [Changelog](CHANGELOG.md) - Version history
 
 ## Contributing
 
