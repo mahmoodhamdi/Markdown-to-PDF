@@ -5,22 +5,23 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { NextRequest } from 'next/server';
 
-// Mock MongoDB
+// Define mock functions at module level
 const mockFindById = vi.fn();
 const mockFindByIdAndUpdate = vi.fn();
+const mockConstructEvent = vi.fn();
 
+// Mock all dependencies before any imports
 vi.mock('@/lib/db/mongodb', () => ({
   connectDB: vi.fn().mockResolvedValue(undefined),
 }));
 
 vi.mock('@/lib/db/models/User', () => ({
   User: {
-    findById: mockFindById,
-    findByIdAndUpdate: mockFindByIdAndUpdate,
+    findById: (...args: unknown[]) => mockFindById(...args),
+    findByIdAndUpdate: (...args: unknown[]) => mockFindByIdAndUpdate(...args),
   },
 }));
 
-// Mock email service
 vi.mock('@/lib/email/service', () => ({
   emailService: {
     isConfigured: vi.fn().mockReturnValue(false),
@@ -29,8 +30,6 @@ vi.mock('@/lib/email/service', () => ({
   },
 }));
 
-// Mock Stripe
-const mockConstructEvent = vi.fn();
 vi.mock('@/lib/stripe/config', () => ({
   stripe: {
     webhooks: {
@@ -40,7 +39,6 @@ vi.mock('@/lib/stripe/config', () => ({
   isStripeConfigured: () => true,
 }));
 
-// Mock webhooks service (idempotency)
 vi.mock('@/lib/webhooks', () => ({
   checkAndMarkProcessing: vi.fn().mockResolvedValue({ isNew: true }),
   markProcessed: vi.fn().mockResolvedValue(undefined),
@@ -50,7 +48,7 @@ vi.mock('@/lib/webhooks', () => ({
 }));
 
 describe('/api/webhooks/stripe', () => {
-  let POST: typeof import('@/app/api/webhooks/stripe/route').POST;
+  let POST: (request: NextRequest) => Promise<Response>;
   const originalEnv = process.env.STRIPE_WEBHOOK_SECRET;
 
   beforeEach(async () => {
@@ -58,24 +56,22 @@ describe('/api/webhooks/stripe', () => {
     mockFindById.mockResolvedValue({ _id: 'test@example.com', name: 'Test User', plan: 'pro' });
     mockFindByIdAndUpdate.mockResolvedValue(undefined);
 
-    // Set webhook secret before importing
+    // Set env var before importing
     process.env.STRIPE_WEBHOOK_SECRET = 'whsec_test123';
 
-    // Reset modules to get fresh import with env set
+    // Reset modules to pick up new env var
     vi.resetModules();
 
-    // Re-mock after reset
+    // Re-apply mocks after reset
     vi.doMock('@/lib/db/mongodb', () => ({
       connectDB: vi.fn().mockResolvedValue(undefined),
     }));
-
     vi.doMock('@/lib/db/models/User', () => ({
       User: {
-        findById: mockFindById,
-        findByIdAndUpdate: mockFindByIdAndUpdate,
+        findById: (...args: unknown[]) => mockFindById(...args),
+        findByIdAndUpdate: (...args: unknown[]) => mockFindByIdAndUpdate(...args),
       },
     }));
-
     vi.doMock('@/lib/email/service', () => ({
       emailService: {
         isConfigured: vi.fn().mockReturnValue(false),
@@ -83,7 +79,6 @@ describe('/api/webhooks/stripe', () => {
         sendSubscriptionCanceled: vi.fn().mockResolvedValue('sent'),
       },
     }));
-
     vi.doMock('@/lib/stripe/config', () => ({
       stripe: {
         webhooks: {
@@ -92,7 +87,6 @@ describe('/api/webhooks/stripe', () => {
       },
       isStripeConfigured: () => true,
     }));
-
     vi.doMock('@/lib/webhooks', () => ({
       checkAndMarkProcessing: vi.fn().mockResolvedValue({ isNew: true }),
       markProcessed: vi.fn().mockResolvedValue(undefined),
@@ -101,7 +95,7 @@ describe('/api/webhooks/stripe', () => {
       webhookLog: vi.fn(),
     }));
 
-    // Dynamic import
+    // Dynamic import after env is set
     const module = await import('@/app/api/webhooks/stripe/route');
     POST = module.POST;
   });
