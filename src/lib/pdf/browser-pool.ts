@@ -1,4 +1,7 @@
-import type { Browser, Page } from 'puppeteer';
+import type { Browser, Page, HTTPRequest } from 'puppeteer';
+
+// Configuration constants
+const MAX_CONCURRENT_CONVERSIONS = parseInt(process.env.MAX_CONCURRENT_CONVERSIONS || '5', 10);
 
 const BROWSER_LAUNCH_ARGS = [
   '--no-sandbox',
@@ -34,6 +37,19 @@ interface BrowserPoolMetrics {
   browserAge: number;
 }
 
+interface PageOptions {
+  blockExternalResources?: boolean;
+}
+
+// Blocked resource types for external URLs
+const BLOCKED_RESOURCE_TYPES = ['image', 'media', 'font'] as const;
+// Allowed CDN domains for essential resources
+const ALLOWED_DOMAINS = [
+  'cdn.jsdelivr.net',    // KaTeX, Mermaid, highlight.js
+  'cdnjs.cloudflare.com',
+  'unpkg.com',
+];
+
 class BrowserPool {
   private state: BrowserPoolState = {
     browser: null,
@@ -51,6 +67,10 @@ class BrowserPool {
     totalBrowsersLaunched: 0,
     totalCrashRecoveries: 0,
   };
+
+  // Semaphore for concurrency control
+  private concurrencyQueue: Array<() => void> = [];
+  private activeConcurrent = 0;
 
   constructor() {
     this.startHealthCheck();
@@ -159,7 +179,7 @@ class BrowserPool {
     }
   }
 
-  async getPage(): Promise<Page> {
+  async getPage(options: PageOptions = {}): Promise<Page> {
     const browser = await this.getBrowser();
     this.state.activePages++;
     this.state.totalPagesCreated++;
@@ -170,12 +190,91 @@ class BrowserPool {
       // Set reasonable defaults
       await page.setViewport({ width: 1200, height: 800 });
 
+      // Set up resource blocking if enabled
+      if (options.blockExternalResources) {
+        await this.setupResourceBlocking(page);
+      }
+
       return page;
     } catch (error) {
       this.state.activePages = Math.max(0, this.state.activePages - 1);
       console.error('[BrowserPool] Failed to create page:', error);
       throw error;
     }
+  }
+
+  /**
+   * Set up request interception to block non-essential external resources.
+   * This speeds up PDF generation by avoiding unnecessary network requests.
+   */
+  private async setupResourceBlocking(page: Page): Promise<void> {
+    await page.setRequestInterception(true);
+
+    page.on('request', (request: HTTPRequest) => {
+      const resourceType = request.resourceType();
+      const url = request.url();
+
+      // Allow local and data URLs
+      if (url.startsWith('data:') || url.startsWith('blob:')) {
+        request.continue();
+        return;
+      }
+
+      // Check if it's a blocked resource type from external URL
+      if (BLOCKED_RESOURCE_TYPES.includes(resourceType as (typeof BLOCKED_RESOURCE_TYPES)[number])) {
+        // Allow resources from known CDNs
+        const isAllowedDomain = ALLOWED_DOMAINS.some(domain => url.includes(domain));
+        if (!isAllowedDomain && url.startsWith('http')) {
+          request.abort();
+          return;
+        }
+      }
+
+      request.continue();
+    });
+  }
+
+  /**
+   * Acquire a slot for concurrent PDF generation.
+   * Used to limit the number of simultaneous conversions.
+   */
+  async acquireConcurrencySlot(): Promise<void> {
+    if (this.activeConcurrent < MAX_CONCURRENT_CONVERSIONS) {
+      this.activeConcurrent++;
+      return;
+    }
+
+    // Wait for a slot to become available
+    return new Promise<void>((resolve) => {
+      this.concurrencyQueue.push(() => {
+        this.activeConcurrent++;
+        resolve();
+      });
+    });
+  }
+
+  /**
+   * Release a concurrency slot after PDF generation completes.
+   */
+  releaseConcurrencySlot(): void {
+    this.activeConcurrent = Math.max(0, this.activeConcurrent - 1);
+
+    // Process next in queue if any
+    const next = this.concurrencyQueue.shift();
+    if (next) {
+      next();
+    }
+  }
+
+  /**
+   * Get the current concurrency state.
+   */
+  getConcurrencyState(): { active: number; queued: number; max: number } {
+    return {
+      active: this.activeConcurrent,
+      queued: this.concurrencyQueue.length,
+      max: MAX_CONCURRENT_CONVERSIONS,
+    };
   }
 
   async releasePage(page: Page): Promise<void> {

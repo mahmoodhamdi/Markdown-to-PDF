@@ -9,6 +9,7 @@ import { authOptions } from '@/lib/auth/config';
 import { trackEvent, EventType } from '@/lib/analytics/service';
 import { checkRateLimit, getRateLimitHeaders } from '@/lib/rate-limit';
 import { z } from 'zod';
+import { safeMetadataSchema } from '@/lib/validations/api-schemas';
 
 const trackEventSchema = z.object({
   eventType: z.enum([
@@ -19,7 +20,7 @@ const trackEventSchema = z.object({
     'template_used',
     'batch_conversion',
   ]),
-  metadata: z.record(z.unknown()).optional(),
+  metadata: safeMetadataSchema,
 });
 
 export async function POST(request: NextRequest) {

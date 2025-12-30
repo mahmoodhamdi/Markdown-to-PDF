@@ -4,6 +4,9 @@ import {
   sanitizeCss,
   sanitizeTextForCss,
   sanitizeWatermarkText,
+  sanitizeFilename,
+  sanitizePathComponent,
+  validateFilePath,
 } from '@/lib/sanitize';
 
 describe('Sanitization Utilities', () => {
@@ -160,9 +163,10 @@ describe('Sanitization Utilities', () => {
 
     it('should limit length to 100 characters', () => {
       const input = 'a'.repeat(150);
-      const output = sanitizeWatermarkText(input);
+      const sanitized = sanitizeWatermarkText(input);
       // After escaping, it should be derived from max 100 chars
       expect(input.length).toBe(150);
+      expect(sanitized.length).toBeLessThanOrEqual(100);
     });
 
     it('should escape special characters', () => {
@@ -176,6 +180,133 @@ describe('Sanitization Utilities', () => {
       const input = 'CONFIDENTIAL';
       const output = sanitizeWatermarkText(input);
       expect(output).toBe('CONFIDENTIAL');
+    });
+  });
+
+  describe('sanitizeFilename', () => {
+    it('should handle normal filenames', () => {
+      expect(sanitizeFilename('document.pdf')).toBe('document.pdf');
+      expect(sanitizeFilename('my-file_v2.txt')).toBe('my-file_v2.txt');
+    });
+
+    it('should remove path traversal sequences', () => {
+      // Leading slashes are converted to underscores, path traversal is removed
+      expect(sanitizeFilename('../../../etc/passwd')).toBe('_etc_passwd');
+      expect(sanitizeFilename('file..name.txt')).toBe('filename.txt');
+    });
+
+    it('should remove directory separators', () => {
+      expect(sanitizeFilename('path/to/file.txt')).toBe('path_to_file.txt');
+      expect(sanitizeFilename('path\\to\\file.txt')).toBe('path_to_file.txt');
+    });
+
+    it('should remove dangerous characters', () => {
+      expect(sanitizeFilename('file<script>.txt')).toBe('file_script_.txt');
+      expect(sanitizeFilename('file|name.txt')).toBe('file_name.txt');
+      expect(sanitizeFilename('file"name.txt')).toBe('file_name.txt');
+      expect(sanitizeFilename('file?name*.txt')).toBe('file_name_.txt');
+    });
+
+    it('should remove null bytes and control characters', () => {
+      expect(sanitizeFilename('file\x00name.txt')).toBe('filename.txt');
+      expect(sanitizeFilename('file\x1fname.txt')).toBe('filename.txt');
+    });
+
+    it('should remove leading dots', () => {
+      expect(sanitizeFilename('...hidden.txt')).toBe('hidden.txt');
+      expect(sanitizeFilename('.gitignore')).toBe('gitignore');
+    });
+
+    it('should handle empty or invalid input', () => {
+      expect(sanitizeFilename('')).toBe('unnamed');
+      expect(sanitizeFilename('   ')).toBe('unnamed');
+      expect(sanitizeFilename(null as unknown as string)).toBe('unnamed');
+      expect(sanitizeFilename(undefined as unknown as string)).toBe('unnamed');
+    });
+
+    it('should collapse multiple underscores', () => {
+      expect(sanitizeFilename('file___name.txt')).toBe('file_name.txt');
+    });
+
+    it('should handle Windows reserved names', () => {
+      expect(sanitizeFilename('CON.txt')).toBe('_CON.txt');
+      expect(sanitizeFilename('PRN')).toBe('_PRN');
+      expect(sanitizeFilename('aux.pdf')).toBe('_aux.pdf');
+      expect(sanitizeFilename('COM1.doc')).toBe('_COM1.doc');
+    });
+
+    it('should truncate long filenames while preserving extension', () => {
+      const longName = 'a'.repeat(250) + '.pdf';
+      const result = sanitizeFilename(longName);
+      expect(result.length).toBeLessThanOrEqual(200);
+      expect(result).toMatch(/\.pdf$/);
+    });
+
+    it('should handle shell injection attempts', () => {
+      expect(sanitizeFilename('file$(whoami).txt')).toBe('file_whoami_.txt');
+      expect(sanitizeFilename('file`id`.txt')).toBe('file_id_.txt');
+      expect(sanitizeFilename('file;rm -rf.txt')).toBe('file_rm -rf.txt');
+    });
+  });
+
+  describe('sanitizePathComponent', () => {
+    it('should only allow safe characters', () => {
+      expect(sanitizePathComponent('safe-file_name.txt')).toBe('safe-file_name.txt');
+      expect(sanitizePathComponent('file with spaces')).toBe('file_with_spaces');
+    });
+
+    it('should remove leading dots', () => {
+      expect(sanitizePathComponent('.hidden')).toBe('hidden');
+      expect(sanitizePathComponent('..parent')).toBe('parent');
+    });
+
+    it('should collapse consecutive special chars', () => {
+      expect(sanitizePathComponent('file...name')).toBe('file.name');
+      expect(sanitizePathComponent('file___name')).toBe('file_name');
+    });
+
+    it('should handle empty input', () => {
+      expect(sanitizePathComponent('')).toBe('unnamed');
+      expect(sanitizePathComponent(null as unknown as string)).toBe('unnamed');
+    });
+  });
+
+  describe('validateFilePath', () => {
+    it('should accept valid paths', () => {
+      expect(validateFilePath('/home/user/file.txt')).toBe('/home/user/file.txt');
+      expect(validateFilePath('folder/subfolder/file.pdf')).toBe('folder/subfolder/file.pdf');
+    });
+
+    it('should normalize Windows paths', () => {
+      expect(validateFilePath('C:\\Users\\test\\file.txt')).toBe('C:/Users/test/file.txt');
+    });
+
+    it('should reject path traversal', () => {
+      expect(validateFilePath('../../../etc/passwd')).toBeNull();
+      expect(validateFilePath('/home/../../../etc/passwd')).toBeNull();
+    });
+
+    it('should reject null bytes', () => {
+      expect(validateFilePath('/home/user/file\x00.txt')).toBeNull();
+    });
+
+    it('should reject double slashes', () => {
+      expect(validateFilePath('/home//user/file.txt')).toBeNull();
+    });
+
+    it('should reject URL encoded characters', () => {
+      expect(validateFilePath('/home/user/%2e%2e/file.txt')).toBeNull();
+    });
+
+    it('should enforce base path when provided', () => {
+      expect(validateFilePath('/uploads/user/file.txt', '/uploads')).toBe('/uploads/user/file.txt');
+      expect(validateFilePath('/etc/passwd', '/uploads')).toBeNull();
+      expect(validateFilePath('/uploads', '/uploads')).toBe('/uploads');
+    });
+
+    it('should handle empty or invalid input', () => {
+      expect(validateFilePath('')).toBeNull();
+      expect(validateFilePath(null as unknown as string)).toBeNull();
     });
   });
 });

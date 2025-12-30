@@ -25,6 +25,7 @@ export default function BatchPage() {
 
     for (let i = 0; i < Math.min(fileList.length, 20 - files.length); i++) {
       const file = fileList[i];
+      if (!file) continue;
       const fileName = file.name.toLowerCase();
       const isValid = validTypes.some((ext) => fileName.endsWith(ext));
 
@@ -79,6 +80,7 @@ export default function BatchPage() {
 
     for (let i = 0; i < updatedFiles.length; i++) {
       const file = updatedFiles[i];
+      if (!file) continue;
       updatedFiles[i] = { ...file, status: 'converting' };
       setFiles([...updatedFiles]);
 
@@ -91,13 +93,13 @@ export default function BatchPage() {
 
         if (response.ok) {
           const blob = await response.blob();
-          updatedFiles[i] = { ...updatedFiles[i], status: 'success', result: blob };
+          updatedFiles[i] = { ...file, status: 'success', result: blob };
         } else {
-          updatedFiles[i] = { ...updatedFiles[i], status: 'failed', error: 'Conversion failed' };
+          updatedFiles[i] = { ...file, status: 'failed', error: 'Conversion failed' };
         }
       } catch (error) {
         updatedFiles[i] = {
-          ...updatedFiles[i],
+          ...file,
           status: 'failed',
           error: error instanceof Error ? error.message : 'Unknown error',
         };

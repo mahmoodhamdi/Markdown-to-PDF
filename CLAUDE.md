@@ -57,12 +57,14 @@ docker-compose -f docker/docker-compose.prod.yml up     # Production mode
 | `PAYTABS_SERVER_KEY` / `PAYTABS_PROFILE_ID` | PayTabs payments (MENA) | Optional |
 | `PADDLE_API_KEY` / `PADDLE_WEBHOOK_SECRET` | Paddle payments (MoR) | Optional |
 | `EMAIL_SERVER_*` | SMTP configuration | Required for email features |
+| `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` | Google OAuth credentials | Required for Google auth |
+| `UPSTASH_REDIS_REST_URL` / `UPSTASH_REDIS_REST_TOKEN` | Distributed rate limiting | Optional (falls back to in-memory) |
 
 ## Architecture Overview
 
 ### Core Processing Pipeline
 
-1. **Markdown Parser** (`src/lib/markdown/parser.ts`): Converts markdown to HTML using `marked` with extensions for GFM, syntax highlighting (highlight.js), KaTeX math, Mermaid diagrams, and emoji shortcodes. All parsing flows through `parseMarkdownFull()`.
+1. **Markdown Parser** (`src/lib/markdown/parser.ts`): Converts markdown to HTML using `marked` with extensions for GFM, syntax highlighting (highlight.js), KaTeX math, Mermaid diagrams, and emoji shortcodes. All parsing flows through `parseMarkdown()`.
 
 2. **PDF Generator** (`src/lib/pdf/generator.ts`): Uses Puppeteer to render HTML and generate PDFs. `generateHtmlDocument()` creates the full HTML with theme CSS, KaTeX/Mermaid scripts. `generatePdf()` launches headless Chrome for conversion.
 
@@ -89,10 +91,10 @@ Database uses MongoDB with Mongoose (`src/lib/db/mongodb.ts`), Storage uses Fire
 
 - **Database** (`src/lib/db/`): MongoDB models for users, subscriptions, teams, SSO configs, analytics
 - **Cloud Storage** (`src/lib/storage/service.ts`): Firebase Storage for file upload/download with per-user quota tracking
-- **Team Management** (`src/lib/teams/service.ts`): Teams with roles (owner/admin/member), invitations, shared settings
+- **Team Management** (`src/lib/teams/`): Teams with roles (owner/admin/member), invitation service, activity logging for auditing
 - **Usage Analytics** (`src/lib/analytics/service.ts`): Event tracking, daily aggregation, usage summaries
 - **SSO/SAML** (`src/lib/sso/`): Enterprise SSO with SAML, OIDC, Azure AD, Okta, Google Workspace support
-- **Email Service** (`src/lib/email/`): Nodemailer-based email with templates for welcome, password reset, subscription, team invitations, email change
+- **Email Service** (`src/lib/email/`): Nodemailer-based email with queue system and templates for welcome, password reset, email verification, subscription confirmation/cancellation, team invitations, email change, account deletion
 
 ### Payment Gateways
 
@@ -151,6 +153,11 @@ Storage routes (`/api/storage/`):
 - `GET|DELETE /api/storage/files/[fileId]` - Manage files
 - `GET /api/storage/quota` - Check quota
 
+API Key routes (`/api/api-keys/`):
+- `GET /api/api-keys` - List user's API keys
+- `POST /api/api-keys` - Create new API key
+- `DELETE /api/api-keys/[keyId]` - Revoke API key
+
 Team routes (`/api/teams/`):
 - CRUD operations for teams and members
 
@@ -169,6 +176,14 @@ Payment routes:
 - `POST /api/webhooks/paymob` - Handle Paymob webhooks
 - `POST /api/webhooks/paytabs` - Handle PayTabs webhooks
 - `POST /api/webhooks/paddle` - Handle Paddle webhooks
+
+Subscription management routes (`/api/subscriptions/`):
+- `GET /api/subscriptions/invoices` - Get billing history
+- `POST /api/subscriptions/pause` - Pause subscription
+- `POST /api/subscriptions/resume` - Resume subscription
+- `GET /api/subscriptions/portal-url` - Get customer portal URL
+- `POST /api/subscriptions/promo-code` - Apply promo code
+- `GET|POST|DELETE /api/subscriptions/payment-methods` - Manage payment methods
 
 ### Type Definitions
 
@@ -201,8 +216,13 @@ Plan types in `src/lib/plans/config.ts`:
 - Test setup: `src/test/setup.ts` - jsdom environment with testing-library
 - Vitest globals enabled (`describe`, `it`, `expect` available without imports)
 
-## Documentation
+## Key Database Models
 
-- `docs/architecture.md` - System architecture diagrams and data flow
-- `docs/plans/` - Feature implementation plans with staged prompts
-- `docs/plans/MASTER_IMPLEMENTATION_PLAN.md` - Overview of all planned stages
+Located in `src/lib/db/models/`:
+- `User.ts` - User accounts with plan, subscription, and preferences
+- `Session.ts` - Authentication sessions
+- `Usage.ts` - Daily usage tracking per user
+- `ApiKey.ts` - API key management for programmatic access
+- `WebhookEvent.ts` - Payment webhook event logging
+- `LoginAttempt.ts` - Security audit for login attempts
+- `EmailVerificationToken.ts`, `PasswordResetToken.ts`, `EmailChangeToken.ts` - Auth tokens

@@ -242,6 +242,7 @@ export function EditorToolbar() {
                       size="icon"
                       className="h-8 w-8"
                       onClick={action.action}
+                      aria-label={action.label}
                     >
                       {action.icon}
                     </Button>
@@ -276,6 +277,7 @@ export function EditorToolbar() {
                       : ''
                   )}
                   onClick={action.action}
+                  aria-label={action.label}
                 >
                   {action.icon}
                 </Button>

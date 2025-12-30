@@ -24,7 +24,7 @@ const EmailChangeTokenSchema = new Schema<IEmailChangeToken>(
     oldEmail: { type: String, required: true },
     newEmail: { type: String, required: true },
     token: { type: String, required: true, unique: true },
-    expiresAt: { type: Date, required: true, index: true },
+    expiresAt: { type: Date, required: true },
     used: { type: Boolean, default: false },
     usedAt: { type: Date },
   },

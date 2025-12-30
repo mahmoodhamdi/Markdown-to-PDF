@@ -157,8 +157,9 @@ export async function POST(request: NextRequest) {
         token,
         EMAIL_CHANGE_TOKEN_EXPIRY_MINUTES
       );
-    } else {
-      // In development, log the token
+    } else if (process.env.NODE_ENV === 'development') {
+      // In development only, log the token when email is not configured
+      // eslint-disable-next-line no-console
       console.log(`[DEV] Email change token for ${currentEmail} -> ${normalizedNewEmail}: ${token}`);
     }
 

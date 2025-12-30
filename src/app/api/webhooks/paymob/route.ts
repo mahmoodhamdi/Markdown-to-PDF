@@ -12,13 +12,24 @@ import { emailService } from '@/lib/email/service';
 import { connectDB } from '@/lib/db/mongodb';
 import { User } from '@/lib/db/models/User';
 import { PlanType } from '@/lib/plans/config';
+import {
+  checkAndMarkProcessing,
+  markProcessed,
+  markFailed,
+  webhookLog,
+  generateEventId,
+} from '@/lib/webhooks';
 
 /**
  * Verify HMAC signature for Paymob webhook
  */
 function verifyHmacSignature(payload: PaymobTransactionCallback): boolean {
   if (!PAYMOB_CONFIG.hmacSecret) {
-    console.warn('PAYMOB_HMAC_SECRET not configured');
+    webhookLog('warn', 'PAYMOB_HMAC_SECRET not configured', {
+      gateway: 'paymob',
+      eventId: 'unknown',
+      eventType: 'unknown',
+    });
     return false;
   }
 
@@ -100,7 +111,11 @@ export async function GET(request: NextRequest) {
       .digest('hex');
 
     if (calculatedHmac !== hmac) {
-      console.error('Invalid HMAC signature on Paymob redirect');
+      webhookLog('error', 'Invalid HMAC signature on redirect', {
+        gateway: 'paymob',
+        eventId: transactionId || 'unknown',
+        eventType: 'redirect',
+      });
       return NextResponse.redirect(new URL('/pricing?error=invalid_signature', request.url));
     }
   }
@@ -123,37 +138,60 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const payload: PaymobTransactionCallback = await request.json();
+    const { obj, type } = payload;
+
+    // Generate event ID from transaction ID and type
+    const eventId = generateEventId('paymob', String(obj.id), type);
+
+    // Log incoming webhook
+    webhookLog('info', 'Webhook received', {
+      gateway: 'paymob',
+      eventId,
+      eventType: type,
+      transactionId: obj.id,
+      success: obj.success,
+    });
 
     // Verify webhook signature
     if (PAYMOB_CONFIG.hmacSecret && !verifyHmacSignature(payload)) {
-      console.error('Invalid Paymob webhook signature');
+      webhookLog('error', 'Invalid webhook signature', {
+        gateway: 'paymob',
+        eventId,
+        eventType: type,
+      });
       return NextResponse.json(
         { error: 'Invalid signature' },
         { status: 400 }
       );
     }
 
-    const { obj, type } = payload;
+    // Check idempotency - skip if already processed
+    const idempotencyResult = await checkAndMarkProcessing(
+      'paymob',
+      eventId,
+      type,
+      { transactionId: obj.id, success: obj.success, amount: obj.amount_cents }
+    );
 
-    console.log(`Paymob webhook received: ${type}`, {
-      transactionId: obj.id,
-      success: obj.success,
-      amount: obj.amount_cents,
-      currency: obj.currency,
-    });
+    if (!idempotencyResult.isNew) {
+      return NextResponse.json({ received: true, status: 'duplicate' });
+    }
 
-    // Use the gateway's handleWebhook method which includes subscription management
-    const result = await paymobGateway.handleWebhook(payload, payload.hmac || '');
+    try {
+      // Use the gateway's handleWebhook method which includes subscription management
+      const result = await paymobGateway.handleWebhook(payload, payload.hmac || '');
 
-    console.log(`Paymob webhook processed:`, {
-      event: result.event,
-      status: result.status,
-      userEmail: result.userEmail,
-    });
+      webhookLog('info', 'Webhook processed', {
+        gateway: 'paymob',
+        eventId,
+        eventType: type,
+        event: result.event,
+        status: result.status,
+        userEmail: result.userEmail,
+      });
 
-    // Send email notifications based on webhook result
-    if (emailService.isConfigured() && result.userEmail) {
-      try {
+      // Send email notifications based on webhook result
+      if (emailService.isConfigured() && result.userEmail) {
         await connectDB();
         const user = await User.findById(result.userEmail);
 
@@ -173,7 +211,12 @@ export async function POST(request: NextRequest) {
               gateway: 'paymob',
             }
           ).catch((err) => {
-            console.error('Failed to send subscription confirmation email:', err);
+            webhookLog('error', 'Failed to send subscription confirmation email', {
+              gateway: 'paymob',
+              eventId,
+              eventType: type,
+              error: err instanceof Error ? err.message : 'Unknown error',
+            });
           });
         } else if (result.event === 'subscription.canceled' || result.status === 'canceled') {
           const plan = (user?.plan as PlanType) || 'pro';
@@ -181,18 +224,32 @@ export async function POST(request: NextRequest) {
             { email: result.userEmail, name: user?.name || '' },
             { plan, immediate: true }
           ).catch((err) => {
-            console.error('Failed to send subscription canceled email:', err);
+            webhookLog('error', 'Failed to send subscription canceled email', {
+              gateway: 'paymob',
+              eventId,
+              eventType: type,
+              error: err instanceof Error ? err.message : 'Unknown error',
+            });
           });
         }
-      } catch (err) {
-        console.error('Error sending webhook email:', err);
       }
-    }
 
-    // Always return success to Paymob
-    return NextResponse.json({ received: true });
+      await markProcessed('paymob', eventId, { event: result.event, status: result.status });
+
+      // Always return success to Paymob
+      return NextResponse.json({ received: true });
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      await markFailed('paymob', eventId, errorMessage);
+      throw error;
+    }
   } catch (error) {
-    console.error('Paymob webhook error:', error);
+    webhookLog('error', 'Webhook handler failed', {
+      gateway: 'paymob',
+      eventId: 'unknown',
+      eventType: 'unknown',
+      error: error instanceof Error ? error.message : 'Unknown error',
+    });
     return NextResponse.json(
       { error: 'Webhook handler failed' },
       { status: 500 }

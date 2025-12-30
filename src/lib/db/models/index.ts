@@ -73,3 +73,22 @@ export {
   type IAccount,
   type OAuthProvider,
 } from './Account';
+export {
+  LoginAttempt,
+  recordFailedLogin,
+  clearLoginAttempts,
+  checkLoginBlocked,
+  getRemainingAttempts,
+  type ILoginAttempt,
+} from './LoginAttempt';
+export {
+  ApiKey,
+  hashApiKey,
+  canCreateApiKey,
+  getDefaultRateLimit,
+  API_KEY_LIMITS,
+  API_PERMISSIONS,
+  type IApiKey,
+  type IApiKeyDocument,
+  type ApiPermission,
+} from './ApiKey';

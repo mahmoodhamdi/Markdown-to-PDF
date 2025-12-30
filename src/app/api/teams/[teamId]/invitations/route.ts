@@ -20,7 +20,7 @@ const createInvitationSchema = z.object({
   role: z.enum(['member', 'admin']).optional(),
 });
 
-export async function GET(request: NextRequest, { params }: RouteParams) {
+export async function GET(_request: NextRequest, { params }: RouteParams) {
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user?.id) {
@@ -93,7 +93,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       role: validation.data.role,
       invitedBy: userId,
       inviterEmail: session.user.email,
-      inviterName: session.user.name || session.user.email.split('@')[0],
+      inviterName: session.user.name || session.user.email.split('@')[0] || 'User',
     });
 
     if (!result.success) {

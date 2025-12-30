@@ -154,7 +154,9 @@ describe('EmailQueue', () => {
       });
     });
 
-    it('should log when email not configured', async () => {
+    it('should log when email not configured in development', async () => {
+      const originalNodeEnv = process.env.NODE_ENV;
+      vi.stubEnv('NODE_ENV', 'development');
       isEmailConfigured.mockReturnValue(false);
       const consoleSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
 
@@ -169,6 +171,25 @@ describe('EmailQueue', () => {
         expect.stringContaining('[DEV] Would send email to test@example.com')
       );
       consoleSpy.mockRestore();
+      vi.stubEnv('NODE_ENV', originalNodeEnv || 'test');
+    });
+
+    it('should not log when email not configured in production', async () => {
+      const originalNodeEnv = process.env.NODE_ENV;
+      vi.stubEnv('NODE_ENV', 'production');
+      isEmailConfigured.mockReturnValue(false);
+      const consoleSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
+
+      await sendEmailDirect({
+        to: 'test@example.com',
+        subject: 'Test',
+        html: '<p>Test</p>',
+        text: 'Test',
+      });
+
+      expect(consoleSpy).not.toHaveBeenCalled();
+      consoleSpy.mockRestore();
+      vi.stubEnv('NODE_ENV', originalNodeEnv || 'test');
     });
   });
 });

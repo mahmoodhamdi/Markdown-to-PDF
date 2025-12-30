@@ -8,6 +8,66 @@ import {
 } from './page-settings';
 import { browserPool } from './browser-pool';
 
+// Content size limits
+const MAX_CONTENT_SIZE = 5 * 1024 * 1024; // 5MB max content size
+const WARN_CONTENT_SIZE = 1 * 1024 * 1024; // 1MB warning threshold
+
+// Tiered timeout configuration based on content size
+const TIMEOUT_TIERS = {
+  small: { maxSize: 100000, timeout: 10000 },    // < 100KB: 10s
+  medium: { maxSize: 500000, timeout: 30000 },   // < 500KB: 30s
+  large: { maxSize: Infinity, timeout: 60000 },  // >= 500KB: 60s
+} as const;
+
+/**
+ * Conversion metrics for performance monitoring
+ */
+export interface ConversionMetrics {
+  startTime: number;
+  browserAcquireTime?: number;
+  pageCreateTime?: number;
+  contentSetTime?: number;
+  waitForRenderTime?: number;
+  pdfGenerateTime?: number;
+  totalTime?: number;
+  contentSize: number;
+  pdfSize?: number;
+  timeout: number;
+}
+
+/**
+ * Calculate appropriate timeout based on content size
+ */
+function getTimeoutForContent(contentSize: number): number {
+  if (contentSize < TIMEOUT_TIERS.small.maxSize) {
+    return TIMEOUT_TIERS.small.timeout;
+  }
+  if (contentSize < TIMEOUT_TIERS.medium.maxSize) {
+    return TIMEOUT_TIERS.medium.timeout;
+  }
+  return TIMEOUT_TIERS.large.timeout;
+}
+
+/**
+ * Log conversion metrics in a structured format
+ */
+function logConversionMetrics(metrics: ConversionMetrics, filename?: string): void {
+  if (process.env.NODE_ENV === 'development' || process.env.PDF_METRICS_ENABLED === 'true') {
+    const file = filename ? ` [${filename}]` : '';
+    console.log(`[PDF]${file} Conversion metrics:`, {
+      contentSize: `${(metrics.contentSize / 1024).toFixed(1)}KB`,
+      pdfSize: metrics.pdfSize ? `${(metrics.pdfSize / 1024).toFixed(1)}KB` : 'N/A',
+      totalTime: metrics.totalTime ? `${metrics.totalTime}ms` : 'N/A',
+      browserAcquire: metrics.browserAcquireTime ? `${metrics.browserAcquireTime}ms` : 'N/A',
+      pageCreate: metrics.pageCreateTime ? `${metrics.pageCreateTime}ms` : 'N/A',
+      contentSet: metrics.contentSetTime ? `${metrics.contentSetTime}ms` : 'N/A',
+      waitForRender: metrics.waitForRenderTime ? `${metrics.waitForRenderTime}ms` : 'N/A',
+      pdfGenerate: metrics.pdfGenerateTime ? `${metrics.pdfGenerateTime}ms` : 'N/A',
+      timeout: `${metrics.timeout}ms`,
+    });
+  }
+}
+
 /**
  * Generates a complete HTML document from markdown content with styling.
  * @param markdown - The markdown content to convert
@@ -105,11 +165,33 @@ export async function generatePdf(options: ConversionOptions): Promise<Conversio
     customCss,
   } = options;
 
+  // Initialize metrics
+  const contentSize = new TextEncoder().encode(markdown || '').length;
+  const timeout = getTimeoutForContent(contentSize);
+  const metrics: ConversionMetrics = {
+    startTime: Date.now(),
+    contentSize,
+    timeout,
+  };
+
   if (!markdown || markdown.trim() === '') {
     return {
       success: false,
       error: 'Content is empty',
     };
+  }
+
+  // Content size validation
+  if (contentSize > MAX_CONTENT_SIZE) {
+    return {
+      success: false,
+      error: `Content too large for PDF generation. Maximum size is ${MAX_CONTENT_SIZE / 1024 / 1024}MB, got ${(contentSize / 1024 / 1024).toFixed(2)}MB`,
+    };
+  }
+
+  // Warn about large content
+  if (contentSize > WARN_CONTENT_SIZE) {
+    console.warn(`[PDF] Large content detected: ${(contentSize / 1024 / 1024).toFixed(2)}MB. Conversion may be slow.`);
   }
 
   const pageSettings: PageSettings = {
@@ -134,9 +216,13 @@ export async function generatePdf(options: ConversionOptions): Promise<Conversio
   };
 
   let page = null;
+  const browserAcquireStart = Date.now();
+
   try {
     // Get page from browser pool (reuses browser instance)
-    page = await browserPool.getPage();
+    page = await browserPool.getPage({ blockExternalResources: true });
+    metrics.browserAcquireTime = Date.now() - browserAcquireStart;
+    metrics.pageCreateTime = Date.now() - browserAcquireStart;
 
     // Generate HTML document
     const htmlContent = generateHtmlDocument(
@@ -147,10 +233,14 @@ export async function generatePdf(options: ConversionOptions): Promise<Conversio
       pageSettings
     );
 
+    const contentSetStart = Date.now();
     await page.setContent(htmlContent, {
       waitUntil: ['networkidle0', 'domcontentloaded'],
+      timeout,
     });
+    metrics.contentSetTime = Date.now() - contentSetStart;
 
+    const renderStart = Date.now();
     // Wait for fonts and scripts to load
     await page.evaluate(() => {
       return new Promise<void>((resolve) => {
@@ -165,19 +255,28 @@ export async function generatePdf(options: ConversionOptions): Promise<Conversio
     // Wait for mermaid to render
     await page.waitForFunction(
       () => !document.querySelector('.mermaid:not([data-processed])'),
-      { timeout: 5000 }
+      { timeout: Math.min(5000, timeout / 2) }
     ).catch(() => {
       // Ignore timeout, mermaid may not be present
     });
+    metrics.waitForRenderTime = Date.now() - renderStart;
 
     // Generate PDF
+    const pdfStart = Date.now();
     const puppeteerSettings = generatePuppeteerPageSettings(pageSettings);
 
     const pdfBuffer = await page.pdf({
       ...puppeteerSettings,
       printBackground: true,
       preferCSSPageSize: false,
+      timeout,
     });
+    metrics.pdfGenerateTime = Date.now() - pdfStart;
+    metrics.pdfSize = pdfBuffer.length;
+    metrics.totalTime = Date.now() - metrics.startTime;
+
+    // Log metrics
+    logConversionMetrics(metrics);
 
     // Estimate pages (rough calculation)
     const estimatedPages = Math.ceil(pdfBuffer.length / 50000) || 1;
@@ -189,7 +288,9 @@ export async function generatePdf(options: ConversionOptions): Promise<Conversio
       pages: estimatedPages,
     };
   } catch (error) {
+    metrics.totalTime = Date.now() - metrics.startTime;
     console.error('PDF generation error:', error);
+    logConversionMetrics(metrics);
     return {
       success: false,
       error: error instanceof Error ? error.message : 'Unknown error occurred',
@@ -229,7 +330,7 @@ interface BatchConversionResult {
 
 /**
  * Generates PDFs for multiple files in parallel using browser pooling.
- * Optimized for batch processing with shared browser resources.
+ * Optimized for batch processing with shared browser resources and concurrency control.
  * @param files - Array of files to convert, each with id, filename, and markdown
  * @param options - Shared conversion options (theme, codeTheme, pageSettings)
  * @returns Array of conversion results with base64-encoded PDF data
@@ -239,6 +340,8 @@ export async function generatePdfBatch(
   options: Omit<ConversionOptions, 'markdown'>
 ): Promise<BatchConversionResult[]> {
   const { theme = 'github', codeTheme = 'github-light', pageSettings: partialSettings, customCss } = options;
+
+  const batchStartTime = Date.now();
 
   const pageSettings: PageSettings = {
     ...defaultPageSettings,
@@ -263,10 +366,13 @@ export async function generatePdfBatch(
 
   const puppeteerSettings = generatePuppeteerPageSettings(pageSettings);
 
-  // Process files in parallel using the browser pool
-  // The pool handles page management efficiently
+  // Process files with concurrency control using the browser pool
   const results = await Promise.all(
     files.map(async (file): Promise<BatchConversionResult> => {
+      // Calculate content size and timeout
+      const contentSize = new TextEncoder().encode(file.markdown || '').length;
+      const timeout = getTimeoutForContent(contentSize);
+
       if (!file.markdown || file.markdown.trim() === '') {
         return {
           id: file.id,
@@ -276,9 +382,29 @@ export async function generatePdfBatch(
         };
       }
 
+      // Content size validation
+      if (contentSize > MAX_CONTENT_SIZE) {
+        return {
+          id: file.id,
+          filename: file.filename,
+          success: false,
+          error: `Content too large. Maximum size is ${MAX_CONTENT_SIZE / 1024 / 1024}MB`,
+        };
+      }
+
+      // Acquire concurrency slot
+      await browserPool.acquireConcurrencySlot();
+
+      const metrics: ConversionMetrics = {
+        startTime: Date.now(),
+        contentSize,
+        timeout,
+      };
+
       let page = null;
       try {
-        page = await browserPool.getPage();
+        page = await browserPool.getPage({ blockExternalResources: true });
+        metrics.browserAcquireTime = Date.now() - metrics.startTime;
 
         const htmlContent = generateHtmlDocument(
           file.markdown,
@@ -288,10 +414,14 @@ export async function generatePdfBatch(
           pageSettings
         );
 
+        const contentSetStart = Date.now();
         await page.setContent(htmlContent, {
           waitUntil: ['networkidle0', 'domcontentloaded'],
+          timeout,
         });
+        metrics.contentSetTime = Date.now() - contentSetStart;
 
+        const renderStart = Date.now();
         // Wait for fonts and scripts to load
         await page.evaluate(() => {
           return new Promise<void>((resolve) => {
@@ -306,16 +436,25 @@ export async function generatePdfBatch(
         // Wait for mermaid to render
         await page.waitForFunction(
           () => !document.querySelector('.mermaid:not([data-processed])'),
-          { timeout: 5000 }
+          { timeout: Math.min(5000, timeout / 2) }
         ).catch(() => {
           // Ignore timeout, mermaid may not be present
         });
+        metrics.waitForRenderTime = Date.now() - renderStart;
 
+        const pdfStart = Date.now();
         const pdfBuffer = await page.pdf({
           ...puppeteerSettings,
           printBackground: true,
           preferCSSPageSize: false,
+          timeout,
         });
+        metrics.pdfGenerateTime = Date.now() - pdfStart;
+        metrics.pdfSize = pdfBuffer.length;
+        metrics.totalTime = Date.now() - metrics.startTime;
+
+        // Log metrics for each file
+        logConversionMetrics(metrics, file.filename);
 
         return {
           id: file.id,
@@ -325,7 +464,9 @@ export async function generatePdfBatch(
           fileSize: pdfBuffer.length,
         };
       } catch (error) {
+        metrics.totalTime = Date.now() - metrics.startTime;
         console.error(`PDF generation error for ${file.filename}:`, error);
+        logConversionMetrics(metrics, file.filename);
         return {
           id: file.id,
           filename: file.filename,
@@ -336,9 +477,18 @@ export async function generatePdfBatch(
         if (page) {
           await browserPool.releasePage(page);
         }
+        // Release concurrency slot
+        browserPool.releaseConcurrencySlot();
       }
     })
   );
+
+  // Log batch summary
+  if (process.env.NODE_ENV === 'development' || process.env.PDF_METRICS_ENABLED === 'true') {
+    const successCount = results.filter(r => r.success).length;
+    const totalTime = Date.now() - batchStartTime;
+    console.log(`[PDF] Batch conversion complete: ${successCount}/${files.length} successful in ${totalTime}ms`);
+  }
 
   return results;
 }

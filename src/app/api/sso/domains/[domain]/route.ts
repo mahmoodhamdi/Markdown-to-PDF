@@ -11,7 +11,7 @@ import { getDomainMapping, deleteDomainMapping } from '@/lib/sso/service';
 import { checkRateLimit, getRateLimitHeaders } from '@/lib/rate-limit';
 
 export async function GET(
-  request: NextRequest,
+  _request: NextRequest,
   { params }: { params: Promise<{ domain: string }> }
 ) {
   try {
@@ -69,7 +69,7 @@ export async function GET(
 }
 
 export async function DELETE(
-  request: NextRequest,
+  _request: NextRequest,
   { params }: { params: Promise<{ domain: string }> }
 ) {
   try {

@@ -50,6 +50,7 @@ describe('Plan Rate Limiting', () => {
       userEmail: null,
       userPlan: 'free',
       ip: '127.0.0.1',
+      authType: 'anonymous',
     };
 
     const freeUserContext: RateLimitContext = {
@@ -57,6 +58,7 @@ describe('Plan Rate Limiting', () => {
       userEmail: 'test@example.com',
       userPlan: 'free',
       ip: '127.0.0.1',
+      authType: 'session',
     };
 
     const proUserContext: RateLimitContext = {
@@ -64,6 +66,7 @@ describe('Plan Rate Limiting', () => {
       userEmail: 'test@example.com',
       userPlan: 'pro',
       ip: '127.0.0.1',
+      authType: 'session',
     };
 
     const teamUserContext: RateLimitContext = {
@@ -71,6 +74,7 @@ describe('Plan Rate Limiting', () => {
       userEmail: 'test@example.com',
       userPlan: 'team',
       ip: '127.0.0.1',
+      authType: 'session',
     };
 
     describe('Anonymous users', () => {
@@ -135,6 +139,7 @@ describe('Plan Rate Limiting', () => {
       userEmail: null,
       userPlan: 'free',
       ip: '127.0.0.1',
+      authType: 'anonymous',
     };
 
     const freeUserContext: RateLimitContext = {
@@ -142,6 +147,7 @@ describe('Plan Rate Limiting', () => {
       userEmail: 'test@example.com',
       userPlan: 'free',
       ip: '127.0.0.1',
+      authType: 'session',
     };
 
     const proUserContext: RateLimitContext = {
@@ -149,6 +155,7 @@ describe('Plan Rate Limiting', () => {
       userEmail: 'test@example.com',
       userPlan: 'pro',
       ip: '127.0.0.1',
+      authType: 'session',
     };
 
     const teamUserContext: RateLimitContext = {
@@ -156,6 +163,7 @@ describe('Plan Rate Limiting', () => {
       userEmail: 'test@example.com',
       userPlan: 'team',
       ip: '127.0.0.1',
+      authType: 'session',
     };
 
     describe('Anonymous users', () => {

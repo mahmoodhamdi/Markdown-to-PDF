@@ -2,6 +2,7 @@
 
 import { useTranslations } from 'next-intl';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Skeleton } from '@/components/ui/skeleton';
 import { UsageProgress } from './UsageProgress';
 import { Clock } from 'lucide-react';
 import { formatFileSize } from '@/lib/plans/config';
@@ -24,9 +25,10 @@ interface UsageStatsProps {
   usage: UsageData;
   limits: UsageLimits;
   resetTime: string;
+  loading?: boolean;
 }
 
-export function UsageStats({ usage, limits, resetTime }: UsageStatsProps) {
+export function UsageStats({ usage, limits, resetTime, loading = false }: UsageStatsProps) {
   const t = useTranslations('dashboard.usage');
 
   // Calculate time until reset
@@ -49,6 +51,50 @@ export function UsageStats({ usage, limits, resetTime }: UsageStatsProps) {
   // Format storage values
   const formatStorage = (bytes: number) => {
     return formatFileSize(bytes);
+  };
+
+  // Loading skeleton for storage section only
+  const renderStorageSection = () => {
+    if (loading) {
+      return (
+        <div className="space-y-4">
+          <h4 className="text-sm font-medium text-muted-foreground">{t('storage')}</h4>
+          <div className="space-y-2">
+            <div className="flex justify-between">
+              <Skeleton className="h-4 w-24" />
+              <Skeleton className="h-4 w-16" />
+            </div>
+            <Skeleton className="h-2 w-full rounded-full" />
+          </div>
+          <div className="flex justify-between">
+            <Skeleton className="h-4 w-20" />
+            <Skeleton className="h-4 w-20" />
+          </div>
+        </div>
+      );
+    }
+
+    return (
+      <div className="space-y-4">
+        <h4 className="text-sm font-medium text-muted-foreground">{t('storage')}</h4>
+
+        <UsageProgress
+          label={t('storageUsed')}
+          current={usage.storageUsed}
+          limit={limits.cloudStorageBytes}
+          showPercentage
+        />
+
+        <div className="flex justify-between text-sm text-muted-foreground">
+          <span>{formatStorage(usage.storageUsed)} {t('used')}</span>
+          <span>
+            {limits.cloudStorageBytes === Infinity
+              ? t('unlimited')
+              : `${formatStorage(limits.cloudStorageBytes)} ${t('total')}`}
+          </span>
+        </div>
+      </div>
+    );
   };
 
   return (
@@ -83,25 +129,7 @@ export function UsageStats({ usage, limits, resetTime }: UsageStatsProps) {
         </div>
 
         {/* Storage */}
-        <div className="space-y-4">
-          <h4 className="text-sm font-medium text-muted-foreground">{t('storage')}</h4>
-
-          <UsageProgress
-            label={t('storageUsed')}
-            current={usage.storageUsed}
-            limit={limits.cloudStorageBytes}
-            showPercentage
-          />
-
-          <div className="flex justify-between text-sm text-muted-foreground">
-            <span>{formatStorage(usage.storageUsed)} {t('used')}</span>
-            <span>
-              {limits.cloudStorageBytes === Infinity
-                ? t('unlimited')
-                : `${formatStorage(limits.cloudStorageBytes)} ${t('total')}`}
-            </span>
-          </div>
-        </div>
+        {renderStorageSection()}
       </CardContent>
     </Card>
   );

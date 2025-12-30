@@ -40,7 +40,8 @@ const UsageEventSchema = new Schema<IUsageEvent>(
 );
 
 // Indexes (userId and date indexes already created by index: true in schema)
-UsageEventSchema.index({ userId: 1, date: 1 }); // Compound index for queries
+UsageEventSchema.index({ userId: 1, date: 1 }); // Compound index for daily queries
+UsageEventSchema.index({ userId: 1, eventType: 1, date: 1 }); // For filtered analytics
 
 export const UsageEvent: Model<IUsageEvent> =
   mongoose.models.UsageEvent || mongoose.model<IUsageEvent>('UsageEvent', UsageEventSchema);

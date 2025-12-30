@@ -11,6 +11,7 @@ interface ThemeState {
   setCodeTheme: (theme: CodeTheme) => void;
   customCss: string;
   setCustomCss: (css: string) => void;
+  resetToDefaults: () => void;
 }
 
 export const useThemeStore = create<ThemeState>()(
@@ -24,6 +25,13 @@ export const useThemeStore = create<ThemeState>()(
       setCodeTheme: (codeTheme) => set({ codeTheme }),
       customCss: '',
       setCustomCss: (customCss) => set({ customCss }),
+      resetToDefaults: () =>
+        set({
+          mode: 'system',
+          documentTheme: 'github',
+          codeTheme: 'github-light',
+          customCss: '',
+        }),
     }),
     {
       name: 'theme-storage',

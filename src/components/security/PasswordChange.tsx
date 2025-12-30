@@ -13,6 +13,22 @@ interface PasswordChangeProps {
   hasPassword: boolean;
 }
 
+// Helper component for requirement items
+function RequirementItem({ met, children }: { met: boolean; children: React.ReactNode }) {
+  return (
+    <div className="flex items-center gap-2 text-xs">
+      {met ? (
+        <CheckCircle className="h-3.5 w-3.5 text-green-600 dark:text-green-400" />
+      ) : (
+        <AlertCircle className="h-3.5 w-3.5 text-muted-foreground" />
+      )}
+      <span className={met ? 'text-green-600 dark:text-green-400' : 'text-muted-foreground'}>
+        {children}
+      </span>
+    </div>
+  );
+}
+
 export function PasswordChange({ hasPassword }: PasswordChangeProps) {
   const t = useTranslations('security');
 
@@ -87,6 +103,17 @@ export function PasswordChange({ hasPassword }: PasswordChangeProps) {
     }
   };
 
+  // Password requirements check
+  const getPasswordRequirements = (password: string) => {
+    return {
+      minLength: password.length >= 8,
+      hasUppercase: /[A-Z]/.test(password),
+      hasLowercase: /[a-z]/.test(password),
+      hasNumber: /\d/.test(password),
+      hasSpecial: /[^a-zA-Z0-9]/.test(password),
+    };
+  };
+
   // Password strength indicator
   const getPasswordStrength = (password: string) => {
     if (!password) return { level: 0, label: '' };
@@ -104,6 +131,7 @@ export function PasswordChange({ hasPassword }: PasswordChangeProps) {
   };
 
   const passwordStrength = getPasswordStrength(newPassword);
+  const passwordRequirements = getPasswordRequirements(newPassword);
 
   if (!hasPassword) {
     return (
@@ -190,7 +218,7 @@ export function PasswordChange({ hasPassword }: PasswordChangeProps) {
             )}
             {/* Password strength indicator */}
             {newPassword && (
-              <div className="space-y-1">
+              <div className="space-y-2">
                 <div className="flex gap-1">
                   {[1, 2, 3].map((level) => (
                     <div
@@ -208,6 +236,28 @@ export function PasswordChange({ hasPassword }: PasswordChangeProps) {
                   ))}
                 </div>
                 <p className="text-xs text-muted-foreground">{passwordStrength.label}</p>
+
+                {/* Requirements checklist */}
+                <div className="mt-2 p-3 bg-muted/50 rounded-md space-y-1.5">
+                  <p className="text-xs font-medium text-muted-foreground mb-2">
+                    {t('password.requirements')}
+                  </p>
+                  <RequirementItem met={passwordRequirements.minLength}>
+                    {t('password.reqMinLength')}
+                  </RequirementItem>
+                  <RequirementItem met={passwordRequirements.hasUppercase}>
+                    {t('password.reqUppercase')}
+                  </RequirementItem>
+                  <RequirementItem met={passwordRequirements.hasLowercase}>
+                    {t('password.reqLowercase')}
+                  </RequirementItem>
+                  <RequirementItem met={passwordRequirements.hasNumber}>
+                    {t('password.reqNumber')}
+                  </RequirementItem>
+                  <RequirementItem met={passwordRequirements.hasSpecial}>
+                    {t('password.reqSpecial')}
+                  </RequirementItem>
+                </div>
               </div>
             )}
           </div>

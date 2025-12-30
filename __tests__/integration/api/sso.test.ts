@@ -116,7 +116,6 @@ vi.mock('@/lib/sso/service', () => ({
 }));
 
 import { getServerSession } from 'next-auth';
-import { adminDb } from '@/lib/firebase/admin';
 
 describe('/api/sso', () => {
   beforeEach(() => {

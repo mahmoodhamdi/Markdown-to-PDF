@@ -4,8 +4,15 @@ import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Skeleton } from '@/components/ui/skeleton';
 import { AvatarUpload } from './AvatarUpload';
-import { Mail, Calendar, Shield, CheckCircle, AlertCircle } from 'lucide-react';
+import { Mail, Calendar, Shield, CheckCircle, AlertCircle, FileText, FolderOpen, TrendingUp } from 'lucide-react';
+
+interface QuickStats {
+  totalConversions: number;
+  totalFiles: number;
+  thisMonthConversions: number;
+}
 
 interface ProfileHeaderProps {
   name: string;
@@ -15,6 +22,8 @@ interface ProfileHeaderProps {
   emailVerified: boolean | null;
   createdAt: string;
   onAvatarChange: (imageUrl: string) => Promise<{ success: boolean; error?: string }>;
+  stats?: QuickStats;
+  statsLoading?: boolean;
 }
 
 export function ProfileHeader({
@@ -25,6 +34,8 @@ export function ProfileHeader({
   emailVerified,
   createdAt,
   onAvatarChange,
+  stats,
+  statsLoading,
 }: ProfileHeaderProps) {
   const t = useTranslations('profile');
   const [avatarUrl, setAvatarUrl] = useState(image);
@@ -110,6 +121,49 @@ export function ProfileHeader({
             </div>
           </div>
         </div>
+
+        {/* Quick Stats */}
+        {(stats || statsLoading) && (
+          <div className="mt-6 pt-6 border-t">
+            <div className="grid grid-cols-3 gap-4">
+              <div className="text-center">
+                <div className="flex items-center justify-center gap-2 text-muted-foreground mb-1">
+                  <FileText className="h-4 w-4" />
+                  <span className="text-xs font-medium">{t('totalConversions')}</span>
+                </div>
+                {statsLoading ? (
+                  <Skeleton className="h-7 w-16 mx-auto" />
+                ) : (
+                  <p className="text-2xl font-bold">{stats?.totalConversions?.toLocaleString() ?? 0}</p>
+                )}
+              </div>
+
+              <div className="text-center">
+                <div className="flex items-center justify-center gap-2 text-muted-foreground mb-1">
+                  <FolderOpen className="h-4 w-4" />
+                  <span className="text-xs font-medium">{t('totalFiles')}</span>
+                </div>
+                {statsLoading ? (
+                  <Skeleton className="h-7 w-16 mx-auto" />
+                ) : (
+                  <p className="text-2xl font-bold">{stats?.totalFiles?.toLocaleString() ?? 0}</p>
+                )}
+              </div>
+
+              <div className="text-center">
+                <div className="flex items-center justify-center gap-2 text-muted-foreground mb-1">
+                  <TrendingUp className="h-4 w-4" />
+                  <span className="text-xs font-medium">{t('thisMonth')}</span>
+                </div>
+                {statsLoading ? (
+                  <Skeleton className="h-7 w-16 mx-auto" />
+                ) : (
+                  <p className="text-2xl font-bold">{stats?.thisMonthConversions?.toLocaleString() ?? 0}</p>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
       </CardContent>
     </Card>
   );

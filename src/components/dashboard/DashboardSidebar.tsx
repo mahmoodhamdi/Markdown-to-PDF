@@ -14,6 +14,7 @@ import {
   Shield,
   UserCog,
   Users,
+  Key,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -33,6 +34,7 @@ const navItems: NavItem[] = [
   { href: '/dashboard/teams', labelKey: 'teams', icon: Users, dividerAfter: true },
   { href: '/dashboard/profile', labelKey: 'profile', icon: User },
   { href: '/dashboard/security', labelKey: 'security', icon: Shield },
+  { href: '/dashboard/api-keys', labelKey: 'apiKeys', icon: Key },
   { href: '/dashboard/account', labelKey: 'account', icon: UserCog, dividerAfter: true },
   { href: '/settings', labelKey: 'settings', icon: Settings },
 ];

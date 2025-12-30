@@ -292,7 +292,7 @@ describe('Analytics API - History', () => {
     });
 
     const response = await GET(request);
-    const data = await response.json();
+    await response.json(); // Parse response body
 
     expect(response.status).toBe(200);
     expect(mockGetUsageHistory).toHaveBeenCalledWith('user-123', 7);

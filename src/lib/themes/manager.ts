@@ -211,7 +211,7 @@ export function getCodeThemeStylesheet(codeTheme: CodeTheme): string {
 
 export function generateFullCss(
   documentTheme: DocumentTheme,
-  codeTheme?: CodeTheme,
+  _codeTheme?: CodeTheme,
   customCss?: string
 ): string {
   let css = getThemeCss(documentTheme);

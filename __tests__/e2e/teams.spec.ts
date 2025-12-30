@@ -87,9 +87,7 @@ test.describe('Teams Page', () => {
     test('should have loading skeleton', async ({ page }) => {
       await page.goto('/en/dashboard/teams');
 
-      // Check for loading state
-      const skeleton = page.locator('[class*="skeleton"], [class*="animate-pulse"]').first();
-
+      // Check for loading state - skeleton elements may briefly appear
       // Skeleton should appear briefly during load
       await page.screenshot({ path: 'screenshots/teams-loading.png' });
     });

@@ -62,12 +62,9 @@ export async function GET(_request: NextRequest) {
       }
     }
 
-    // For Stripe, you would typically fetch invoices from Stripe API
-    // This is a placeholder - in production, implement actual Stripe invoice fetching
-    if (user.stripeCustomerId && invoices.length === 0) {
-      // TODO: Fetch invoices from Stripe
-      // const stripeInvoices = await stripe.invoices.list({ customer: user.stripeCustomerId });
-    }
+    // Note: For Stripe customers, invoice data is currently derived from subscription records.
+    // Direct Stripe Invoice API integration can be added in a future enhancement.
+    // See: https://stripe.com/docs/api/invoices/list
 
     return NextResponse.json({ invoices });
   } catch (error) {

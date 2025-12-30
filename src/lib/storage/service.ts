@@ -8,6 +8,7 @@ import { v2 as cloudinary } from 'cloudinary';
 import { connectDB } from '@/lib/db/mongodb';
 import { UserFile, StorageQuota } from '@/lib/db/models/UserFile';
 import { getPlanLimits, PlanType } from '@/lib/plans/config';
+import { sanitizeFilename } from '@/lib/sanitize';
 
 // Configure Cloudinary
 cloudinary.config({
@@ -66,8 +67,8 @@ export async function getStorageQuota(
   const limits = getPlanLimits(planType);
   const quotaLimit = limits.cloudStorageBytes;
 
-  // Get current usage from MongoDB
-  const quota = await StorageQuota.findOne({ userId });
+  // Get current usage from MongoDB (lean for faster read-only)
+  const quota = await StorageQuota.findOne({ userId }).lean();
   const used = quota?.used || 0;
 
   // Handle Infinity for enterprise plans
@@ -147,12 +148,15 @@ export async function uploadFile(
     // Determine resource type based on MIME type
     const resourceType = mimeType.startsWith('image/') ? 'image' : 'raw';
 
+    // Sanitize filename for safe storage
+    const safeFilename = sanitizeFilename(filename);
+
     // Upload to Cloudinary
     const uploadResult = await new Promise<{ secure_url: string; public_id: string }>((resolve, reject) => {
       const uploadStream = cloudinary.uploader.upload_stream(
         {
           folder: `md2pdf/users/${userId}`,
-          public_id: `${Date.now()}_${filename.replace(/[^a-zA-Z0-9.-]/g, '_')}`,
+          public_id: `${Date.now()}_${safeFilename}`,
           resource_type: resourceType,
         },
         (error, result) => {
@@ -214,7 +218,8 @@ export async function listFiles(
 
     const quota = await getStorageQuota(userId, planType);
 
-    const files = await UserFile.find({ userId }).sort({ createdAt: -1 });
+    // Use lean() for faster read-only query
+    const files = await UserFile.find({ userId }).sort({ createdAt: -1 }).lean();
 
     return {
       success: true,
@@ -251,7 +256,8 @@ export async function getFile(
   try {
     await connectDB();
 
-    const file = await UserFile.findById(fileId);
+    // Use lean() for faster read-only query
+    const file = await UserFile.findById(fileId).lean();
 
     if (!file) {
       return {

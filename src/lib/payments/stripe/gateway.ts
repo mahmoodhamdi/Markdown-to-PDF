@@ -64,8 +64,8 @@ function mapSubscriptionStatus(status: Stripe.Subscription.Status): Subscription
   return statusMap[status] || 'incomplete';
 }
 
-// Map Stripe payment status to our status
-function _mapPaymentStatus(status: Stripe.PaymentIntent.Status): PaymentStatus {
+// Map Stripe payment status to our status (exported for webhook handling)
+export function mapPaymentStatus(status: Stripe.PaymentIntent.Status): PaymentStatus {
   const statusMap: Record<Stripe.PaymentIntent.Status, PaymentStatus> = {
     succeeded: 'succeeded',
     processing: 'processing',

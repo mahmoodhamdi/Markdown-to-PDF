@@ -16,6 +16,16 @@ export async function POST(request: NextRequest) {
   // Get request context (auth status, user plan, IP)
   const context = await getRequestContext(request);
 
+  // For API key auth, check both 'convert' and 'batch' permissions
+  if (context.authType === 'api-key' && context.apiKeyUser) {
+    if (!context.apiKeyUser.permissions.includes('batch')) {
+      return NextResponse.json(
+        { error: "API key lacks 'batch' permission" },
+        { status: 403 }
+      );
+    }
+  }
+
   // Check conversion rate limit based on user plan
   const rateLimitResult = await checkConversionRateLimit(context);
 

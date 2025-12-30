@@ -49,7 +49,10 @@ export function ThemeToggle() {
     const themes: ThemeMode[] = ['light', 'dark', 'system'];
     const currentIndex = themes.indexOf(mode);
     const nextIndex = (currentIndex + 1) % themes.length;
-    setMode(themes[nextIndex]);
+    const nextTheme = themes[nextIndex];
+    if (nextTheme) {
+      setMode(nextTheme);
+    }
   };
 
   const getIcon = () => {

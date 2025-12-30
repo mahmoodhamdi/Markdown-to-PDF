@@ -2,7 +2,7 @@
  * Unit tests for analytics service
  */
 
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 
 // Mock Firebase Admin
 vi.mock('@/lib/firebase/admin', () => ({

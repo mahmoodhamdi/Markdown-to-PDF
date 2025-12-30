@@ -262,7 +262,7 @@ describe('/api/webhooks/stripe', () => {
       });
 
       const response = await POST(request);
-      const data = await response.json();
+      await response.json(); // Parse response body
 
       expect(response.status).toBe(200);
       expect(mockFindByIdAndUpdate).toHaveBeenCalledWith(
@@ -297,7 +297,7 @@ describe('/api/webhooks/stripe', () => {
       });
 
       const response = await POST(request);
-      const data = await response.json();
+      await response.json(); // Parse response body
 
       expect(response.status).toBe(200);
       expect(mockFindByIdAndUpdate).toHaveBeenCalledWith(

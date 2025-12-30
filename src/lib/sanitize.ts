@@ -70,8 +70,8 @@ const DANGEROUS_ATTRS = [
   'xlink:href',
 ];
 
-// Safe attributes for specific tags (reserved for future allowlist implementation)
-const _SAFE_ATTRS: Record<string, string[]> = {
+// Safe attributes for specific tags (exported for potential allowlist implementation)
+export const SAFE_ATTRS: Record<string, string[]> = {
   a: ['href', 'title', 'target', 'rel'],
   img: ['src', 'alt', 'title', 'width', 'height', 'loading'],
   input: ['type', 'checked', 'disabled'],
@@ -218,4 +218,128 @@ export function sanitizeWatermarkText(text: string): string {
   result = sanitizeTextForCss(result);
 
   return result;
+}
+
+/**
+ * Sanitize filename to prevent path traversal and injection attacks
+ * Safe for use in storage paths and downloads
+ */
+export function sanitizeFilename(filename: string): string {
+  if (!filename || typeof filename !== 'string') {
+    return 'unnamed';
+  }
+
+  let result = filename;
+
+  // Remove path traversal sequences
+  result = result.replace(/\.\./g, '');
+
+  // Remove directory separators
+  result = result.replace(/[/\\]/g, '_');
+
+  // Remove null bytes and control characters
+  result = result.replace(/[\x00-\x1f]/g, '');
+
+  // Remove characters that are problematic on various filesystems
+  // Windows: < > : " / \ | ? *
+  // Also remove characters that could cause issues in URLs or shell commands
+  result = result.replace(/[<>:"|?*`${}[\]()!#&;]/g, '_');
+
+  // Remove leading/trailing dots and spaces (Windows issue)
+  result = result.replace(/^[.\s]+|[.\s]+$/g, '');
+
+  // Collapse multiple underscores
+  result = result.replace(/_+/g, '_');
+
+  // Ensure filename is not empty after sanitization
+  if (!result) {
+    return 'unnamed';
+  }
+
+  // Limit length (255 is common filesystem limit)
+  if (result.length > 200) {
+    // Preserve extension if present
+    const extMatch = result.match(/\.[a-zA-Z0-9]{1,10}$/);
+    if (extMatch) {
+      const ext = extMatch[0];
+      result = result.substring(0, 200 - ext.length) + ext;
+    } else {
+      result = result.substring(0, 200);
+    }
+  }
+
+  // Block certain reserved names on Windows
+  const reserved = /^(con|prn|aux|nul|com[0-9]|lpt[0-9])$/i;
+  if (reserved.test(result.replace(/\.[^.]*$/, ''))) {
+    result = '_' + result;
+  }
+
+  return result;
+}
+
+/**
+ * Sanitize path component (single directory or filename)
+ * More restrictive than sanitizeFilename
+ */
+export function sanitizePathComponent(component: string): string {
+  if (!component || typeof component !== 'string') {
+    return 'unnamed';
+  }
+
+  // Only allow alphanumeric, hyphen, underscore, and dot
+  let result = component.replace(/[^a-zA-Z0-9._-]/g, '_');
+
+  // Remove leading dots
+  result = result.replace(/^\.+/, '');
+
+  // Collapse multiple underscores/dots
+  result = result.replace(/[_.]+/g, (match) => match[0]);
+
+  return result || 'unnamed';
+}
+
+/**
+ * Validate and sanitize a complete file path
+ * Returns null if the path is suspicious
+ */
+export function validateFilePath(path: string, allowedBasePath?: string): string | null {
+  if (!path || typeof path !== 'string') {
+    return null;
+  }
+
+  // Normalize path separators
+  const normalizedPath = path.replace(/\\/g, '/');
+
+  // Check for path traversal attempts
+  if (normalizedPath.includes('..')) {
+    return null;
+  }
+
+  // Check for null bytes
+  if (normalizedPath.includes('\x00')) {
+    return null;
+  }
+
+  // Check for suspicious patterns
+  const suspiciousPatterns = [
+    /\/\//,           // Double slashes
+    /^\s|\s$/,        // Leading/trailing whitespace
+    /%[0-9a-f]{2}/i,  // URL encoded characters
+  ];
+
+  for (const pattern of suspiciousPatterns) {
+    if (pattern.test(normalizedPath)) {
+      return null;
+    }
+  }
+
+  // If base path is specified, ensure the path starts with it
+  if (allowedBasePath) {
+    const normalizedBase = allowedBasePath.replace(/\\/g, '/').replace(/\/$/, '');
+    if (!normalizedPath.startsWith(normalizedBase + '/') && normalizedPath !== normalizedBase) {
+      return null;
+    }
+  }
+
+  return normalizedPath;
 }

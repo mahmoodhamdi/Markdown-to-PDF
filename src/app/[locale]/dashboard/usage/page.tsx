@@ -1,5 +1,6 @@
 'use client';
 
+import { useMemo } from 'react';
 import { useSession } from 'next-auth/react';
 import { redirect } from 'next/navigation';
 import { useTranslations } from 'next-intl';
@@ -7,11 +8,27 @@ import { UsageStats, UsageHistory } from '@/components/dashboard';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Badge } from '@/components/ui/badge';
 import { getPlanLimits } from '@/lib/plans/config';
+import { useStorageQuota } from '@/hooks/useStorage';
+import { useAnalyticsHistory } from '@/hooks/useAnalytics';
 
 export default function UsagePage() {
   const { data: session, status } = useSession();
   const t = useTranslations('dashboard.usage');
   const tAuth = useTranslations('auth');
+
+  // Use SWR hooks for cached data fetching
+  const { quota, filesCount, isLoading: storageLoading } = useStorageQuota();
+  const { history, isLoading: historyLoading } = useAnalyticsHistory('7');
+
+  // Memoize history data transformation
+  const historyData = useMemo(() => {
+    if (!history?.daily) return [];
+    return history.daily.map((day) => ({
+      date: day.date,
+      conversions: day.conversions || 0,
+      apiCalls: day.apiCalls || 0,
+    }));
+  }, [history?.daily]);
 
   // Redirect to login if not authenticated
   if (status === 'unauthenticated') {
@@ -27,12 +44,12 @@ export default function UsagePage() {
   const plan = user?.plan || 'free';
   const limits = getPlanLimits(plan);
 
-  // Current usage from session
+  // Current usage from session + SWR data
   const usage = {
     conversions: user?.usage?.conversions || 0,
     apiCalls: user?.usage?.apiCalls || 0,
-    storageUsed: 0, // TODO: Fetch from storage API
-    filesUploaded: 0, // TODO: Fetch from storage API
+    storageUsed: quota?.used || 0,
+    filesUploaded: filesCount,
   };
 
   // Calculate reset time (midnight tomorrow)
@@ -41,22 +58,6 @@ export default function UsagePage() {
     tomorrow.setDate(tomorrow.getDate() + 1);
     tomorrow.setHours(0, 0, 0, 0);
     return tomorrow.toISOString();
-  };
-
-  // Generate mock history data for the past 7 days
-  // TODO: Replace with actual API call to /api/analytics/history
-  const generateHistoryData = () => {
-    const data = [];
-    for (let i = 6; i >= 0; i--) {
-      const date = new Date();
-      date.setDate(date.getDate() - i);
-      data.push({
-        date: date.toISOString().split('T')[0],
-        conversions: i === 0 ? usage.conversions : Math.floor(Math.random() * 15),
-        apiCalls: i === 0 ? usage.apiCalls : Math.floor(Math.random() * 50),
-      });
-    }
-    return data;
   };
 
   const planLabels: Record<string, string> = {
@@ -89,12 +90,14 @@ export default function UsagePage() {
           maxBatchFiles: limits.maxBatchFiles,
         }}
         resetTime={getResetTime()}
+        loading={storageLoading}
       />
 
       {/* Usage History */}
       <UsageHistory
-        data={generateHistoryData()}
+        data={historyData}
         maxConversions={limits.conversionsPerDay === Infinity ? undefined : limits.conversionsPerDay}
+        loading={historyLoading}
       />
     </div>
   );

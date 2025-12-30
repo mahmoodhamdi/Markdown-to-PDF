@@ -10,7 +10,7 @@ import { getSSOConfig, testSSOConfig } from '@/lib/sso/service';
 import { checkRateLimit, getRateLimitHeaders } from '@/lib/rate-limit';
 
 export async function POST(
-  request: NextRequest,
+  _request: NextRequest,
   { params }: { params: Promise<{ configId: string }> }
 ) {
   try {

@@ -15,8 +15,8 @@ const EXCLUDED_RULES = [
   'heading-order', // Dynamic heading levels may vary
 ];
 
-// CI environment may have different rendering - skip strict accessibility checks
-const IS_CI = process.env.CI === 'true';
+// CI environment may have different rendering
+void process.env.CI; // Used for potential CI-specific adjustments
 
 test.describe('Accessibility Tests', () => {
   test('Home page should have no critical accessibility violations', async ({ page }) => {
