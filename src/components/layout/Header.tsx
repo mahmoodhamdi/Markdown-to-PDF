@@ -39,7 +39,10 @@ export function Header() {
         </Link>
 
         {/* Desktop Navigation */}
-        <nav className="hidden md:flex items-center space-x-6 text-sm font-medium flex-1">
+        <nav
+          className="hidden md:flex items-center space-x-6 text-sm font-medium flex-1"
+          aria-label="Main navigation"
+        >
           {navItems.map((item) => (
             <Link
               key={item.href}
@@ -67,7 +70,9 @@ export function Header() {
             variant="ghost"
             size="icon"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            aria-label="Toggle menu"
+            aria-label={mobileMenuOpen ? 'Close menu' : 'Open menu'}
+            aria-expanded={mobileMenuOpen}
+            aria-controls="mobile-navigation"
           >
             {mobileMenuOpen ? (
               <X className="h-5 w-5" />
@@ -80,12 +85,14 @@ export function Header() {
 
       {/* Mobile Navigation */}
       <div
+        id="mobile-navigation"
         className={cn(
           'md:hidden border-t bg-background overflow-hidden transition-all duration-200',
           mobileMenuOpen ? 'max-h-64' : 'max-h-0'
         )}
+        aria-hidden={!mobileMenuOpen}
       >
-        <nav className="container py-4 space-y-2">
+        <nav className="container py-4 space-y-2" aria-label="Mobile navigation">
           {navItems.map((item) => (
             <Link
               key={item.href}

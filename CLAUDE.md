@@ -64,7 +64,7 @@ docker-compose -f docker/docker-compose.prod.yml up     # Production mode
 
 ### Core Processing Pipeline
 
-1. **Markdown Parser** (`src/lib/markdown/parser.ts`): Converts markdown to HTML using `marked` with extensions for GFM, syntax highlighting (highlight.js), KaTeX math, Mermaid diagrams, and emoji shortcodes. All parsing flows through `parseMarkdown()`.
+1. **Markdown Parser** (`src/lib/markdown/parser.ts`): Converts markdown to HTML using `marked` with extensions for GFM, syntax highlighting (highlight.js), KaTeX math, Mermaid diagrams, and emoji shortcodes. All parsing flows through `parseMarkdownFull()`.
 
 2. **PDF Generator** (`src/lib/pdf/generator.ts`): Uses Puppeteer to render HTML and generate PDFs. `generateHtmlDocument()` creates the full HTML with theme CSS, KaTeX/Mermaid scripts. `generatePdf()` launches headless Chrome for conversion.
 

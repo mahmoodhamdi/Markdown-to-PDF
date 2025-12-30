@@ -1214,7 +1214,9 @@
       "reqUppercase": "حرف كبير واحد",
       "reqLowercase": "حرف صغير واحد",
       "reqNumber": "رقم واحد",
-      "reqSpecial": "رمز خاص واحد"
+      "reqSpecial": "رمز خاص واحد",
+      "showPassword": "إظهار كلمة المرور",
+      "hidePassword": "إخفاء كلمة المرور"
     },
     "sessions": {
       "title": "الجلسات النشطة",

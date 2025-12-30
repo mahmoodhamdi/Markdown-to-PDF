@@ -1,46 +1,45 @@
 import { test, expect } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
 
-// Known issues that can be excluded in CI (third-party components, dynamic content)
-const EXCLUDED_RULES = [
-  'color-contrast', // Can vary based on rendering engine
-  'region', // Some third-party components may not have proper regions
-  'landmark-one-main', // Layout may differ in CI
-  'scrollable-region-focusable', // Monaco editor scrollable region
-  'label', // Some form controls may use aria-label instead
-  'aria-allowed-role', // Dynamic content may have valid role changes
-  'image-alt', // Decorative images may be empty
-  'button-name', // Some icon buttons use aria-label
-  'link-name', // Some icon links use aria-label
+// Third-party component issues that we can't fix directly
+const EXCLUDED_RULES_THIRDPARTY = [
+  'scrollable-region-focusable', // Monaco editor scrollable region - third party
+];
+
+// Rules to log but not fail (informational only in CI)
+const INFORMATIONAL_RULES = [
+  'color-contrast', // Can vary based on rendering engine and theme
   'heading-order', // Dynamic heading levels may vary
 ];
 
-// CI environment may have different rendering
-void process.env.CI; // Used for potential CI-specific adjustments
+// Detect if running in CI environment
+const isCI = !!process.env.CI;
 
 test.describe('Accessibility Tests', () => {
   test('Home page should have no critical accessibility violations', async ({ page }) => {
     await page.goto('/en');
     await page.setViewportSize({ width: 1280, height: 720 });
-
-    // Wait for page to fully load
     await page.waitForLoadState('domcontentloaded');
-    await page.waitForTimeout(1000); // Extra wait for hydration
+    await page.waitForTimeout(1000);
 
     const accessibilityScanResults = await new AxeBuilder({ page })
       .withTags(['wcag2a', 'wcag2aa'])
-      .disableRules(EXCLUDED_RULES)
+      .disableRules([...EXCLUDED_RULES_THIRDPARTY, ...INFORMATIONAL_RULES])
       .analyze();
 
-    // Log violations for debugging
-    const allViolations = accessibilityScanResults.violations;
-    if (allViolations.length > 0) {
-      console.log(`Found ${allViolations.length} accessibility violations (informational)`);
+    const violations = accessibilityScanResults.violations;
+    if (violations.length > 0) {
+      console.log('Accessibility violations found:');
+      violations.forEach((v) => {
+        console.log(`  - ${v.id}: ${v.description} (${v.nodes.length} instances)`);
+      });
     }
 
-    // In CI, just verify the test runs - accessibility is informational
-    // Pass the test regardless of violations in CI
-    expect(true).toBe(true);
+    // In CI, we log but don't fail to avoid flaky tests
+    // In local development, we should have zero violations
+    if (!isCI) {
+      expect(violations).toEqual([]);
+    }
   });
 
   test('Templates page should have no critical accessibility violations', async ({ page }) => {
@@ -51,16 +50,17 @@ test.describe('Accessibility Tests', () => {
 
     const accessibilityScanResults = await new AxeBuilder({ page })
       .withTags(['wcag2a', 'wcag2aa'])
-      .disableRules(EXCLUDED_RULES)
+      .disableRules([...EXCLUDED_RULES_THIRDPARTY, ...INFORMATIONAL_RULES])
       .analyze();
 
-    const allViolations = accessibilityScanResults.violations;
-    if (allViolations.length > 0) {
-      console.log(`Found ${allViolations.length} accessibility violations (informational)`);
+    const violations = accessibilityScanResults.violations;
+    if (violations.length > 0) {
+      console.log(`Templates page: ${violations.length} violations found`);
     }
 
-    // In CI, just verify the test runs
-    expect(true).toBe(true);
+    if (!isCI) {
+      expect(violations).toEqual([]);
+    }
   });
 
   test('Themes page should have no critical accessibility violations', async ({ page }) => {
@@ -71,16 +71,17 @@ test.describe('Accessibility Tests', () => {
 
     const accessibilityScanResults = await new AxeBuilder({ page })
       .withTags(['wcag2a', 'wcag2aa'])
-      .disableRules(EXCLUDED_RULES)
+      .disableRules([...EXCLUDED_RULES_THIRDPARTY, ...INFORMATIONAL_RULES])
       .analyze();
 
-    const allViolations = accessibilityScanResults.violations;
-    if (allViolations.length > 0) {
-      console.log(`Found ${allViolations.length} accessibility violations (informational)`);
+    const violations = accessibilityScanResults.violations;
+    if (violations.length > 0) {
+      console.log(`Themes page: ${violations.length} violations found`);
     }
 
-    // In CI, just verify the test runs
-    expect(true).toBe(true);
+    if (!isCI) {
+      expect(violations).toEqual([]);
+    }
   });
 
   test('Arabic locale should maintain accessibility', async ({ page }) => {
@@ -89,23 +90,24 @@ test.describe('Accessibility Tests', () => {
     await page.waitForLoadState('domcontentloaded');
     await page.waitForTimeout(1000);
 
-    // Check RTL is properly set - this is the important check
+    // Check RTL is properly set
     const html = page.locator('html');
     await expect(html).toHaveAttribute('dir', 'rtl');
     await expect(html).toHaveAttribute('lang', 'ar');
 
     const accessibilityScanResults = await new AxeBuilder({ page })
       .withTags(['wcag2a', 'wcag2aa'])
-      .disableRules(EXCLUDED_RULES)
+      .disableRules([...EXCLUDED_RULES_THIRDPARTY, ...INFORMATIONAL_RULES])
       .analyze();
 
-    const allViolations = accessibilityScanResults.violations;
-    if (allViolations.length > 0) {
-      console.log(`Found ${allViolations.length} accessibility violations (informational)`);
+    const violations = accessibilityScanResults.violations;
+    if (violations.length > 0) {
+      console.log(`Arabic page: ${violations.length} violations found`);
     }
 
-    // In CI, just verify RTL is set correctly
-    expect(true).toBe(true);
+    if (!isCI) {
+      expect(violations).toEqual([]);
+    }
   });
 
   test('Mobile view should be accessible', async ({ page }) => {
@@ -116,16 +118,17 @@ test.describe('Accessibility Tests', () => {
 
     const accessibilityScanResults = await new AxeBuilder({ page })
       .withTags(['wcag2a', 'wcag2aa'])
-      .disableRules(EXCLUDED_RULES)
+      .disableRules([...EXCLUDED_RULES_THIRDPARTY, ...INFORMATIONAL_RULES])
       .analyze();
 
-    const allViolations = accessibilityScanResults.violations;
-    if (allViolations.length > 0) {
-      console.log(`Found ${allViolations.length} accessibility violations (informational)`);
+    const violations = accessibilityScanResults.violations;
+    if (violations.length > 0) {
+      console.log(`Mobile view: ${violations.length} violations found`);
     }
 
-    // In CI, just verify the test runs
-    expect(true).toBe(true);
+    if (!isCI) {
+      expect(violations).toEqual([]);
+    }
   });
 });
 
@@ -184,19 +187,25 @@ test.describe('Color Contrast', () => {
 
     const accessibilityScanResults = await new AxeBuilder({ page })
       .withTags(['wcag2aa'])
-      .disableRules(EXCLUDED_RULES)
+      .disableRules(EXCLUDED_RULES_THIRDPARTY)
       .analyze();
 
-    // Check specifically for color contrast issues (info only - don't fail)
+    // Check specifically for color contrast issues
     const contrastViolations = accessibilityScanResults.violations.filter(
       (v) => v.id === 'color-contrast'
     );
 
-    // Log violations for debugging but don't fail - color contrast is informational
+    // Log violations for debugging
     if (contrastViolations.length > 0) {
-      console.log('Color contrast issues found:', contrastViolations.length);
+      console.log(`Color contrast issues found: ${contrastViolations.length}`);
+      contrastViolations.forEach((v) => {
+        v.nodes.forEach((node) => {
+          console.log(`  - ${node.html.substring(0, 100)}...`);
+        });
+      });
     }
-    // This test is informational only - don't fail
+
+    // Color contrast is informational - rendering varies across environments
   });
 });
 
@@ -245,19 +254,85 @@ test.describe('Form Accessibility', () => {
     // Check that inputs have associated labels or aria-label
     const accessibilityScanResults = await new AxeBuilder({ page })
       .withTags(['wcag2a'])
-      .disableRules(EXCLUDED_RULES)
+      .disableRules(EXCLUDED_RULES_THIRDPARTY)
       .analyze();
 
     const labelViolations = accessibilityScanResults.violations.filter(
       (v) => v.id === 'label' || v.id === 'label-content-name-mismatch'
     );
 
-    // Log violations for debugging (informational only)
+    // Log violations for debugging
     if (labelViolations.length > 0) {
-      console.log(`Found ${labelViolations.length} label violations (informational)`);
+      console.log(`Form label violations: ${labelViolations.length}`);
+      labelViolations.forEach((v) => {
+        console.log(`  - ${v.id}: ${v.nodes.length} instances`);
+      });
     }
 
-    // In CI, this is informational - accessibility auditing should be done separately
-    expect(true).toBe(true);
+    // In local development, enforce label rules
+    if (!isCI) {
+      expect(labelViolations).toEqual([]);
+    }
+  });
+});
+
+test.describe('Skip Link', () => {
+  test('should have working skip link', async ({ page }) => {
+    await page.goto('/en');
+    await page.setViewportSize({ width: 1280, height: 720 });
+
+    // Tab to focus the skip link
+    await page.keyboard.press('Tab');
+
+    // Check that skip link is visible when focused
+    const skipLink = page.locator('a[href="#main-content"]');
+    const isVisible = await skipLink.isVisible();
+
+    // Skip link should be visible when focused
+    expect(isVisible).toBe(true);
+
+    // Click skip link
+    await skipLink.click();
+
+    // Verify focus moved to main content
+    const mainContent = page.locator('#main-content');
+    await expect(mainContent).toBeVisible();
+  });
+
+  test('main content should have correct id', async ({ page }) => {
+    await page.goto('/en');
+
+    const mainContent = page.locator('main#main-content');
+    await expect(mainContent).toBeVisible();
+    await expect(mainContent).toHaveAttribute('role', 'main');
+  });
+});
+
+test.describe('Navigation Accessibility', () => {
+  test('navigation should have aria-label', async ({ page }) => {
+    await page.goto('/en');
+    await page.setViewportSize({ width: 1280, height: 720 });
+
+    // Check desktop navigation
+    const desktopNav = page.locator('nav[aria-label="Main navigation"]');
+    await expect(desktopNav).toBeVisible();
+  });
+
+  test('mobile menu toggle should have proper aria attributes', async ({ page }) => {
+    await page.goto('/en');
+    await page.setViewportSize({ width: 375, height: 667 });
+
+    // Find mobile menu button
+    const menuButton = page.locator('button[aria-controls="mobile-navigation"]');
+    await expect(menuButton).toBeVisible();
+    await expect(menuButton).toHaveAttribute('aria-expanded', 'false');
+
+    // Click to open menu
+    await menuButton.click();
+    await expect(menuButton).toHaveAttribute('aria-expanded', 'true');
+
+    // Click to close menu
+    await menuButton.click();
+    await expect(menuButton).toHaveAttribute('aria-expanded', 'false');
   });
 });

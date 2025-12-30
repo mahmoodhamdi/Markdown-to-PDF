@@ -175,6 +175,8 @@ export function PasswordChange({ hasPassword }: PasswordChangeProps) {
                 onChange={(e) => setCurrentPassword(e.target.value)}
                 placeholder={t('password.currentPlaceholder')}
                 className={errors.currentPassword ? 'border-destructive' : ''}
+                aria-describedby={errors.currentPassword ? 'currentPassword-error' : undefined}
+                aria-invalid={!!errors.currentPassword}
               />
               <Button
                 type="button"
@@ -182,12 +184,13 @@ export function PasswordChange({ hasPassword }: PasswordChangeProps) {
                 size="icon"
                 className="absolute right-0 top-0 h-full px-3"
                 onClick={() => setShowCurrent(!showCurrent)}
+                aria-label={showCurrent ? t('password.hidePassword') : t('password.showPassword')}
               >
                 {showCurrent ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
               </Button>
             </div>
             {errors.currentPassword && (
-              <p className="text-sm text-destructive">{errors.currentPassword}</p>
+              <p id="currentPassword-error" className="text-sm text-destructive" role="alert">{errors.currentPassword}</p>
             )}
           </div>
 
@@ -202,6 +205,8 @@ export function PasswordChange({ hasPassword }: PasswordChangeProps) {
                 onChange={(e) => setNewPassword(e.target.value)}
                 placeholder={t('password.newPlaceholder')}
                 className={errors.newPassword ? 'border-destructive' : ''}
+                aria-describedby={errors.newPassword ? 'newPassword-error' : 'password-requirements'}
+                aria-invalid={!!errors.newPassword}
               />
               <Button
                 type="button"
@@ -209,12 +214,13 @@ export function PasswordChange({ hasPassword }: PasswordChangeProps) {
                 size="icon"
                 className="absolute right-0 top-0 h-full px-3"
                 onClick={() => setShowNew(!showNew)}
+                aria-label={showNew ? t('password.hidePassword') : t('password.showPassword')}
               >
                 {showNew ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
               </Button>
             </div>
             {errors.newPassword && (
-              <p className="text-sm text-destructive">{errors.newPassword}</p>
+              <p id="newPassword-error" className="text-sm text-destructive" role="alert">{errors.newPassword}</p>
             )}
             {/* Password strength indicator */}
             {newPassword && (
@@ -238,7 +244,7 @@ export function PasswordChange({ hasPassword }: PasswordChangeProps) {
                 <p className="text-xs text-muted-foreground">{passwordStrength.label}</p>
 
                 {/* Requirements checklist */}
-                <div className="mt-2 p-3 bg-muted/50 rounded-md space-y-1.5">
+                <div id="password-requirements" className="mt-2 p-3 bg-muted/50 rounded-md space-y-1.5">
                   <p className="text-xs font-medium text-muted-foreground mb-2">
                     {t('password.requirements')}
                   </p>
@@ -273,6 +279,8 @@ export function PasswordChange({ hasPassword }: PasswordChangeProps) {
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 placeholder={t('password.confirmPlaceholder')}
                 className={errors.confirmPassword ? 'border-destructive' : ''}
+                aria-describedby={errors.confirmPassword ? 'confirmPassword-error' : undefined}
+                aria-invalid={!!errors.confirmPassword}
               />
               <Button
                 type="button"
@@ -280,12 +288,13 @@ export function PasswordChange({ hasPassword }: PasswordChangeProps) {
                 size="icon"
                 className="absolute right-0 top-0 h-full px-3"
                 onClick={() => setShowConfirm(!showConfirm)}
+                aria-label={showConfirm ? t('password.hidePassword') : t('password.showPassword')}
               >
                 {showConfirm ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
               </Button>
             </div>
             {errors.confirmPassword && (
-              <p className="text-sm text-destructive">{errors.confirmPassword}</p>
+              <p id="confirmPassword-error" className="text-sm text-destructive" role="alert">{errors.confirmPassword}</p>
             )}
             {confirmPassword && newPassword === confirmPassword && (
               <p className="text-sm text-green-600 dark:text-green-400 flex items-center gap-1">
