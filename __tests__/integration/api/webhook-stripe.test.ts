@@ -40,6 +40,15 @@ vi.mock('@/lib/stripe/config', () => ({
   isStripeConfigured: () => true,
 }));
 
+// Mock webhooks service (idempotency)
+vi.mock('@/lib/webhooks', () => ({
+  checkAndMarkProcessing: vi.fn().mockResolvedValue({ isNew: true }),
+  markProcessed: vi.fn().mockResolvedValue(undefined),
+  markFailed: vi.fn().mockResolvedValue(undefined),
+  markSkipped: vi.fn().mockResolvedValue(undefined),
+  webhookLog: vi.fn(),
+}));
+
 describe('/api/webhooks/stripe', () => {
   let POST: typeof import('@/app/api/webhooks/stripe/route').POST;
   const originalEnv = process.env.STRIPE_WEBHOOK_SECRET;
@@ -82,6 +91,14 @@ describe('/api/webhooks/stripe', () => {
         },
       },
       isStripeConfigured: () => true,
+    }));
+
+    vi.doMock('@/lib/webhooks', () => ({
+      checkAndMarkProcessing: vi.fn().mockResolvedValue({ isNew: true }),
+      markProcessed: vi.fn().mockResolvedValue(undefined),
+      markFailed: vi.fn().mockResolvedValue(undefined),
+      markSkipped: vi.fn().mockResolvedValue(undefined),
+      webhookLog: vi.fn(),
     }));
 
     // Dynamic import

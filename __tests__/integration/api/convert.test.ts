@@ -1,22 +1,23 @@
 import { describe, it, expect, vi } from 'vitest';
 
-// Mock puppeteer for integration tests
-vi.mock('puppeteer', () => ({
-  default: {
-    launch: vi.fn().mockResolvedValue({
-      connected: true,
-      newPage: vi.fn().mockResolvedValue({
-        setContent: vi.fn().mockResolvedValue(undefined),
-        setViewport: vi.fn().mockResolvedValue(undefined),
-        evaluate: vi.fn().mockResolvedValue(undefined),
-        waitForFunction: vi.fn().mockResolvedValue(undefined),
-        pdf: vi.fn().mockResolvedValue(Buffer.from('PDF content')),
-        close: vi.fn().mockResolvedValue(undefined),
-        isClosed: vi.fn().mockReturnValue(false),
-      }),
-      close: vi.fn().mockResolvedValue(undefined),
-      on: vi.fn(),
-    }),
+// Mock browser pool for integration tests - use vi.hoisted to avoid initialization order issues
+const mockPage = vi.hoisted(() => ({
+  setContent: vi.fn().mockResolvedValue(undefined),
+  setViewport: vi.fn().mockResolvedValue(undefined),
+  evaluate: vi.fn().mockResolvedValue(undefined),
+  waitForFunction: vi.fn().mockResolvedValue(undefined),
+  pdf: vi.fn().mockResolvedValue(Buffer.from('PDF content')),
+  isClosed: vi.fn().mockReturnValue(false),
+  close: vi.fn().mockResolvedValue(undefined),
+}));
+
+vi.mock('@/lib/pdf/browser-pool', () => ({
+  browserPool: {
+    getPage: vi.fn().mockResolvedValue(mockPage),
+    releasePage: vi.fn().mockResolvedValue(undefined),
+    releaseConcurrencySlot: vi.fn(),
+    acquireConcurrencySlot: vi.fn().mockResolvedValue(undefined),
+    close: vi.fn().mockResolvedValue(undefined),
   },
 }));
 
