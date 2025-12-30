@@ -11,12 +11,14 @@ import {
   markTokenAsUsed,
 } from '@/lib/db/models/PasswordResetToken';
 import { checkRateLimit, getRateLimitHeaders } from '@/lib/rate-limit';
+import { invalidateAllUserSessions } from '@/lib/auth/session-service';
+import { passwordSchema, BCRYPT_ROUNDS } from '@/lib/auth/password-validation';
 import bcrypt from 'bcryptjs';
 import { z } from 'zod';
 
 const resetPasswordSchema = z.object({
   token: z.string().min(1, 'Token is required'),
-  password: z.string().min(6, 'Password must be at least 6 characters'),
+  password: passwordSchema,
 });
 
 export async function POST(request: NextRequest) {
@@ -38,7 +40,7 @@ export async function POST(request: NextRequest) {
     const validation = resetPasswordSchema.safeParse(body);
 
     if (!validation.success) {
-      const firstError = validation.error.errors[0];
+      const firstError = validation.error.errors[0] ?? { message: 'Validation failed' };
       return NextResponse.json(
         { error: firstError.message, code: 'validation_error' },
         { status: 400 }
@@ -78,7 +80,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Hash new password
-    const hashedPassword = await bcrypt.hash(password, 12);
+    const hashedPassword = await bcrypt.hash(password, BCRYPT_ROUNDS);
 
     // Update user password
     await User.updateOne(
@@ -88,6 +90,9 @@ export async function POST(request: NextRequest) {
 
     // Mark token as used
     await markTokenAsUsed(token);
+
+    // Invalidate all existing sessions for security
+    await invalidateAllUserSessions(tokenDoc.userId);
 
     return NextResponse.json({
       success: true,

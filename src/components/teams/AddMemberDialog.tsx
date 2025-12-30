@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useTranslations } from 'next-intl';
 import {
   Dialog,
@@ -54,6 +54,16 @@ export function AddMemberDialog({
   const [role, setRole] = useState<'member' | 'admin'>('member');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // Reset form when dialog closes
+  useEffect(() => {
+    if (!open) {
+      setEmail('');
+      setName('');
+      setRole('member');
+      setError(null);
+    }
+  }, [open]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -126,7 +136,7 @@ export function AddMemberDialog({
           <DialogDescription>{t('addMemberDescription')}</DialogDescription>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit} noValidate>
           <div className="grid gap-4 py-4">
             <div className="grid gap-2">
               <Label htmlFor="email">{t('email')} *</Label>

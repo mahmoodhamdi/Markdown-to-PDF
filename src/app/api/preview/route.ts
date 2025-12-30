@@ -14,8 +14,8 @@ export async function POST(request: NextRequest) {
   // Get request context (auth status, user plan, IP)
   const context = await getRequestContext(request);
 
-  // Check API rate limit based on user plan
-  const rateLimitResult = await checkApiRateLimit(context);
+  // Check API rate limit based on user plan (with preview permission for API keys)
+  const rateLimitResult = await checkApiRateLimit(context, 'preview');
 
   if (!rateLimitResult.success) {
     return createRateLimitErrorResponse(rateLimitResult);

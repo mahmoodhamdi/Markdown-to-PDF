@@ -10,24 +10,36 @@ vi.mock('@/lib/db/mongodb', () => ({
 }));
 
 // Mock UserFile and StorageQuota models
-const mockUserFileFindById = vi.fn();
-const mockUserFileFind = vi.fn();
+const mockUserFileFindByIdResult = vi.fn();
+const mockUserFileFindResult = vi.fn();
 const mockUserFileCreate = vi.fn();
 const mockUserFileFindByIdAndDelete = vi.fn();
 
-const mockStorageQuotaFindOne = vi.fn();
+const mockStorageQuotaFindOneResult = vi.fn();
 const mockStorageQuotaFindOneAndUpdate = vi.fn();
 const mockStorageQuotaUpdateOne = vi.fn();
 
+// Helper to create chainable mock with .lean()
+const createLeanableQuery = (resultFn: ReturnType<typeof vi.fn>) => ({
+  lean: () => resultFn(),
+});
+
+// Helper to create chainable mock with .sort().lean()
+const createSortableLeanableQuery = (resultFn: ReturnType<typeof vi.fn>) => ({
+  sort: () => ({
+    lean: () => resultFn(),
+  }),
+});
+
 vi.mock('@/lib/db/models/UserFile', () => ({
   UserFile: {
-    findById: (...args: unknown[]) => mockUserFileFindById(...args),
-    find: (...args: unknown[]) => mockUserFileFind(...args),
+    findById: () => createLeanableQuery(mockUserFileFindByIdResult),
+    find: () => createSortableLeanableQuery(mockUserFileFindResult),
     create: (...args: unknown[]) => mockUserFileCreate(...args),
     findByIdAndDelete: (...args: unknown[]) => mockUserFileFindByIdAndDelete(...args),
   },
   StorageQuota: {
-    findOne: (...args: unknown[]) => mockStorageQuotaFindOne(...args),
+    findOne: () => createLeanableQuery(mockStorageQuotaFindOneResult),
     findOneAndUpdate: (...args: unknown[]) => mockStorageQuotaFindOneAndUpdate(...args),
     updateOne: (...args: unknown[]) => mockStorageQuotaUpdateOne(...args),
   },
@@ -153,7 +165,7 @@ describe('Storage Service - Quota Operations', () => {
 
   describe('getStorageQuota', () => {
     it('should return quota for user with existing usage', async () => {
-      mockStorageQuotaFindOne.mockResolvedValue({ userId: 'user-123', used: 500 * 1024 * 1024 });
+      mockStorageQuotaFindOneResult.mockResolvedValue({ userId: 'user-123', used: 500 * 1024 * 1024 });
 
       const quota = await getStorageQuota('user-123', 'pro');
 
@@ -165,7 +177,7 @@ describe('Storage Service - Quota Operations', () => {
     });
 
     it('should return zero usage for new user', async () => {
-      mockStorageQuotaFindOne.mockResolvedValue(null);
+      mockStorageQuotaFindOneResult.mockResolvedValue(null);
 
       const quota = await getStorageQuota('new-user', 'pro');
 
@@ -175,7 +187,7 @@ describe('Storage Service - Quota Operations', () => {
     });
 
     it('should return zero limit for free plan', async () => {
-      mockStorageQuotaFindOne.mockResolvedValue(null);
+      mockStorageQuotaFindOneResult.mockResolvedValue(null);
 
       const quota = await getStorageQuota('free-user', 'free');
 
@@ -183,7 +195,7 @@ describe('Storage Service - Quota Operations', () => {
     });
 
     it('should return Infinity for enterprise plan', async () => {
-      mockStorageQuotaFindOne.mockResolvedValue({ used: 10 * 1024 * 1024 * 1024 });
+      mockStorageQuotaFindOneResult.mockResolvedValue({ used: 10 * 1024 * 1024 * 1024 });
 
       const quota = await getStorageQuota('enterprise-user', 'enterprise');
 
@@ -223,10 +235,8 @@ describe('Storage Service - File Operations', () => {
         createMockFileDoc({ _id: { toString: () => 'file-1' }, filename: 'file1.md' }),
         createMockFileDoc({ _id: { toString: () => 'file-2' }, filename: 'file2.md' }),
       ];
-      mockUserFileFind.mockReturnValue({
-        sort: vi.fn().mockResolvedValue(mockFiles),
-      });
-      mockStorageQuotaFindOne.mockResolvedValue({ used: 2048 });
+      mockUserFileFindResult.mockResolvedValue(mockFiles);
+      mockStorageQuotaFindOneResult.mockResolvedValue({ used: 2048 });
 
       const result = await listFiles('user-123', 'pro');
 
@@ -236,10 +246,8 @@ describe('Storage Service - File Operations', () => {
     });
 
     it('should return empty array for user with no files', async () => {
-      mockUserFileFind.mockReturnValue({
-        sort: vi.fn().mockResolvedValue([]),
-      });
-      mockStorageQuotaFindOne.mockResolvedValue(null);
+      mockUserFileFindResult.mockResolvedValue([]);
+      mockStorageQuotaFindOneResult.mockResolvedValue(null);
 
       const result = await listFiles('empty-user', 'pro');
 
@@ -248,9 +256,7 @@ describe('Storage Service - File Operations', () => {
     });
 
     it('should handle errors gracefully', async () => {
-      mockUserFileFind.mockReturnValue({
-        sort: vi.fn().mockRejectedValue(new Error('Database error')),
-      });
+      mockUserFileFindResult.mockRejectedValue(new Error('Database error'));
 
       const result = await listFiles('user-123', 'pro');
 
@@ -261,7 +267,7 @@ describe('Storage Service - File Operations', () => {
 
   describe('getFile', () => {
     it('should return file for valid ID and owner', async () => {
-      mockUserFileFindById.mockResolvedValue(createMockFileDoc());
+      mockUserFileFindByIdResult.mockResolvedValue(createMockFileDoc());
 
       const result = await getFile('user-123', 'file-123');
 
@@ -271,7 +277,7 @@ describe('Storage Service - File Operations', () => {
     });
 
     it('should return error for non-existent file', async () => {
-      mockUserFileFindById.mockResolvedValue(null);
+      mockUserFileFindByIdResult.mockResolvedValue(null);
 
       const result = await getFile('user-123', 'non-existent');
 
@@ -280,7 +286,7 @@ describe('Storage Service - File Operations', () => {
     });
 
     it('should deny access to files owned by other users', async () => {
-      mockUserFileFindById.mockResolvedValue(createMockFileDoc({ userId: 'other-user' }));
+      mockUserFileFindByIdResult.mockResolvedValue(createMockFileDoc({ userId: 'other-user' }));
 
       const result = await getFile('user-123', 'file-123');
 
@@ -289,7 +295,7 @@ describe('Storage Service - File Operations', () => {
     });
 
     it('should handle database errors', async () => {
-      mockUserFileFindById.mockRejectedValue(new Error('Database connection failed'));
+      mockUserFileFindByIdResult.mockRejectedValue(new Error('Database connection failed'));
 
       const result = await getFile('user-123', 'file-123');
 
@@ -300,7 +306,7 @@ describe('Storage Service - File Operations', () => {
 
   describe('getDownloadUrl', () => {
     it('should return URL for existing file', async () => {
-      mockUserFileFindById.mockResolvedValue(createMockFileDoc());
+      mockUserFileFindByIdResult.mockResolvedValue(createMockFileDoc());
 
       const result = await getDownloadUrl('user-123', 'file-123');
 
@@ -309,7 +315,7 @@ describe('Storage Service - File Operations', () => {
     });
 
     it('should return error for non-existent file', async () => {
-      mockUserFileFindById.mockResolvedValue(null);
+      mockUserFileFindByIdResult.mockResolvedValue(null);
 
       const result = await getDownloadUrl('user-123', 'non-existent');
 
@@ -318,7 +324,7 @@ describe('Storage Service - File Operations', () => {
     });
 
     it('should generate signed URL if no stored URL', async () => {
-      mockUserFileFindById.mockResolvedValue(createMockFileDoc({ url: undefined }));
+      mockUserFileFindByIdResult.mockResolvedValue(createMockFileDoc({ url: undefined }));
 
       const result = await getDownloadUrl('user-123', 'file-123');
 
@@ -329,7 +335,7 @@ describe('Storage Service - File Operations', () => {
 
   describe('deleteFile', () => {
     it('should delete file successfully', async () => {
-      mockUserFileFindById.mockResolvedValue(createMockFileDoc());
+      mockUserFileFindByIdResult.mockResolvedValue(createMockFileDoc());
       mockUserFileFindByIdAndDelete.mockResolvedValue({});
       mockStorageQuotaFindOneAndUpdate.mockResolvedValue({});
       mockStorageQuotaUpdateOne.mockResolvedValue({});
@@ -341,7 +347,7 @@ describe('Storage Service - File Operations', () => {
     });
 
     it('should return error for non-existent file', async () => {
-      mockUserFileFindById.mockResolvedValue(null);
+      mockUserFileFindByIdResult.mockResolvedValue(null);
 
       const result = await deleteFile('user-123', 'non-existent');
 
@@ -350,7 +356,7 @@ describe('Storage Service - File Operations', () => {
     });
 
     it('should deny deletion of files owned by others', async () => {
-      mockUserFileFindById.mockResolvedValue(createMockFileDoc({ userId: 'other-user' }));
+      mockUserFileFindByIdResult.mockResolvedValue(createMockFileDoc({ userId: 'other-user' }));
 
       const result = await deleteFile('user-123', 'file-123');
 
@@ -361,7 +367,7 @@ describe('Storage Service - File Operations', () => {
     it('should handle Cloudinary deletion failure gracefully', async () => {
       const cloudinary = await import('cloudinary');
       vi.mocked(cloudinary.v2.uploader.destroy).mockRejectedValueOnce(new Error('Cloudinary error'));
-      mockUserFileFindById.mockResolvedValue(createMockFileDoc());
+      mockUserFileFindByIdResult.mockResolvedValue(createMockFileDoc());
       mockUserFileFindByIdAndDelete.mockResolvedValue({});
       mockStorageQuotaFindOneAndUpdate.mockResolvedValue({});
       mockStorageQuotaUpdateOne.mockResolvedValue({});
@@ -381,7 +387,7 @@ describe('Storage Service - Plan Restrictions', () => {
 
   describe('Quota enforcement', () => {
     it('should calculate remaining quota correctly', async () => {
-      mockStorageQuotaFindOne.mockResolvedValue({ used: 500 * 1024 * 1024 });
+      mockStorageQuotaFindOneResult.mockResolvedValue({ used: 500 * 1024 * 1024 });
 
       const quota = await getStorageQuota('user-123', 'pro');
 
@@ -392,7 +398,7 @@ describe('Storage Service - Plan Restrictions', () => {
 
     it('should show 100% when quota is exceeded', async () => {
       // Used more than limit
-      mockStorageQuotaFindOne.mockResolvedValue({ used: 2 * 1024 * 1024 * 1024 });
+      mockStorageQuotaFindOneResult.mockResolvedValue({ used: 2 * 1024 * 1024 * 1024 });
 
       const quota = await getStorageQuota('user-123', 'pro');
 

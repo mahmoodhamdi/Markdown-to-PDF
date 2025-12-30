@@ -80,9 +80,7 @@ test.describe('Dashboard', () => {
       await page.goto('/en/auth/login');
 
       // Check for OAuth buttons (GitHub, Google) - they may be styled differently
-      const oauthButtons = page.locator('button').filter({
-        has: page.locator('[class*="lucide-github"], [class*="github"], svg'),
-      });
+      // Locator is available for future assertions
 
       // Screenshot the login page to verify what's there
       await page.screenshot({ path: 'screenshots/login-oauth.png' });
@@ -126,9 +124,6 @@ test.describe('Dashboard', () => {
   test.describe('Navigation Links', () => {
     test('should have dashboard link in header when applicable', async ({ page }) => {
       await page.goto('/en');
-
-      // Look for dashboard link
-      const dashboardLink = page.locator('a[href*="/dashboard"]');
 
       // Screenshot regardless of auth state
       await page.screenshot({ path: 'screenshots/home-dashboard-link.png' });

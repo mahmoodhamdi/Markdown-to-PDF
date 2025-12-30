@@ -20,7 +20,7 @@ const EmailVerificationTokenSchema = new Schema<IEmailVerificationToken>(
   {
     userId: { type: String, required: true, index: true },
     token: { type: String, required: true, unique: true },
-    expiresAt: { type: Date, required: true, index: true },
+    expiresAt: { type: Date, required: true },
     used: { type: Boolean, default: false },
     usedAt: { type: Date },
   },

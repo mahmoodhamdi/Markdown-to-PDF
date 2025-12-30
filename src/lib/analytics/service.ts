@@ -124,7 +124,8 @@ export async function getDailyUsage(userId: string, date: string): Promise<Daily
   try {
     await connectDB();
 
-    const usage = await DailyUsage.findOne({ userId, date });
+    // Use lean() for faster read-only query
+    const usage = await DailyUsage.findOne({ userId, date }).lean();
 
     if (!usage) {
       return {
@@ -289,10 +290,11 @@ export async function getUsageHistory(
   try {
     await connectDB();
 
+    // Use lean() for faster read-only query
     const usageData = await DailyUsage.find({
       userId,
       date: { $gte: startDate, $lte: endDate },
-    }).sort({ date: 1 });
+    }).sort({ date: 1 }).lean();
 
     // Create a map of existing data
     const usageMap = new Map<string, DailyUsageData>();

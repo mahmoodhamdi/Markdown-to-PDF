@@ -3,7 +3,7 @@
 import { useTranslations } from 'next-intl';
 import { useEffect, useState, useRef, useCallback } from 'react';
 import { Minimize2 } from 'lucide-react';
-import { MarkdownEditor } from '@/components/editor/MarkdownEditor';
+import { LazyMarkdownEditor } from '@/components/editor/LazyMarkdownEditor';
 import { EditorToolbar } from '@/components/editor/EditorToolbar';
 import { EditorStats } from '@/components/editor/EditorStats';
 import { RecoveryPrompt } from '@/components/editor/RecoveryPrompt';
@@ -90,7 +90,7 @@ export default function HomePage() {
             <div className="h-full flex flex-col">
               <EditorToolbar />
               <div className="flex-1 overflow-hidden">
-                <MarkdownEditor />
+                <LazyMarkdownEditor />
               </div>
               <EditorStats />
             </div>
@@ -150,7 +150,7 @@ export default function HomePage() {
           )}
         >
           <div className="flex-1 overflow-hidden">
-            <MarkdownEditor />
+            <LazyMarkdownEditor />
           </div>
           <EditorStats />
         </div>

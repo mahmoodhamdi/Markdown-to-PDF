@@ -14,10 +14,22 @@ const mockUsageEventCreate = vi.fn();
 const mockUsageEventCountDocuments = vi.fn();
 const mockUsageEventDeleteMany = vi.fn();
 
-const mockDailyUsageFindOne = vi.fn();
-const mockDailyUsageFind = vi.fn();
+const mockDailyUsageFindOneResult = vi.fn();
+const mockDailyUsageFindResult = vi.fn();
 const mockDailyUsageFindOneAndUpdate = vi.fn();
 const mockDailyUsageAggregate = vi.fn();
+
+// Helper to create chainable mock with .lean()
+const createLeanableQuery = (resultFn: ReturnType<typeof vi.fn>) => ({
+  lean: () => resultFn(),
+});
+
+// Helper to create chainable mock with .sort().lean()
+const createSortableLeanableQuery = (resultFn: ReturnType<typeof vi.fn>) => ({
+  sort: () => ({
+    lean: () => resultFn(),
+  }),
+});
 
 vi.mock('@/lib/db/models/Usage', () => ({
   UsageEvent: {
@@ -26,8 +38,8 @@ vi.mock('@/lib/db/models/Usage', () => ({
     deleteMany: (...args: unknown[]) => mockUsageEventDeleteMany(...args),
   },
   DailyUsage: {
-    findOne: (...args: unknown[]) => mockDailyUsageFindOne(...args),
-    find: (...args: unknown[]) => mockDailyUsageFind(...args),
+    findOne: () => createLeanableQuery(mockDailyUsageFindOneResult),
+    find: () => createSortableLeanableQuery(mockDailyUsageFindResult),
     findOneAndUpdate: (...args: unknown[]) => mockDailyUsageFindOneAndUpdate(...args),
     aggregate: (...args: unknown[]) => mockDailyUsageAggregate(...args),
   },
@@ -179,7 +191,7 @@ describe('Analytics Service - Daily Usage', () => {
 
   describe('getDailyUsage', () => {
     it('should return usage data for specific date', async () => {
-      mockDailyUsageFindOne.mockResolvedValue({
+      mockDailyUsageFindOneResult.mockResolvedValue({
         conversions: 10,
         apiCalls: 50,
         fileUploads: 5,
@@ -198,7 +210,7 @@ describe('Analytics Service - Daily Usage', () => {
     });
 
     it('should return zero values for new user', async () => {
-      mockDailyUsageFindOne.mockResolvedValue(null);
+      mockDailyUsageFindOneResult.mockResolvedValue(null);
 
       const usage = await getDailyUsage('new-user', '2024-01-15');
 
@@ -212,7 +224,7 @@ describe('Analytics Service - Daily Usage', () => {
     });
 
     it('should handle database errors gracefully', async () => {
-      mockDailyUsageFindOne.mockRejectedValue(new Error('Database error'));
+      mockDailyUsageFindOneResult.mockRejectedValue(new Error('Database error'));
 
       const usage = await getDailyUsage('user-123', '2024-01-15');
 
@@ -221,7 +233,7 @@ describe('Analytics Service - Daily Usage', () => {
     });
 
     it('should handle partial data', async () => {
-      mockDailyUsageFindOne.mockResolvedValue({
+      mockDailyUsageFindOneResult.mockResolvedValue({
         conversions: 5,
         // Other fields missing
       });
@@ -288,7 +300,7 @@ describe('Analytics Service - Usage Summary', () => {
 
   describe('getUsageSummary', () => {
     it('should return complete usage summary', async () => {
-      mockDailyUsageFindOne.mockResolvedValue({
+      mockDailyUsageFindOneResult.mockResolvedValue({
         conversions: 3,
         apiCalls: 5,
         fileUploads: 1,
@@ -319,7 +331,7 @@ describe('Analytics Service - Usage Summary', () => {
     });
 
     it('should calculate remaining usage correctly for free plan', async () => {
-      mockDailyUsageFindOne.mockResolvedValue({
+      mockDailyUsageFindOneResult.mockResolvedValue({
         conversions: 3,
         apiCalls: 5,
       });
@@ -332,7 +344,7 @@ describe('Analytics Service - Usage Summary', () => {
     });
 
     it('should return Infinity remaining for enterprise plan', async () => {
-      mockDailyUsageFindOne.mockResolvedValue({
+      mockDailyUsageFindOneResult.mockResolvedValue({
         conversions: 1000,
         apiCalls: 5000,
       });
@@ -345,7 +357,7 @@ describe('Analytics Service - Usage Summary', () => {
     });
 
     it('should not go negative on remaining', async () => {
-      mockDailyUsageFindOne.mockResolvedValue({
+      mockDailyUsageFindOneResult.mockResolvedValue({
         conversions: 10, // Over limit for free plan (5)
         apiCalls: 20, // Over limit for free plan (10)
       });
@@ -366,12 +378,10 @@ describe('Analytics Service - Usage History', () => {
 
   describe('getUsageHistory', () => {
     it('should return usage history for specified days', async () => {
-      mockDailyUsageFind.mockReturnValue({
-        sort: vi.fn().mockResolvedValue([
-          { date: '2024-01-14', conversions: 5, apiCalls: 10 },
-          { date: '2024-01-15', conversions: 3, apiCalls: 8 },
-        ]),
-      });
+      mockDailyUsageFindResult.mockResolvedValue([
+        { date: '2024-01-14', conversions: 5, apiCalls: 10 },
+        { date: '2024-01-15', conversions: 3, apiCalls: 8 },
+      ]);
 
       const history = await getUsageHistory('user-123', 7);
 
@@ -382,9 +392,7 @@ describe('Analytics Service - Usage History', () => {
     });
 
     it('should fill in missing days with zeros', async () => {
-      mockDailyUsageFind.mockReturnValue({
-        sort: vi.fn().mockResolvedValue([]),
-      });
+      mockDailyUsageFindResult.mockResolvedValue([]);
 
       const history = await getUsageHistory('user-123', 7);
 
@@ -398,9 +406,7 @@ describe('Analytics Service - Usage History', () => {
     });
 
     it('should handle database errors', async () => {
-      mockDailyUsageFind.mockReturnValue({
-        sort: vi.fn().mockRejectedValue(new Error('Database error')),
-      });
+      mockDailyUsageFindResult.mockRejectedValue(new Error('Database error'));
 
       const history = await getUsageHistory('user-123', 7);
 
@@ -408,9 +414,7 @@ describe('Analytics Service - Usage History', () => {
     });
 
     it('should use default of 30 days', async () => {
-      mockDailyUsageFind.mockReturnValue({
-        sort: vi.fn().mockResolvedValue([]),
-      });
+      mockDailyUsageFindResult.mockResolvedValue([]);
 
       const history = await getUsageHistory('user-123');
 
@@ -428,7 +432,7 @@ describe('Analytics Service - Daily Limits', () => {
 
   describe('checkDailyLimits', () => {
     it('should return within limits when usage is low', async () => {
-      mockDailyUsageFindOne.mockResolvedValue({
+      mockDailyUsageFindOneResult.mockResolvedValue({
         conversions: 2,
         apiCalls: 5,
       });
@@ -441,7 +445,7 @@ describe('Analytics Service - Daily Limits', () => {
     });
 
     it('should return not within limits when at capacity', async () => {
-      mockDailyUsageFindOne.mockResolvedValue({
+      mockDailyUsageFindOneResult.mockResolvedValue({
         conversions: 5,
         apiCalls: 10,
       });
@@ -454,7 +458,7 @@ describe('Analytics Service - Daily Limits', () => {
     });
 
     it('should return not within limits when over capacity', async () => {
-      mockDailyUsageFindOne.mockResolvedValue({
+      mockDailyUsageFindOneResult.mockResolvedValue({
         conversions: 100,
         apiCalls: 500,
       });
@@ -467,7 +471,7 @@ describe('Analytics Service - Daily Limits', () => {
     });
 
     it('should always be within limits for enterprise', async () => {
-      mockDailyUsageFindOne.mockResolvedValue({
+      mockDailyUsageFindOneResult.mockResolvedValue({
         conversions: 10000,
         apiCalls: 50000,
       });
@@ -481,7 +485,7 @@ describe('Analytics Service - Daily Limits', () => {
 
     it('should check both conversions and API calls', async () => {
       // Conversions at limit, API calls ok
-      mockDailyUsageFindOne.mockResolvedValue({
+      mockDailyUsageFindOneResult.mockResolvedValue({
         conversions: 5,
         apiCalls: 5,
       });
@@ -562,7 +566,7 @@ describe('Analytics Service - Cleanup', () => {
 describe('Analytics Service - Plan Limits Integration', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    mockDailyUsageFindOne.mockResolvedValue({ conversions: 0, apiCalls: 0 });
+    mockDailyUsageFindOneResult.mockResolvedValue({ conversions: 0, apiCalls: 0 });
     mockDailyUsageAggregate.mockResolvedValue([]);
   });
 

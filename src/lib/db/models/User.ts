@@ -55,6 +55,8 @@ const UserSchema = new Schema<IUser>(
 // Indexes (email index already created by unique: true in schema)
 UserSchema.index({ plan: 1 });
 UserSchema.index({ createdAt: -1 });
+UserSchema.index({ plan: 1, createdAt: -1 }); // For admin queries by plan
+UserSchema.index({ stripeCustomerId: 1 }, { sparse: true }); // For webhook lookups
 
 // Prevent model recompilation in development
 export const User: Model<IUser> =

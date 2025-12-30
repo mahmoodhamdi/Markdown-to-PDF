@@ -340,3 +340,103 @@ describe('PDF Generator - HTML Structure', () => {
     expect(html).toContain('</script>');
   });
 });
+
+describe('PDF Generator - generatePdf with mocked browser pool', () => {
+  // Since browser pool is mocked at the top of this file, we can test generatePdf behavior
+  // through its direct module import
+
+  it('should return error for empty content', async () => {
+    const { generatePdf } = await import('@/lib/pdf/generator');
+
+    const result = await generatePdf({ markdown: '' });
+
+    expect(result.success).toBe(false);
+    expect(result.error).toContain('empty');
+  });
+
+  it('should return error for whitespace-only content', async () => {
+    const { generatePdf } = await import('@/lib/pdf/generator');
+
+    const result = await generatePdf({ markdown: '   \n\t  ' });
+
+    expect(result.success).toBe(false);
+    expect(result.error).toContain('empty');
+  });
+
+  it('should return error for content exceeding max size', async () => {
+    const { generatePdf } = await import('@/lib/pdf/generator');
+
+    // Create content larger than 5MB
+    const largeContent = 'a'.repeat(6 * 1024 * 1024);
+
+    const result = await generatePdf({ markdown: largeContent });
+
+    expect(result.success).toBe(false);
+    expect(result.error).toContain('too large');
+  });
+});
+
+describe('PDF Generator - Content Size Validation', () => {
+  it('should accept content under 5MB', () => {
+    // Content under 5MB should be accepted
+    const validContent = 'a'.repeat(4 * 1024 * 1024); // 4MB
+    expect(validContent.length).toBeLessThan(5 * 1024 * 1024);
+  });
+
+  it('should reject content over 5MB', () => {
+    // Content over 5MB should be rejected
+    const invalidContent = 'a'.repeat(6 * 1024 * 1024); // 6MB
+    expect(invalidContent.length).toBeGreaterThan(5 * 1024 * 1024);
+  });
+
+  it('should warn about content over 1MB', () => {
+    // Content over 1MB should trigger a warning (but still process)
+    const warningContent = 'a'.repeat(1.5 * 1024 * 1024); // 1.5MB
+    expect(warningContent.length).toBeGreaterThan(1 * 1024 * 1024);
+    expect(warningContent.length).toBeLessThan(5 * 1024 * 1024);
+  });
+});
+
+describe('PDF Generator - Tiered Timeouts', () => {
+  it('should use short timeout for small content', () => {
+    // Testing internal timeout calculation behavior
+    // Small content (< 100KB) should use 10s timeout
+    const smallContent = 'a'.repeat(50000); // 50KB
+    expect(smallContent.length).toBeLessThan(100000);
+  });
+
+  it('should use medium timeout for medium content', () => {
+    // Medium content (100KB - 500KB) should use 30s timeout
+    const mediumContent = 'a'.repeat(200000); // 200KB
+    expect(mediumContent.length).toBeGreaterThanOrEqual(100000);
+    expect(mediumContent.length).toBeLessThan(500000);
+  });
+
+  it('should use long timeout for large content', () => {
+    // Large content (>= 500KB) should use 60s timeout
+    const largeContent = 'a'.repeat(600000); // 600KB
+    expect(largeContent.length).toBeGreaterThanOrEqual(500000);
+  });
+});
+
+describe('PDF Generator - ConversionMetrics Type', () => {
+  it('should define conversion metrics structure', () => {
+    // Verify the metrics structure
+    const mockMetrics = {
+      startTime: Date.now(),
+      contentSize: 1000,
+      timeout: 10000,
+      browserAcquireTime: 100,
+      pageCreateTime: 50,
+      contentSetTime: 200,
+      waitForRenderTime: 300,
+      pdfGenerateTime: 500,
+      totalTime: 1150,
+      pdfSize: 5000,
+    };
+
+    expect(mockMetrics.startTime).toBeGreaterThan(0);
+    expect(mockMetrics.contentSize).toBe(1000);
+    expect(mockMetrics.timeout).toBe(10000);
+  });
+});

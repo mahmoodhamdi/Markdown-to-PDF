@@ -11,6 +11,13 @@ import { emailService } from '@/lib/email/service';
 import { connectDB } from '@/lib/db/mongodb';
 import { User } from '@/lib/db/models/User';
 import { PlanType } from '@/lib/plans/config';
+import {
+  checkAndMarkProcessing,
+  markProcessed,
+  markFailed,
+  webhookLog,
+  generateEventId,
+} from '@/lib/webhooks';
 
 /**
  * Handle POST request (callback from PayTabs)
@@ -27,8 +34,14 @@ export async function POST(request: NextRequest) {
 
     // Parse the callback data
     const callback: PayTabsCallbackData = await request.json();
+    const eventType = callback.payment_result?.response_status === 'A' ? 'payment.success' : 'payment.failed';
+    const eventId = generateEventId('paytabs', callback.tran_ref || 'unknown', eventType);
 
-    console.log('PayTabs callback received:', {
+    // Log incoming webhook
+    webhookLog('info', 'Webhook received', {
+      gateway: 'paytabs',
+      eventId,
+      eventType,
       tranRef: callback.tran_ref,
       responseStatus: callback.payment_result?.response_status,
       cartId: callback.cart_id,
@@ -38,7 +51,11 @@ export async function POST(request: NextRequest) {
     if (callback.signature) {
       const isValid = paytabsClient.verifyCallbackSignature(callback);
       if (!isValid) {
-        console.error('Invalid PayTabs callback signature');
+        webhookLog('error', 'Invalid callback signature', {
+          gateway: 'paytabs',
+          eventId,
+          eventType,
+        });
         return NextResponse.json(
           { error: 'Invalid signature' },
           { status: 400 }
@@ -46,19 +63,38 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // Use the gateway's handleWebhook method which includes subscription management
-    const result = await paytabsGateway.handleWebhook(callback, callback.signature || '');
+    // Check idempotency - skip if already processed
+    const idempotencyResult = await checkAndMarkProcessing(
+      'paytabs',
+      eventId,
+      eventType,
+      {
+        tranRef: callback.tran_ref,
+        cartId: callback.cart_id,
+        responseStatus: callback.payment_result?.response_status,
+      }
+    );
 
-    console.log('PayTabs webhook processed:', {
-      event: result.event,
-      status: result.status,
-      userEmail: result.userEmail,
-      paymentId: result.paymentId,
-    });
+    if (!idempotencyResult.isNew) {
+      return NextResponse.json({ received: true, status: 'duplicate' });
+    }
 
-    // Send email notifications based on webhook result
-    if (emailService.isConfigured() && result.userEmail) {
-      try {
+    try {
+      // Use the gateway's handleWebhook method which includes subscription management
+      const result = await paytabsGateway.handleWebhook(callback, callback.signature || '');
+
+      webhookLog('info', 'Webhook processed', {
+        gateway: 'paytabs',
+        eventId,
+        eventType,
+        event: result.event,
+        status: result.status,
+        userEmail: result.userEmail,
+        paymentId: result.paymentId,
+      });
+
+      // Send email notifications based on webhook result
+      if (emailService.isConfigured() && result.userEmail) {
         await connectDB();
         const user = await User.findById(result.userEmail);
 
@@ -80,7 +116,12 @@ export async function POST(request: NextRequest) {
               gateway: 'paytabs',
             }
           ).catch((err) => {
-            console.error('Failed to send subscription confirmation email:', err);
+            webhookLog('error', 'Failed to send subscription confirmation email', {
+              gateway: 'paytabs',
+              eventId,
+              eventType,
+              error: err instanceof Error ? err.message : 'Unknown error',
+            });
           });
         } else if (result.status === 'canceled') {
           const plan = (user?.plan as PlanType) || 'pro';
@@ -88,31 +129,45 @@ export async function POST(request: NextRequest) {
             { email: result.userEmail, name: user?.name || '' },
             { plan, immediate: true }
           ).catch((err) => {
-            console.error('Failed to send subscription canceled email:', err);
+            webhookLog('error', 'Failed to send subscription canceled email', {
+              gateway: 'paytabs',
+              eventId,
+              eventType,
+              error: err instanceof Error ? err.message : 'Unknown error',
+            });
           });
         }
-      } catch (err) {
-        console.error('Error sending webhook email:', err);
       }
-    }
 
-    // Return appropriate response
-    if (result.status === 'succeeded') {
+      await markProcessed('paytabs', eventId, { event: result.event, status: result.status });
+
+      // Return appropriate response
+      if (result.status === 'succeeded') {
+        return NextResponse.json({
+          received: true,
+          status: 'success',
+          transactionRef: result.paymentId,
+        });
+      }
+
+      // Handle failed payment
       return NextResponse.json({
         received: true,
-        status: 'success',
-        transactionRef: result.paymentId,
+        status: 'failed',
+        message: result.error,
       });
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      await markFailed('paytabs', eventId, errorMessage);
+      throw error;
     }
-
-    // Handle failed payment
-    return NextResponse.json({
-      received: true,
-      status: 'failed',
-      message: result.error,
-    });
   } catch (error) {
-    console.error('PayTabs webhook error:', error);
+    webhookLog('error', 'Webhook handler failed', {
+      gateway: 'paytabs',
+      eventId: 'unknown',
+      eventType: 'unknown',
+      error: error instanceof Error ? error.message : 'Unknown error',
+    });
     return NextResponse.json(
       { error: 'Webhook handler failed' },
       { status: 500 }
@@ -129,9 +184,16 @@ export async function GET(request: NextRequest) {
   // Get response status from query params
   const respStatus = searchParams.get('respStatus');
   const tranRef = searchParams.get('tranRef');
-  const _cartId = searchParams.get('cartId');
 
   const isSuccess = respStatus === 'A'; // 'A' = Authorized/Approved
+
+  webhookLog('info', 'Redirect callback received', {
+    gateway: 'paytabs',
+    eventId: tranRef || 'unknown',
+    eventType: 'redirect',
+    respStatus,
+    isSuccess,
+  });
 
   // Redirect based on payment status
   if (isSuccess) {

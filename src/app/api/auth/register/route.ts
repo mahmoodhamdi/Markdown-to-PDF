@@ -11,11 +11,12 @@ import { z } from 'zod';
 import { checkRateLimit, getRateLimitHeaders } from '@/lib/rate-limit';
 import { emailService } from '@/lib/email/service';
 import { createEmailVerificationToken } from '@/lib/db/models/EmailVerificationToken';
+import { passwordSchema, BCRYPT_ROUNDS } from '@/lib/auth/password-validation';
 
 const registerSchema = z.object({
   name: z.string().min(1, 'Name is required'),
   email: z.string().email('Invalid email'),
-  password: z.string().min(6, 'Password must be at least 6 characters'),
+  password: passwordSchema,
 });
 
 export async function POST(request: NextRequest) {
@@ -37,7 +38,7 @@ export async function POST(request: NextRequest) {
     const validation = registerSchema.safeParse(body);
 
     if (!validation.success) {
-      const firstError = validation.error.errors[0];
+      const firstError = validation.error.errors[0] ?? { message: 'Validation failed' };
       return NextResponse.json(
         { error: firstError.message, code: 'validation_error' },
         { status: 400 }
@@ -58,7 +59,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Hash password
-    const hashedPassword = await bcrypt.hash(password, 12);
+    const hashedPassword = await bcrypt.hash(password, BCRYPT_ROUNDS);
 
     // Create user with emailVerified undefined (not verified yet)
     await User.create({

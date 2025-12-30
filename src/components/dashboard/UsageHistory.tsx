@@ -2,6 +2,7 @@
 
 import { useTranslations } from 'next-intl';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/lib/utils';
 
 interface DailyUsage {
@@ -13,13 +14,50 @@ interface DailyUsage {
 interface UsageHistoryProps {
   data: DailyUsage[];
   maxConversions?: number;
+  loading?: boolean;
 }
 
-export function UsageHistory({ data, maxConversions }: UsageHistoryProps) {
+export function UsageHistory({ data, maxConversions, loading = false }: UsageHistoryProps) {
   const t = useTranslations('dashboard.usage');
 
   // Calculate max for scaling
   const maxValue = maxConversions || Math.max(...data.map((d) => d.conversions), 1);
+
+  // Loading state
+  if (loading) {
+    return (
+      <Card>
+        <CardHeader>
+          <Skeleton className="h-6 w-32" />
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-3">
+            {[1, 2, 3, 4, 5, 6, 7].map((i) => (
+              <div key={i} className="space-y-1">
+                <div className="flex items-center justify-between">
+                  <Skeleton className="h-4 w-24" />
+                  <Skeleton className="h-4 w-20" />
+                </div>
+                <Skeleton className="h-3 w-full rounded-full" />
+              </div>
+            ))}
+          </div>
+          <div className="mt-6 pt-4 border-t">
+            <div className="grid grid-cols-2 gap-4 text-center">
+              <div>
+                <Skeleton className="h-8 w-16 mx-auto" />
+                <Skeleton className="h-4 w-24 mx-auto mt-1" />
+              </div>
+              <div>
+                <Skeleton className="h-8 w-16 mx-auto" />
+                <Skeleton className="h-4 w-24 mx-auto mt-1" />
+              </div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
 
   // Get day name from date
   const getDayName = (dateStr: string) => {

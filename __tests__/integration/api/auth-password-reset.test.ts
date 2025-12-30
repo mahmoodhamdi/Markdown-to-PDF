@@ -2,7 +2,7 @@
  * Password Reset API Integration Tests
  */
 
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { NextRequest } from 'next/server';
 
 // Mock dependencies
@@ -238,7 +238,7 @@ describe('POST /api/auth/reset-password', () => {
     });
 
     const response = await POST(request);
-    const data = await response.json();
+    await response.json(); // Parse response body
 
     expect(response.status).toBe(400);
   });

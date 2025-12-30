@@ -12,10 +12,26 @@ vi.mock('next-intl', () => ({
       invoicePending: 'Pending',
       invoiceFailed: 'Failed',
       invoiceRefunded: 'Refunded',
+      invoiceVoid: 'Void',
       viewReceipt: 'View Receipt',
       downloadInvoice: 'Download Invoice',
+      downloadPdf: 'Download PDF',
+      viewInvoice: 'View Invoice',
+      includesTax: 'Includes {amount} tax',
+      subtotal: 'Subtotal',
+      tax: 'Tax',
+      discount: 'Discount',
     };
-    return (key: string) => translations[key] || key;
+    return (key: string, params?: Record<string, string>) => {
+      const translation = translations[key] || key;
+      if (params) {
+        return Object.entries(params).reduce(
+          (acc, [k, v]) => acc.replace(`{${k}}`, v),
+          translation
+        );
+      }
+      return translation;
+    };
   },
 }));
 
@@ -167,5 +183,59 @@ describe('BillingHistory', () => {
     render(<BillingHistory invoices={eurInvoices} />);
     // Should contain euro symbol
     expect(screen.getByText(/€4\.50/)).toBeInTheDocument();
+  });
+
+  it('should render void status badge', () => {
+    const voidInvoices: Invoice[] = [
+      {
+        id: 'inv_void',
+        date: '2024-01-15T10:00:00Z',
+        amount: 5,
+        currency: 'USD',
+        status: 'void',
+        description: 'Pro Plan - Monthly',
+      },
+    ];
+    render(<BillingHistory invoices={voidInvoices} />);
+    expect(screen.getByText('Void')).toBeInTheDocument();
+  });
+
+  it('should render PDF download link when pdfUrl is provided', () => {
+    const invoicesWithPdf: Invoice[] = [
+      {
+        id: 'inv_pdf',
+        date: '2024-01-15T10:00:00Z',
+        amount: 5,
+        currency: 'USD',
+        status: 'paid',
+        description: 'Pro Plan - Monthly',
+        pdfUrl: 'https://example.com/invoice.pdf',
+      },
+    ];
+    render(<BillingHistory invoices={invoicesWithPdf} />);
+    const downloadLink = document.querySelector('a[download]');
+    expect(downloadLink).toBeInTheDocument();
+    expect(downloadLink).toHaveAttribute('href', 'https://example.com/invoice.pdf');
+  });
+
+  it('should render discount code badge when present', () => {
+    const invoicesWithDiscount: Invoice[] = [
+      {
+        id: 'inv_discount',
+        date: '2024-01-15T10:00:00Z',
+        amount: 5,
+        currency: 'USD',
+        status: 'paid',
+        description: 'Pro Plan - Monthly',
+        discountCode: 'SAVE20',
+      },
+    ];
+    render(<BillingHistory invoices={invoicesWithDiscount} />);
+    expect(screen.getByText('SAVE20')).toBeInTheDocument();
+  });
+
+  it('should display invoice count badge', () => {
+    render(<BillingHistory invoices={mockInvoices} />);
+    expect(screen.getByText('4')).toBeInTheDocument();
   });
 });

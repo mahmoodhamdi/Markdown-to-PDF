@@ -13,6 +13,8 @@ const mockPage = {
   evaluate: vi.fn().mockResolvedValue(undefined),
   setViewport: vi.fn().mockResolvedValue(undefined),
   waitForSelector: vi.fn().mockResolvedValue(undefined),
+  setRequestInterception: vi.fn().mockResolvedValue(undefined),
+  on: vi.fn(),
 };
 
 const mockBrowser = {
@@ -117,7 +119,7 @@ describe('Browser Pool', () => {
 
     it('should decrement active page count', async () => {
       const page1 = await browserPool.getPage();
-      const page2 = await browserPool.getPage();
+      await browserPool.getPage(); // page2 - kept active to test release behavior
 
       await browserPool.releasePage(page1);
 
@@ -298,5 +300,93 @@ describe('Browser Pool - Resource Limits', () => {
     // Verify close was called for each page
     expect(mockPage.close).toHaveBeenCalled();
     expect(mockPage.close.mock.calls.length).toBeGreaterThanOrEqual(pageCount);
+  });
+});
+
+describe('Browser Pool - Resource Blocking', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mockBrowser.connected = true;
+    mockPage.setRequestInterception.mockResolvedValue(undefined);
+    mockPage.on.mockClear();
+    mockPage.setViewport.mockResolvedValue(undefined);
+    mockBrowser.newPage.mockResolvedValue(mockPage);
+  });
+
+  it('should set up request interception when blockExternalResources is true', async () => {
+    const page = await browserPool.getPage({ blockExternalResources: true });
+
+    expect(page.setRequestInterception).toHaveBeenCalledWith(true);
+    expect(page.on).toHaveBeenCalledWith('request', expect.any(Function));
+  });
+
+  it('should not set up request interception when blockExternalResources is false', async () => {
+    const page = await browserPool.getPage({ blockExternalResources: false });
+
+    expect(page.setRequestInterception).not.toHaveBeenCalled();
+  });
+
+  it('should not set up request interception by default', async () => {
+    const page = await browserPool.getPage();
+
+    expect(page.setRequestInterception).not.toHaveBeenCalled();
+  });
+});
+
+describe('Browser Pool - Concurrency Control', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mockBrowser.connected = true;
+    mockBrowser.newPage.mockResolvedValue(mockPage);
+  });
+
+  it('should track concurrency state', () => {
+    const state = browserPool.getConcurrencyState();
+
+    expect(state).toHaveProperty('active');
+    expect(state).toHaveProperty('queued');
+    expect(state).toHaveProperty('max');
+    expect(typeof state.active).toBe('number');
+    expect(typeof state.queued).toBe('number');
+    expect(typeof state.max).toBe('number');
+  });
+
+  it('should acquire and release concurrency slots', async () => {
+    const initialState = browserPool.getConcurrencyState();
+
+    await browserPool.acquireConcurrencySlot();
+    const afterAcquire = browserPool.getConcurrencyState();
+
+    expect(afterAcquire.active).toBe(initialState.active + 1);
+
+    browserPool.releaseConcurrencySlot();
+    const afterRelease = browserPool.getConcurrencyState();
+
+    expect(afterRelease.active).toBe(initialState.active);
+  });
+
+  it('should handle multiple concurrent slot acquisitions', async () => {
+    const slots = 3;
+    const releases: (() => void)[] = [];
+
+    for (let i = 0; i < slots; i++) {
+      await browserPool.acquireConcurrencySlot();
+      releases.push(() => browserPool.releaseConcurrencySlot());
+    }
+
+    const state = browserPool.getConcurrencyState();
+    expect(state.active).toBeGreaterThanOrEqual(slots);
+
+    // Release all slots
+    releases.forEach(release => release());
+  });
+
+  it('should not go below 0 when releasing slots', () => {
+    // Release more slots than acquired
+    browserPool.releaseConcurrencySlot();
+    browserPool.releaseConcurrencySlot();
+
+    const state = browserPool.getConcurrencyState();
+    expect(state.active).toBeGreaterThanOrEqual(0);
   });
 });

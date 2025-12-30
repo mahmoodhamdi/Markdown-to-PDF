@@ -1,11 +1,12 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, beforeEach, vi } from 'vitest';
 import {
   PLANS,
   getPlanLimits,
   getPlan,
   isThemeAvailable,
   formatFileSize,
-  PlanType,
+  getCachedPlanLimits,
+  clearPlanLimitsCache,
 } from '@/lib/plans/config';
 
 describe('Plan Configuration', () => {
@@ -262,6 +263,83 @@ describe('Plan Configuration', () => {
 
     it('should return "0 B" for zero', () => {
       expect(formatFileSize(0)).toBe('0 B');
+    });
+  });
+
+  describe('getCachedPlanLimits', () => {
+    beforeEach(() => {
+      clearPlanLimitsCache();
+    });
+
+    it('should return correct limits for free plan', () => {
+      const limits = getCachedPlanLimits('free');
+      expect(limits.conversionsPerDay).toBe(20);
+      expect(limits.maxFileSize).toBe(500 * 1024);
+    });
+
+    it('should return correct limits for pro plan', () => {
+      const limits = getCachedPlanLimits('pro');
+      expect(limits.conversionsPerDay).toBe(500);
+      expect(limits.customCssAllowed).toBe(true);
+    });
+
+    it('should return correct limits for team plan', () => {
+      const limits = getCachedPlanLimits('team');
+      expect(limits.conversionsPerDay).toBe(Infinity);
+      expect(limits.teamMembersAllowed).toBe(5);
+    });
+
+    it('should return correct limits for enterprise plan', () => {
+      const limits = getCachedPlanLimits('enterprise');
+      expect(limits.apiCallsPerDay).toBe(100000);
+      expect(limits.cloudStorageBytes).toBe(Infinity);
+    });
+
+    it('should return cached value on subsequent calls', () => {
+      const limits1 = getCachedPlanLimits('pro');
+      const limits2 = getCachedPlanLimits('pro');
+      expect(limits1).toBe(limits2);
+    });
+
+    it('should cache different plans separately', () => {
+      const freeLimits = getCachedPlanLimits('free');
+      const proLimits = getCachedPlanLimits('pro');
+      expect(freeLimits.conversionsPerDay).toBe(20);
+      expect(proLimits.conversionsPerDay).toBe(500);
+    });
+
+    it('should return fresh value after cache expires', () => {
+      vi.useFakeTimers();
+
+      const limits1 = getCachedPlanLimits('free');
+      expect(limits1.conversionsPerDay).toBe(20);
+
+      // Advance time past the 1-hour TTL
+      vi.advanceTimersByTime(61 * 60 * 1000);
+
+      const limits2 = getCachedPlanLimits('free');
+      expect(limits2.conversionsPerDay).toBe(20);
+
+      vi.useRealTimers();
+    });
+  });
+
+  describe('clearPlanLimitsCache', () => {
+    it('should clear the cache', () => {
+      // Populate cache
+      getCachedPlanLimits('free');
+      getCachedPlanLimits('pro');
+
+      // Clear cache
+      clearPlanLimitsCache();
+
+      // Should get fresh values (function works correctly after clear)
+      const limits = getCachedPlanLimits('free');
+      expect(limits.conversionsPerDay).toBe(20);
+    });
+
+    it('should not throw when cache is already empty', () => {
+      expect(() => clearPlanLimitsCache()).not.toThrow();
     });
   });
 });

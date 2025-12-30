@@ -4,6 +4,11 @@ import GoogleProvider from 'next-auth/providers/google';
 import CredentialsProvider from 'next-auth/providers/credentials';
 import { connectDB } from '@/lib/db/mongodb';
 import { User } from '@/lib/db/models/User';
+import {
+  checkLoginBlocked,
+  recordFailedLogin,
+  clearLoginAttempts,
+} from '@/lib/db/models/LoginAttempt';
 import bcrypt from 'bcryptjs';
 
 // Environment variable helpers - supports both naming conventions
@@ -133,19 +138,34 @@ export const authOptions: NextAuthOptions = {
         email: { label: 'Email', type: 'email' },
         password: { label: 'Password', type: 'password' },
       },
-      async authorize(credentials) {
+      async authorize(credentials, req) {
         if (!credentials?.email || !credentials?.password) {
           throw new Error('Email and password required');
         }
 
+        const email = credentials.email.toLowerCase();
+        // Get IP from request headers (works with most proxies)
+        const forwardedFor = req?.headers?.['x-forwarded-for'];
+        const ip = typeof forwardedFor === 'string'
+          ? forwardedFor.split(',')[0].trim()
+          : 'unknown';
+
         try {
           await connectDB();
 
+          // Check if login is blocked due to too many attempts
+          const blockStatus = await checkLoginBlocked(email, ip);
+          if (blockStatus.blocked) {
+            throw new Error(blockStatus.reason || 'Too many login attempts. Please try again later.');
+          }
+
           // Find user by email
-          const user = await User.findById(credentials.email);
+          const user = await User.findById(email);
 
           if (!user) {
-            throw new Error('No user found with this email');
+            // Record failed attempt but use generic error
+            await recordFailedLogin(email, ip);
+            throw new Error('Invalid credentials');
           }
 
           // Check password
@@ -159,8 +179,13 @@ export const authOptions: NextAuthOptions = {
           );
 
           if (!isValid) {
+            // Record failed attempt
+            await recordFailedLogin(email, ip);
             throw new Error('Invalid credentials');
           }
+
+          // Clear any failed login attempts on successful login
+          await clearLoginAttempts(email, ip);
 
           return {
             id: user._id,
@@ -169,7 +194,10 @@ export const authOptions: NextAuthOptions = {
             image: user.image,
           };
         } catch (error) {
-          console.error('Auth error:', error);
+          // Re-throw the error message for proper display
+          if (error instanceof Error) {
+            throw error;
+          }
           throw new Error('Invalid credentials');
         }
       },

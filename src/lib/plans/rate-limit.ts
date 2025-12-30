@@ -1,5 +1,6 @@
 /**
  * Plan-based rate limiting for authenticated users
+ * Supports both session-based and API key authentication
  */
 
 import { getServerSession } from 'next-auth';
@@ -13,6 +14,11 @@ import {
 } from './usage';
 import { getPlanLimits, PlanType } from './config';
 import { checkRateLimit, getRateLimitHeaders } from '@/lib/rate-limit';
+import {
+  authenticateApiKey,
+  checkApiKeyRateLimit,
+  type ApiKeyUser,
+} from '@/lib/auth/api-key-auth';
 
 // Anonymous user limits (stricter than free plan)
 const ANONYMOUS_LIMITS = {
@@ -27,6 +33,9 @@ export interface RateLimitContext {
   userEmail: string | null;
   userPlan: PlanType;
   ip: string;
+  // API key specific fields
+  authType: 'session' | 'api-key' | 'anonymous';
+  apiKeyUser?: ApiKeyUser;
 }
 
 export interface RateLimitResult {
@@ -39,16 +48,33 @@ export interface RateLimitResult {
 
 /**
  * Get request context including authentication status
+ * Supports both session-based and API key authentication
+ * API key auth takes precedence when present
  */
 export async function getRequestContext(
   request: NextRequest
 ): Promise<RateLimitContext> {
-  const session = await getServerSession(authOptions);
-
   const ip =
     request.headers.get('x-forwarded-for')?.split(',')[0] ||
     request.headers.get('x-real-ip') ||
     'anonymous';
+
+  // Try API key authentication first
+  const apiKeyResult = await authenticateApiKey(request);
+
+  if (apiKeyResult?.success && apiKeyResult.user) {
+    return {
+      isAuthenticated: true,
+      userEmail: apiKeyResult.user.email,
+      userPlan: apiKeyResult.user.plan,
+      ip,
+      authType: 'api-key',
+      apiKeyUser: apiKeyResult.user,
+    };
+  }
+
+  // Fall back to session authentication
+  const session = await getServerSession(authOptions);
 
   if (session?.user?.email) {
     return {
@@ -56,6 +82,7 @@ export async function getRequestContext(
       userEmail: session.user.email,
       userPlan: session.user.plan || 'free',
       ip,
+      authType: 'session',
     };
   }
 
@@ -64,6 +91,7 @@ export async function getRequestContext(
     userEmail: null,
     userPlan: 'free',
     ip,
+    authType: 'anonymous',
   };
 }
 
@@ -102,7 +130,40 @@ export async function checkConversionRateLimit(
     };
   }
 
-  // Authenticated user - use plan-based limits
+  // API key authentication - use API key rate limits and check permission
+  if (context.authType === 'api-key' && context.apiKeyUser) {
+    // Check permission
+    if (!context.apiKeyUser.permissions.includes('convert')) {
+      return {
+        success: false,
+        error: "API key lacks 'convert' permission",
+        statusCode: 403,
+        headers: {},
+        context,
+      };
+    }
+
+    // Use API key's specific rate limit
+    const rateLimitResult = await checkApiKeyRateLimit(context.apiKeyUser);
+
+    if (!rateLimitResult.success) {
+      return {
+        success: false,
+        error: rateLimitResult.error,
+        statusCode: 429,
+        headers: rateLimitResult.headers,
+        context,
+      };
+    }
+
+    return {
+      success: true,
+      headers: rateLimitResult.headers,
+      context,
+    };
+  }
+
+  // Session authenticated user - use plan-based limits
   const limitCheck = await checkConversionLimit(
     context.userEmail,
     context.userPlan
@@ -138,10 +199,11 @@ export async function checkConversionRateLimit(
 }
 
 /**
- * Check rate limit for API calls
+ * Check rate limit for API calls (preview, templates, themes)
  */
 export async function checkApiRateLimit(
-  context: RateLimitContext
+  context: RateLimitContext,
+  requiredPermission?: 'preview' | 'templates' | 'themes' | 'batch'
 ): Promise<RateLimitResult> {
   const headers: Record<string, string> = {};
 
@@ -172,7 +234,40 @@ export async function checkApiRateLimit(
     };
   }
 
-  // Authenticated user - use plan-based limits
+  // API key authentication - use API key rate limits and check permission
+  if (context.authType === 'api-key' && context.apiKeyUser) {
+    // Check permission if required
+    if (requiredPermission && !context.apiKeyUser.permissions.includes(requiredPermission)) {
+      return {
+        success: false,
+        error: `API key lacks '${requiredPermission}' permission`,
+        statusCode: 403,
+        headers: {},
+        context,
+      };
+    }
+
+    // Use API key's specific rate limit
+    const rateLimitResult = await checkApiKeyRateLimit(context.apiKeyUser);
+
+    if (!rateLimitResult.success) {
+      return {
+        success: false,
+        error: rateLimitResult.error,
+        statusCode: 429,
+        headers: rateLimitResult.headers,
+        context,
+      };
+    }
+
+    return {
+      success: true,
+      headers: rateLimitResult.headers,
+      context,
+    };
+  }
+
+  // Session authenticated user - use plan-based limits
   const limitCheck = await checkApiCallLimit(context.userEmail, context.userPlan);
 
   headers['X-RateLimit-Limit'] = limitCheck.limit.toString();

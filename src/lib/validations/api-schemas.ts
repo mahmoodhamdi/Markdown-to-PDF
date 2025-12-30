@@ -2,7 +2,123 @@ import { z } from 'zod';
 
 /**
  * API request validation schemas using Zod
+ *
+ * Centralized validation schemas for:
+ * - API requests
+ * - Common data types (email, ObjectId, pagination)
+ * - File operations
+ * - User data
  */
+
+// =============================================================================
+// Common Schemas
+// =============================================================================
+
+/**
+ * MongoDB ObjectId validation
+ * Validates 24-character hexadecimal string
+ */
+export const mongoIdSchema = z
+  .string()
+  .regex(/^[a-f\d]{24}$/i, 'Invalid ID format');
+
+/**
+ * Email schema with normalization
+ * Trims whitespace before validation
+ */
+export const emailSchema = z
+  .string()
+  .transform((e) => e.trim().toLowerCase())
+  .pipe(
+    z.string()
+      .email('Invalid email address')
+      .max(255, 'Email too long')
+  );
+
+/**
+ * User name schema
+ * Trims whitespace and rejects empty strings
+ */
+export const userNameSchema = z
+  .string()
+  .transform((s) => s.trim())
+  .pipe(
+    z.string()
+      .min(1, 'Name is required')
+      .max(100, 'Name too long')
+  );
+
+/**
+ * Pagination schema
+ */
+export const paginationSchema = z.object({
+  page: z.coerce.number().int().min(1).default(1),
+  limit: z.coerce.number().int().min(1).max(100).default(20),
+});
+
+export type PaginationParams = z.infer<typeof paginationSchema>;
+
+/**
+ * Safe filename schema
+ * Removes potentially dangerous characters
+ */
+export const filenameSchema = z
+  .string()
+  .min(1, 'Filename is required')
+  .max(255, 'Filename too long')
+  .transform((name) => {
+    // Remove path traversal and dangerous characters
+    return name
+      .replace(/\.\./g, '') // Remove path traversal
+      .replace(/[<>:"/\\|?*\x00-\x1f]/g, '_') // Remove dangerous chars
+      .replace(/^\.+/, '') // Remove leading dots
+      .trim();
+  })
+  .refine((name) => name.length > 0, 'Invalid filename');
+
+/**
+ * URL schema for safe URLs (http/https only)
+ */
+export const safeUrlSchema = z
+  .string()
+  .url('Invalid URL')
+  .refine((url) => {
+    try {
+      const parsed = new URL(url);
+      return ['http:', 'https:'].includes(parsed.protocol);
+    } catch {
+      return false;
+    }
+  }, 'URL must use http or https protocol');
+
+/**
+ * Safe string schema that removes angle brackets (basic XSS prevention)
+ */
+export const safeStringSchema = z
+  .string()
+  .transform((s) => s.replace(/[<>]/g, '').trim());
+
+/**
+ * Metadata schema for analytics - allow only safe primitive values
+ */
+export const safeMetadataSchema = z
+  .record(
+    z.union([
+      z.string().max(500),
+      z.number(),
+      z.boolean(),
+      z.null(),
+    ])
+  )
+  .optional()
+  .refine(
+    (obj) => !obj || Object.keys(obj).length <= 20,
+    'Too many metadata fields (max 20)'
+  );
+
+// =============================================================================
+// Theme Schemas
+// =============================================================================
 
 // Document themes enum
 const documentThemeSchema = z.enum([

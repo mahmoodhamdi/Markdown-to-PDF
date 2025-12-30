@@ -27,9 +27,7 @@ vi.mock('@/lib/db/models/User', () => ({
 // Mock RegionalSubscription model
 const mockSubFindByTransactionId = vi.fn();
 const mockSubFindActiveByUserId = vi.fn();
-const mockSubSave = vi.fn();
 const mockSubCancel = vi.fn();
-const mockSubRenew = vi.fn();
 
 vi.mock('@/lib/db/models/RegionalSubscription', () => ({
   RegionalSubscription: {

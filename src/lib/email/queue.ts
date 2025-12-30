@@ -76,7 +76,10 @@ class EmailQueue {
     };
 
     this.queue.push(job);
-    console.log(`Email queued: ${job.id} to ${job.to}`);
+    if (process.env.NODE_ENV === 'development') {
+      // eslint-disable-next-line no-console
+      console.log(`Email queued: ${job.id} to ${job.to}`);
+    }
 
     // Start processing if not already running
     this.startProcessing();
@@ -134,7 +137,10 @@ class EmailQueue {
       await this.sendEmail(job);
       // Remove successful job from queue
       this.queue = this.queue.filter((j) => j.id !== job.id);
-      console.log(`Email sent successfully: ${job.id} to ${job.to}`);
+      if (process.env.NODE_ENV === 'development') {
+        // eslint-disable-next-line no-console
+        console.log(`Email sent successfully: ${job.id} to ${job.to}`);
+      }
     } catch (error) {
       job.attempts++;
       job.lastError = error instanceof Error ? error.message : 'Unknown error';
@@ -162,7 +168,10 @@ class EmailQueue {
 
     if (!transporter) {
       // In development without email config, just log
-      console.log(`[DEV] Would send email to ${job.to}: ${job.subject}`);
+      if (process.env.NODE_ENV === 'development') {
+        // eslint-disable-next-line no-console
+        console.log(`[DEV] Would send email to ${job.to}: ${job.subject}`);
+      }
       return;
     }
 
@@ -235,7 +244,10 @@ export async function sendEmailDirect(options: {
   text: string;
 }): Promise<void> {
   if (!isEmailConfigured()) {
-    console.log(`[DEV] Would send email to ${options.to}: ${options.subject}`);
+    if (process.env.NODE_ENV === 'development') {
+      // eslint-disable-next-line no-console
+      console.log(`[DEV] Would send email to ${options.to}: ${options.subject}`);
+    }
     return;
   }
 

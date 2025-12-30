@@ -2,7 +2,7 @@
 
 import { useCallback, useState } from 'react';
 import { useTranslations } from 'next-intl';
-import { Upload, File } from 'lucide-react';
+import { Upload } from 'lucide-react';
 import { toast } from 'sonner';
 import { useEditorStore } from '@/stores/editor-store';
 import { cn } from '@/lib/utils';

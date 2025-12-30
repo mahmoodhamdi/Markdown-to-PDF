@@ -221,7 +221,7 @@ test.describe('Profile Arabic Locale', () => {
     await page.goto('/ar/dashboard/profile');
 
     // Check for Arabic content
-    const content = await page.content();
+    await page.content(); // Page content captured for debugging
     // Arabic text should be present
     await page.screenshot({ path: 'screenshots/profile-arabic-form.png', fullPage: true });
   });
@@ -231,9 +231,7 @@ test.describe('Profile Error States', () => {
   test('should show loading skeleton', async ({ page }) => {
     await page.goto('/en/dashboard/profile');
 
-    // Check for loading state
-    const skeleton = page.locator('[class*="skeleton"], [class*="animate-pulse"]').first();
-
+    // Check for loading state - skeleton elements may briefly appear
     // Screenshot during load
     await page.screenshot({ path: 'screenshots/profile-loading.png' });
   });

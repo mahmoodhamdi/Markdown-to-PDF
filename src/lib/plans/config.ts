@@ -132,10 +132,52 @@ export const PLANS: Record<PlanType, Plan> = {
 };
 
 /**
+ * Cache TTL for plan limits (1 hour in milliseconds)
+ * Used to prepare for future database-backed plan configurations
+ */
+const PLAN_LIMITS_CACHE_TTL_MS = 60 * 60 * 1000;
+
+/**
+ * In-memory cache for plan limits
+ * Provides caching layer for potential future database-backed configs
+ */
+const planLimitsCache = new Map<string, { limits: PlanLimits; expires: number }>();
+
+/**
  * Get plan limits by plan type
  */
 export function getPlanLimits(planType: PlanType): PlanLimits {
   return PLANS[planType].limits;
+}
+
+/**
+ * Get cached plan limits with TTL
+ * Uses in-memory cache to reduce lookups in hot paths
+ * Prepares for future database-backed plan configurations
+ */
+export function getCachedPlanLimits(planType: PlanType): PlanLimits {
+  const cached = planLimitsCache.get(planType);
+  const now = Date.now();
+
+  if (cached && cached.expires > now) {
+    return cached.limits;
+  }
+
+  const limits = getPlanLimits(planType);
+  planLimitsCache.set(planType, {
+    limits,
+    expires: now + PLAN_LIMITS_CACHE_TTL_MS,
+  });
+
+  return limits;
+}
+
+/**
+ * Clear the plan limits cache
+ * Useful for testing or when plan configurations are updated
+ */
+export function clearPlanLimitsCache(): void {
+  planLimitsCache.clear();
 }
 
 /**

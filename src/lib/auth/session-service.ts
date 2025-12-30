@@ -188,3 +188,14 @@ export async function cleanupExpiredSessions(): Promise<number> {
 
   return result.deletedCount;
 }
+
+/**
+ * Invalidate all sessions for a user
+ * Used when password is changed or reset for security
+ */
+export async function invalidateAllUserSessions(userId: string): Promise<number> {
+  await connectDB();
+
+  const result = await Session.deleteMany({ userId });
+  return result.deletedCount;
+}

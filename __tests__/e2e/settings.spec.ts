@@ -70,12 +70,8 @@ test.describe('Settings Page', () => {
       }
 
       if (buttonVisible) {
-        const initialClass = await page.locator('html').getAttribute('class');
-
         await buttonToClick.click();
         await page.waitForTimeout(500);
-
-        const newClass = await page.locator('html').getAttribute('class');
 
         // Class should change (dark to light or vice versa)
         await page.screenshot({ path: 'screenshots/settings-theme-toggled.png' });

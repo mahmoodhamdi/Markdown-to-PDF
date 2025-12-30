@@ -5,14 +5,18 @@ import { RotateCcw } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { useSettingsStore } from '@/stores/settings-store';
+import { useThemeStore } from '@/stores/theme-store';
 
 export function ResetSettings() {
   const t = useTranslations('settings');
-  const { resetToDefaults } = useSettingsStore();
+  const { resetToDefaults: resetSettings } = useSettingsStore();
+  const { resetToDefaults: resetTheme } = useThemeStore();
 
   const handleReset = () => {
     if (window.confirm(t('resetConfirm'))) {
-      resetToDefaults();
+      // Reset both stores to defaults
+      resetSettings();
+      resetTheme();
     }
   };
 

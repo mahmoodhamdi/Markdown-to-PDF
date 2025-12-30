@@ -32,13 +32,16 @@ const SessionSchema = new Schema<ISession>(
     ip: { type: String },
     location: { type: String },
     lastActive: { type: Date, default: Date.now },
-    expiresAt: { type: Date, required: true, index: true },
+    expiresAt: { type: Date, required: true },
   },
   {
     _id: false,
     timestamps: { createdAt: true, updatedAt: false },
   }
 );
+
+// Index for token verification
+SessionSchema.index({ token: 1 });
 
 // Index for cleanup of expired sessions
 SessionSchema.index({ expiresAt: 1 }, { expireAfterSeconds: 0 });

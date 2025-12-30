@@ -9,13 +9,15 @@ import { authOptions } from '@/lib/auth/config';
 import { connectDB } from '@/lib/db/mongodb';
 import { User } from '@/lib/db/models/User';
 import { checkRateLimit, getRateLimitHeaders } from '@/lib/rate-limit';
+import { invalidateAllUserSessions } from '@/lib/auth/session-service';
+import { passwordSchema, BCRYPT_ROUNDS } from '@/lib/auth/password-validation';
 import { z } from 'zod';
 import bcrypt from 'bcryptjs';
 
 // Validation schema
 const changePasswordSchema = z.object({
   currentPassword: z.string().min(1, 'Current password is required'),
-  newPassword: z.string().min(8, 'Password must be at least 8 characters'),
+  newPassword: passwordSchema,
 });
 
 /**
@@ -104,16 +106,19 @@ export async function POST(request: NextRequest) {
     }
 
     // Hash new password
-    const hashedPassword = await bcrypt.hash(newPassword, 12);
+    const hashedPassword = await bcrypt.hash(newPassword, BCRYPT_ROUNDS);
 
     // Update password
     await User.findByIdAndUpdate(session.user.email, {
       $set: { password: hashedPassword },
     });
 
+    // Invalidate all sessions for security (user will need to log in again)
+    await invalidateAllUserSessions(session.user.email);
+
     return NextResponse.json({
       success: true,
-      message: 'Password changed successfully',
+      message: 'Password changed successfully. Please sign in again.',
     });
   } catch (error) {
     console.error('Change password error:', error);

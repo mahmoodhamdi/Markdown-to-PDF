@@ -23,7 +23,7 @@ import {
 } from '@/components/ui/select';
 import { Separator } from '@/components/ui/separator';
 import { toast } from 'sonner';
-import { Settings, Trash2 } from 'lucide-react';
+import { Settings, Trash2, Crown } from 'lucide-react';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -51,8 +51,10 @@ interface TeamSettingsProps {
   teamName: string;
   settings: TeamSettingsData;
   isOwner: boolean;
+  hasAdmins?: boolean;
   onSettingsUpdated: (settings: TeamSettingsData) => void;
   onTeamNameUpdated: (name: string) => void;
+  onTransferOwnership?: () => void;
 }
 
 export function TeamSettings({
@@ -62,8 +64,10 @@ export function TeamSettings({
   teamName,
   settings,
   isOwner,
+  hasAdmins = false,
   onSettingsUpdated,
   onTeamNameUpdated,
+  onTransferOwnership,
 }: TeamSettingsProps) {
   const t = useTranslations('dashboard.teams.detail');
   const router = useRouter();
@@ -250,6 +254,30 @@ export function TeamSettings({
                 <Separator />
                 <div className="space-y-4">
                   <h4 className="font-medium text-destructive">{t('dangerZone')}</h4>
+
+                  {/* Transfer Ownership */}
+                  {onTransferOwnership && (
+                    <div className="flex items-center justify-between p-4 border border-yellow-500/50 rounded-lg bg-yellow-50/50 dark:bg-yellow-900/10">
+                      <div className="space-y-0.5">
+                        <Label>{t('transferOwnership')}</Label>
+                        <p className="text-sm text-muted-foreground">{t('transferOwnershipHint')}</p>
+                      </div>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => {
+                          onOpenChange(false);
+                          onTransferOwnership();
+                        }}
+                        disabled={isLoading || !hasAdmins}
+                      >
+                        <Crown className="h-4 w-4 me-2" />
+                        {t('transfer')}
+                      </Button>
+                    </div>
+                  )}
+
+                  {/* Delete Team */}
                   <div className="flex items-center justify-between p-4 border border-destructive/50 rounded-lg bg-destructive/5">
                     <div className="space-y-0.5">
                       <Label>{t('deleteTeam')}</Label>
