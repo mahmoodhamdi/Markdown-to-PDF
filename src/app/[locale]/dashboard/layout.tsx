@@ -9,7 +9,7 @@ export default function DashboardLayout({
     <div className="container py-8">
       <div className="flex gap-8">
         <DashboardSidebar />
-        <main className="flex-1 min-w-0">{children}</main>
+        <div className="flex-1 min-w-0">{children}</div>
       </div>
     </div>
   );
