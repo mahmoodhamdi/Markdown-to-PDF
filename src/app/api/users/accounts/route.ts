@@ -13,10 +13,7 @@ export async function GET() {
     const session = await getServerSession(authOptions);
 
     if (!session?.user?.email) {
-      return NextResponse.json(
-        { success: false, error: 'Unauthorized' },
-        { status: 401 }
-      );
+      return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 });
     }
 
     const userId = session.user.email;
@@ -44,9 +41,6 @@ export async function GET() {
     });
   } catch (error) {
     console.error('Get accounts error:', error);
-    return NextResponse.json(
-      { success: false, error: 'Failed to get accounts' },
-      { status: 500 }
-    );
+    return NextResponse.json({ success: false, error: 'Failed to get accounts' }, { status: 500 });
   }
 }

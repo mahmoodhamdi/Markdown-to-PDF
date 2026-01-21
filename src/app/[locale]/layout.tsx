@@ -84,7 +84,9 @@ export default async function LocaleLayout({
                   Skip to main content
                 </a>
                 <Header />
-                <main id="main-content" className="flex-1" role="main">{children}</main>
+                <main id="main-content" className="flex-1" role="main">
+                  {children}
+                </main>
                 <Footer />
               </div>
               <Toaster />

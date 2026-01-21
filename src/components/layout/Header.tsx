@@ -33,9 +33,7 @@ export function Header() {
         {/* Logo */}
         <Link href="/" className="flex items-center space-x-2 me-6">
           <FileText className="h-6 w-6 text-primary" />
-          <span className="font-bold hidden sm:inline-block">
-            {tCommon('appName')}
-          </span>
+          <span className="font-bold hidden sm:inline-block">{tCommon('appName')}</span>
         </Link>
 
         {/* Desktop Navigation */}
@@ -74,11 +72,7 @@ export function Header() {
             aria-expanded={mobileMenuOpen}
             aria-controls="mobile-navigation"
           >
-            {mobileMenuOpen ? (
-              <X className="h-5 w-5" />
-            ) : (
-              <Menu className="h-5 w-5" />
-            )}
+            {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
           </Button>
         </div>
       </div>

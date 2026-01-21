@@ -88,7 +88,11 @@ export function FileList({
     if (mimeType.startsWith('image/')) {
       return <FileImage className="h-5 w-5 text-blue-500" />;
     }
-    if (mimeType === 'application/pdf' || mimeType.includes('markdown') || mimeType === 'text/plain') {
+    if (
+      mimeType === 'application/pdf' ||
+      mimeType.includes('markdown') ||
+      mimeType === 'text/plain'
+    ) {
       return <FileText className="h-5 w-5 text-red-500" />;
     }
     return <File className="h-5 w-5 text-gray-500" />;
@@ -150,68 +154,77 @@ export function FileList({
     if (selectedFiles.size === files.length) {
       setSelectedFiles(new Set());
     } else {
-      setSelectedFiles(new Set(files.map(f => f.id)));
+      setSelectedFiles(new Set(files.map((f) => f.id)));
     }
   };
 
-  const handleDownload = useCallback(async (file: UserFile) => {
-    try {
-      const response = await fetch(`/api/storage/files/${file.id}`);
-      if (!response.ok) throw new Error('Download failed');
+  const handleDownload = useCallback(
+    async (file: UserFile) => {
+      try {
+        const response = await fetch(`/api/storage/files/${file.id}`);
+        if (!response.ok) throw new Error('Download failed');
 
-      const blob = await response.blob();
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = file.filename;
-      document.body.appendChild(a);
-      a.click();
-      window.URL.revokeObjectURL(url);
-      document.body.removeChild(a);
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = file.filename;
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
+        document.body.removeChild(a);
 
-      toast.success(t('downloadSuccess'));
-    } catch {
-      toast.error(t('downloadError'));
-    }
-  }, [t]);
+        toast.success(t('downloadSuccess'));
+      } catch {
+        toast.error(t('downloadError'));
+      }
+    },
+    [t]
+  );
 
-  const handleCopyLink = useCallback(async (file: UserFile) => {
-    try {
-      const response = await fetch(`/api/storage/files/${file.id}/link`);
-      if (!response.ok) throw new Error('Failed to get link');
+  const handleCopyLink = useCallback(
+    async (file: UserFile) => {
+      try {
+        const response = await fetch(`/api/storage/files/${file.id}/link`);
+        if (!response.ok) throw new Error('Failed to get link');
 
-      const { url } = await response.json();
-      await navigator.clipboard.writeText(url);
-      toast.success(t('linkCopied'));
-    } catch {
-      toast.error(t('linkError'));
-    }
-  }, [t]);
+        const { url } = await response.json();
+        await navigator.clipboard.writeText(url);
+        toast.success(t('linkCopied'));
+      } catch {
+        toast.error(t('linkError'));
+      }
+    },
+    [t]
+  );
 
-  const handleDelete = useCallback(async (fileId: string) => {
-    setDeletingFiles(prev => new Set(prev).add(fileId));
-    try {
-      const response = await fetch(`/api/storage/files/${fileId}`, {
-        method: 'DELETE',
-      });
+  const handleDelete = useCallback(
+    async (fileId: string) => {
+      setDeletingFiles((prev) => new Set(prev).add(fileId));
+      try {
+        const response = await fetch(`/api/storage/files/${fileId}`, {
+          method: 'DELETE',
+        });
 
-      if (!response.ok) throw new Error('Delete failed');
+        if (!response.ok) throw new Error('Delete failed');
 
-      toast.success(t('deleteSuccess'));
-      onFileDelete?.(fileId);
-      onRefresh?.();
-    } catch {
-      toast.error(t('deleteError'));
-    } finally {
-      setDeletingFiles(prev => {
-        const newSet = new Set(prev);
-        newSet.delete(fileId);
-        return newSet;
-      });
-      setFileToDelete(null);
-      setShowDeleteDialog(false);
-    }
-  }, [t, onFileDelete, onRefresh]);
+        toast.success(t('deleteSuccess'));
+        onFileDelete?.(fileId);
+        onRefresh?.();
+      } catch {
+        toast.error(t('deleteError'));
+      } finally {
+        setDeletingFiles((prev) => {
+          const newSet = new Set(prev);
+          newSet.delete(fileId);
+          return newSet;
+        });
+        setFileToDelete(null);
+        setShowDeleteDialog(false);
+      }
+    },
+    [t, onFileDelete, onRefresh]
+  );
 
   const handleBulkDelete = useCallback(async () => {
     const fileIds = Array.from(selectedFiles);
@@ -219,13 +232,11 @@ export function FileList({
 
     try {
       const results = await Promise.allSettled(
-        fileIds.map(id =>
-          fetch(`/api/storage/files/${id}`, { method: 'DELETE' })
-        )
+        fileIds.map((id) => fetch(`/api/storage/files/${id}`, { method: 'DELETE' }))
       );
 
-      const successCount = results.filter(r => r.status === 'fulfilled').length;
-      const failCount = results.filter(r => r.status === 'rejected').length;
+      const successCount = results.filter((r) => r.status === 'fulfilled').length;
+      const failCount = results.filter((r) => r.status === 'rejected').length;
 
       if (failCount === 0) {
         toast.success(t('bulkDeleteSuccess', { count: successCount }));
@@ -264,7 +275,7 @@ export function FileList({
         </CardHeader>
         <CardContent>
           <div className="space-y-3">
-            {[1, 2, 3].map(i => (
+            {[1, 2, 3].map((i) => (
               <Skeleton key={i} className="h-12 w-full" />
             ))}
           </div>
@@ -293,11 +304,7 @@ export function FileList({
           <CardTitle className="text-sm font-medium">{t('yourFiles')}</CardTitle>
           <div className="flex items-center gap-2">
             {selectedFiles.size > 0 && (
-              <Button
-                variant="destructive"
-                size="sm"
-                onClick={confirmBulkDelete}
-              >
+              <Button variant="destructive" size="sm" onClick={confirmBulkDelete}>
                 <Trash2 className="h-4 w-4 me-2" />
                 {t('deleteSelected', { count: selectedFiles.size })}
               </Button>
@@ -370,7 +377,7 @@ export function FileList({
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {sortedFiles.map(file => (
+                {sortedFiles.map((file) => (
                   <TableRow key={file.id}>
                     <TableCell>
                       <Checkbox
@@ -422,7 +429,7 @@ export function FileList({
             </Table>
           ) : (
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-              {sortedFiles.map(file => (
+              {sortedFiles.map((file) => (
                 <div
                   key={file.id}
                   className={`relative p-4 rounded-lg border hover:border-primary transition-colors ${
@@ -482,9 +489,7 @@ export function FileList({
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>{t('confirmDelete')}</AlertDialogTitle>
-            <AlertDialogDescription>
-              {t('confirmDeleteDescription')}
-            </AlertDialogDescription>
+            <AlertDialogDescription>{t('confirmDeleteDescription')}</AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>{t('cancel')}</AlertDialogCancel>

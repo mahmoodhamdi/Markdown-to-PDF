@@ -138,10 +138,7 @@ export class PaymobClient {
   /**
    * Make an authenticated API request
    */
-  private async request<T>(
-    endpoint: string,
-    options: RequestInit = {}
-  ): Promise<T> {
+  private async request<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
     const url = endpoint.startsWith('http') ? endpoint : `${this.baseUrl}${endpoint}`;
 
     const response = await fetch(url, {
@@ -155,9 +152,7 @@ export class PaymobClient {
 
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));
-      throw new Error(
-        `Paymob API error: ${response.status} - ${JSON.stringify(errorData)}`
-      );
+      throw new Error(`Paymob API error: ${response.status} - ${JSON.stringify(errorData)}`);
     }
 
     return response.json();

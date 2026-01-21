@@ -7,5 +7,4 @@ export const routing = defineRouting({
   defaultLocale,
 });
 
-export const { Link, redirect, usePathname, useRouter } =
-  createSharedPathnamesNavigation(routing);
+export const { Link, redirect, usePathname, useRouter } = createSharedPathnamesNavigation(routing);

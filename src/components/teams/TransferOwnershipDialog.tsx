@@ -58,9 +58,7 @@ export function TransferOwnershipDialog({
   const [isTransferring, setIsTransferring] = useState(false);
 
   // Only admins can receive ownership transfer
-  const eligibleMembers = members.filter(
-    (m) => m.role === 'admin' && m.userId !== currentOwnerId
-  );
+  const eligibleMembers = members.filter((m) => m.role === 'admin' && m.userId !== currentOwnerId);
 
   const selectedMember = eligibleMembers.find((m) => m.userId === selectedMemberId);
   const confirmationRequired = teamName.toLowerCase();
@@ -81,7 +79,9 @@ export function TransferOwnershipDialog({
 
       if (response.ok && data.success) {
         toast.success(t('success'), {
-          description: t('successDescription', { name: selectedMember?.name || selectedMember?.email }),
+          description: t('successDescription', {
+            name: selectedMember?.name || selectedMember?.email,
+          }),
         });
         onOwnershipTransferred(selectedMemberId);
         handleClose();
@@ -175,9 +175,7 @@ export function TransferOwnershipDialog({
               {selectedMemberId && (
                 <div className="space-y-2">
                   <Label htmlFor="confirmText">{t('confirmLabel')}</Label>
-                  <p className="text-sm text-muted-foreground">
-                    {t('confirmHint', { teamName })}
-                  </p>
+                  <p className="text-sm text-muted-foreground">{t('confirmHint', { teamName })}</p>
                   <Input
                     id="confirmText"
                     value={confirmText}
@@ -198,7 +196,9 @@ export function TransferOwnershipDialog({
           <Button
             variant="destructive"
             onClick={handleTransfer}
-            disabled={!selectedMemberId || !isConfirmed || isTransferring || eligibleMembers.length === 0}
+            disabled={
+              !selectedMemberId || !isConfirmed || isTransferring || eligibleMembers.length === 0
+            }
           >
             {isTransferring ? t('transferring') : t('transferOwnership')}
           </Button>

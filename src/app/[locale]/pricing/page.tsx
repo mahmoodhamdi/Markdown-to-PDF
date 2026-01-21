@@ -5,7 +5,14 @@ import { useTranslations } from 'next-intl';
 import { useSession } from 'next-auth/react';
 import { useSearchParams } from 'next/navigation';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { Check, Zap, Users, Building2, Loader2 } from 'lucide-react';
@@ -112,11 +119,7 @@ function PricingContent() {
           <Label htmlFor="billing" className={cn(!isYearly && 'font-semibold')}>
             {t('monthly')}
           </Label>
-          <Switch
-            id="billing"
-            checked={isYearly}
-            onCheckedChange={setIsYearly}
-          />
+          <Switch id="billing" checked={isYearly} onCheckedChange={setIsYearly} />
           <Label htmlFor="billing" className={cn(isYearly && 'font-semibold')}>
             {t('yearly')}
             <span className="ms-2 text-green-600 dark:text-green-400 text-sm">
@@ -221,14 +224,13 @@ function PricingContent() {
 
       {/* FAQ Section */}
       <div className="mt-20 max-w-3xl mx-auto">
-        <h2 className="text-2xl font-bold text-center mb-8">
-          Frequently Asked Questions
-        </h2>
+        <h2 className="text-2xl font-bold text-center mb-8">Frequently Asked Questions</h2>
         <div className="space-y-6">
           <div className="border rounded-lg p-6">
             <h3 className="font-semibold mb-2">Can I upgrade or downgrade my plan?</h3>
             <p className="text-muted-foreground">
-              Yes, you can upgrade or downgrade your plan at any time. Changes take effect immediately.
+              Yes, you can upgrade or downgrade your plan at any time. Changes take effect
+              immediately.
             </p>
           </div>
           <div className="border rounded-lg p-6">
@@ -240,13 +242,15 @@ function PricingContent() {
           <div className="border rounded-lg p-6">
             <h3 className="font-semibold mb-2">Is there a free trial?</h3>
             <p className="text-muted-foreground">
-              Our Free plan is always available with generous limits. You can test all features before upgrading.
+              Our Free plan is always available with generous limits. You can test all features
+              before upgrading.
             </p>
           </div>
           <div className="border rounded-lg p-6">
             <h3 className="font-semibold mb-2">What happens when I reach my limit?</h3>
             <p className="text-muted-foreground">
-              You&apos;ll receive a notification and can either wait for the daily reset or upgrade your plan for more capacity.
+              You&apos;ll receive a notification and can either wait for the daily reset or upgrade
+              your plan for more capacity.
             </p>
           </div>
         </div>

@@ -86,7 +86,9 @@ export function UsageStats({ usage, limits, resetTime, loading = false }: UsageS
         />
 
         <div className="flex justify-between text-sm text-muted-foreground">
-          <span>{formatStorage(usage.storageUsed)} {t('used')}</span>
+          <span>
+            {formatStorage(usage.storageUsed)} {t('used')}
+          </span>
           <span>
             {limits.cloudStorageBytes === Infinity
               ? t('unlimited')

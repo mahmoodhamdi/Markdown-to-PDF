@@ -38,9 +38,7 @@ export function CustomCssEditor({ className }: CustomCssEditorProps) {
             <Sparkles className="h-8 w-8 text-blue-500" />
             <div>
               <p className="font-medium text-sm">{t('upgradeTitle')}</p>
-              <p className="text-sm text-muted-foreground mt-1">
-                {t('upgradeDescription')}
-              </p>
+              <p className="text-sm text-muted-foreground mt-1">{t('upgradeDescription')}</p>
             </div>
             <Link href="/pricing">
               <Button variant="outline" size="sm">
@@ -66,9 +64,7 @@ export function CustomCssEditor({ className }: CustomCssEditorProps) {
         placeholder={t('placeholder')}
         className="font-mono text-sm min-h-[150px]"
       />
-      <p className="text-xs text-muted-foreground">
-        {t('hint')}
-      </p>
+      <p className="text-xs text-muted-foreground">{t('hint')}</p>
     </div>
   );
 }

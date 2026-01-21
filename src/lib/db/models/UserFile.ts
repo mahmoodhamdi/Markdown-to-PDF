@@ -56,5 +56,4 @@ const StorageQuotaSchema = new Schema<IStorageQuota>(
 );
 
 export const StorageQuota: Model<IStorageQuota> =
-  mongoose.models.StorageQuota ||
-  mongoose.model<IStorageQuota>('StorageQuota', StorageQuotaSchema);
+  mongoose.models.StorageQuota || mongoose.model<IStorageQuota>('StorageQuota', StorageQuotaSchema);

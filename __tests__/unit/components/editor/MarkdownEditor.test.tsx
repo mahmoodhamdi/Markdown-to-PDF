@@ -131,7 +131,7 @@ describe('MarkdownEditor', () => {
     it('should render loading state initially', async () => {
       // The component shows loading until mounted state is true
       // On first synchronous render, mounted is false so loading is shown
-      const { container } = render(<MarkdownEditor />);
+      render(<MarkdownEditor />);
 
       // The loading state should be visible initially (before useEffect runs)
       // After effects run, the editor should be visible

@@ -134,9 +134,7 @@ export default function VerifyEmailPage() {
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4">
-      <Card className="w-full max-w-md">
-        {renderContent()}
-      </Card>
+      <Card className="w-full max-w-md">{renderContent()}</Card>
     </div>
   );
 }

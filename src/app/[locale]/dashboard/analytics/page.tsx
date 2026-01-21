@@ -22,12 +22,7 @@ export default function AnalyticsPage() {
   const [dateRange, setDateRange] = useState<DateRangePreset>('7');
 
   // Use SWR hooks for cached data fetching
-  const {
-    summary,
-    themeUsage,
-    templateUsage,
-    isLoading: summaryLoading,
-  } = useAnalyticsSummary();
+  const { summary, themeUsage, templateUsage, isLoading: summaryLoading } = useAnalyticsSummary();
 
   const { history, isLoading: historyLoading } = useAnalyticsHistory(dateRange);
 

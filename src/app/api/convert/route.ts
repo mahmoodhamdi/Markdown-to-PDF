@@ -55,7 +55,9 @@ export async function POST(request: NextRequest) {
     if (body.customCss) {
       if (!planLimits.customCssAllowed && !context.isAuthenticated) {
         return NextResponse.json(
-          { error: 'Custom CSS requires a Pro plan or higher. Please upgrade to use this feature.' },
+          {
+            error: 'Custom CSS requires a Pro plan or higher. Please upgrade to use this feature.',
+          },
           { status: 403, headers: rateLimitHeaders }
         );
       }
@@ -70,7 +72,9 @@ export async function POST(request: NextRequest) {
     // Check if the requested theme is available for the user's plan
     if (body.theme && !planLimits.availableThemes.includes(body.theme)) {
       return NextResponse.json(
-        { error: `Theme "${body.theme}" is not available for your plan. Available themes: ${planLimits.availableThemes.join(', ')}` },
+        {
+          error: `Theme "${body.theme}" is not available for your plan. Available themes: ${planLimits.availableThemes.join(', ')}`,
+        },
         { status: 403, headers: rateLimitHeaders }
       );
     }

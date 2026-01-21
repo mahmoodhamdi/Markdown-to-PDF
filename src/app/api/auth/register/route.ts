@@ -81,11 +81,7 @@ export async function POST(request: NextRequest) {
     if (emailService.isConfigured()) {
       try {
         const { token } = await createEmailVerificationToken(email.toLowerCase(), 24);
-        await emailService.sendEmailVerification(
-          { email: email.toLowerCase(), name },
-          token,
-          24
-        );
+        await emailService.sendEmailVerification({ email: email.toLowerCase(), name }, token, 24);
       } catch (err) {
         console.error('Failed to send verification email:', err);
         // Still return success, user can resend verification later

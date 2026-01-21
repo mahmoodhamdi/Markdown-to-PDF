@@ -96,7 +96,9 @@ export default function UsagePage() {
       {/* Usage History */}
       <UsageHistory
         data={historyData}
-        maxConversions={limits.conversionsPerDay === Infinity ? undefined : limits.conversionsPerDay}
+        maxConversions={
+          limits.conversionsPerDay === Infinity ? undefined : limits.conversionsPerDay
+        }
         loading={historyLoading}
       />
     </div>

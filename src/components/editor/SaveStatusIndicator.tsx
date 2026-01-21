@@ -88,10 +88,7 @@ export function SaveStatusIndicator({ className }: SaveStatusIndicatorProps) {
 
   return (
     <div
-      className={cn(
-        'flex items-center gap-1.5 text-xs',
-        className
-      )}
+      className={cn('flex items-center gap-1.5 text-xs', className)}
       title={lastSaved ? `Last saved: ${new Date(lastSaved).toLocaleString()}` : ''}
     >
       <Icon className={cn('h-3.5 w-3.5', config.iconClass)} />

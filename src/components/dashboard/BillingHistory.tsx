@@ -5,12 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from '@/components/ui/tooltip';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import {
   Download,
   Receipt,
@@ -101,7 +96,10 @@ export function BillingHistory({ invoices, loading, showTax = true }: BillingHis
         <CardContent>
           <div className="space-y-4">
             {[1, 2, 3].map((i) => (
-              <div key={i} className="animate-pulse flex items-center justify-between py-3 border-b last:border-0">
+              <div
+                key={i}
+                className="animate-pulse flex items-center justify-between py-3 border-b last:border-0"
+              >
                 <div className="space-y-2">
                   <Skeleton className="h-4 w-32" />
                   <Skeleton className="h-3 w-24" />
@@ -149,7 +147,11 @@ export function BillingHistory({ invoices, loading, showTax = true }: BillingHis
         <CardContent>
           <div className="divide-y">
             {invoices.map((invoice) => {
-              const defaultStatus = { color: 'bg-yellow-500', icon: <Clock className="h-3.5 w-3.5" />, label: t('invoicePending') };
+              const defaultStatus = {
+                color: 'bg-yellow-500',
+                icon: <Clock className="h-3.5 w-3.5" />,
+                label: t('invoicePending'),
+              };
               const status = statusConfig[invoice.status] ?? defaultStatus;
 
               return (
@@ -176,18 +178,26 @@ export function BillingHistory({ invoices, loading, showTax = true }: BillingHis
                         <Tooltip>
                           <TooltipTrigger asChild>
                             <span className="text-xs">
-                              {t('includesTax', { amount: formatAmount(invoice.tax, invoice.currency) })}
+                              {t('includesTax', {
+                                amount: formatAmount(invoice.tax, invoice.currency),
+                              })}
                             </span>
                           </TooltipTrigger>
                           <TooltipContent>
                             <div className="text-xs space-y-1">
                               {invoice.subtotal !== undefined && (
-                                <p>{t('subtotal')}: {formatAmount(invoice.subtotal, invoice.currency)}</p>
+                                <p>
+                                  {t('subtotal')}:{' '}
+                                  {formatAmount(invoice.subtotal, invoice.currency)}
+                                </p>
                               )}
-                              <p>{t('tax')}: {formatAmount(invoice.tax, invoice.currency)}</p>
+                              <p>
+                                {t('tax')}: {formatAmount(invoice.tax, invoice.currency)}
+                              </p>
                               {invoice.discount !== undefined && invoice.discount > 0 && (
                                 <p className="text-green-400">
-                                  {t('discount')}: -{formatAmount(invoice.discount, invoice.currency)}
+                                  {t('discount')}: -
+                                  {formatAmount(invoice.discount, invoice.currency)}
                                 </p>
                               )}
                             </div>
@@ -198,10 +208,12 @@ export function BillingHistory({ invoices, loading, showTax = true }: BillingHis
                   </div>
 
                   <div className="flex items-center gap-4 ms-4">
-                    <span className={cn(
-                      'font-semibold tabular-nums',
-                      invoice.status === 'refunded' && 'line-through text-muted-foreground'
-                    )}>
+                    <span
+                      className={cn(
+                        'font-semibold tabular-nums',
+                        invoice.status === 'refunded' && 'line-through text-muted-foreground'
+                      )}
+                    >
                       {formatAmount(invoice.amount, invoice.currency)}
                     </span>
 

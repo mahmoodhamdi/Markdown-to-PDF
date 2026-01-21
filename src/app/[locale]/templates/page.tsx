@@ -20,9 +20,10 @@ export default function TemplatesPage() {
   const templates = getAllTemplates();
   const categories = ['all', 'business', 'academic', 'personal', 'technical'] as const;
 
-  const filteredTemplates = selectedCategory === 'all'
-    ? templates
-    : templates.filter((template) => template.category === selectedCategory);
+  const filteredTemplates =
+    selectedCategory === 'all'
+      ? templates
+      : templates.filter((template) => template.category === selectedCategory);
 
   const handleUseTemplate = (template: Template) => {
     setContent(template.content);
@@ -54,9 +55,7 @@ export default function TemplatesPage() {
                 <FileText className="h-5 w-5" />
                 {t(`items.${template.id}`)}
               </CardTitle>
-              <CardDescription>
-                {t(`items.${template.id}Desc`)}
-              </CardDescription>
+              <CardDescription>{t(`items.${template.id}Desc`)}</CardDescription>
             </CardHeader>
             <CardContent className="flex-1 flex items-end">
               <div className="flex gap-2 w-full">
@@ -68,10 +67,7 @@ export default function TemplatesPage() {
                   <Eye className="h-4 w-4 me-2" />
                   {t('previewTemplate')}
                 </Button>
-                <Button
-                  className="flex-1"
-                  onClick={() => handleUseTemplate(template)}
-                >
+                <Button className="flex-1" onClick={() => handleUseTemplate(template)}>
                   {t('useTemplate')}
                 </Button>
               </div>

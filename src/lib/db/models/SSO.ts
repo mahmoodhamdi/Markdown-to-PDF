@@ -137,7 +137,15 @@ const SSOAuditLogSchema = new Schema<ISSOAuditLog>(
     organizationId: { type: String, required: true, index: true },
     action: {
       type: String,
-      enum: ['login', 'logout', 'config_created', 'config_updated', 'config_deleted', 'test_success', 'test_failure'],
+      enum: [
+        'login',
+        'logout',
+        'config_created',
+        'config_updated',
+        'config_deleted',
+        'test_success',
+        'test_failure',
+      ],
       required: true,
     },
     userId: { type: String },

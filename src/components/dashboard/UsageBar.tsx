@@ -40,11 +40,13 @@ export function UsageBar({
     <div className={cn('space-y-1.5', className)}>
       <div className="flex items-center justify-between text-sm">
         <span className="text-muted-foreground">{label}</span>
-        <span className={cn(
-          'font-medium',
-          isCritical && 'text-destructive',
-          isHigh && !isCritical && 'text-yellow-600 dark:text-yellow-400'
-        )}>
+        <span
+          className={cn(
+            'font-medium',
+            isCritical && 'text-destructive',
+            isHigh && !isCritical && 'text-yellow-600 dark:text-yellow-400'
+          )}
+        >
           {formatValue(used)} / {formatValue(limit)}
           {showPercentage && !isUnlimited && (
             <span className="text-muted-foreground ms-1">({percentage}%)</span>

@@ -56,11 +56,7 @@ export async function applyRateLimit(
   const { identifier } = await getRateLimitIdentifier(request);
   const config = getRateLimitConfig(endpoint);
 
-  const result = await checkRateLimit(
-    `${endpoint}:${identifier}`,
-    config.limit,
-    config.window
-  );
+  const result = await checkRateLimit(`${endpoint}:${identifier}`, config.limit, config.window);
 
   return { ...result, identifier };
 }
@@ -90,10 +86,7 @@ export function createRateLimitResponse(
 /**
  * Add rate limit headers to a response
  */
-export function addRateLimitHeaders(
-  response: NextResponse,
-  result: RateLimitResult
-): NextResponse {
+export function addRateLimitHeaders(response: NextResponse, result: RateLimitResult): NextResponse {
   const headers = getRateLimitHeaders(result);
   for (const [key, value] of Object.entries(headers)) {
     response.headers.set(key, value);

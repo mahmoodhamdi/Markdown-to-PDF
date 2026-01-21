@@ -17,10 +17,7 @@ export async function GET(_request: NextRequest, { params }: RouteParams) {
     const result = await getInvitationByToken(token);
 
     if (!result.success) {
-      return NextResponse.json(
-        { error: result.error },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: result.error }, { status: 404 });
     }
 
     return NextResponse.json({
@@ -29,9 +26,6 @@ export async function GET(_request: NextRequest, { params }: RouteParams) {
     });
   } catch (error) {
     console.error('Get invitation API error:', error);
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

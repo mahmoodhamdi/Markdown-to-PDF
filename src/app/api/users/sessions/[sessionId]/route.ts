@@ -17,10 +17,7 @@ export async function DELETE(
     const session = await getServerSession(authOptions);
 
     if (!session?.user?.email) {
-      return NextResponse.json(
-        { success: false, error: 'Unauthorized' },
-        { status: 401 }
-      );
+      return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 });
     }
 
     const { sessionId } = await context.params;
@@ -42,10 +39,7 @@ export async function DELETE(
     const revoked = await revokeSession(sessionId, userId);
 
     if (!revoked) {
-      return NextResponse.json(
-        { success: false, error: 'Session not found' },
-        { status: 404 }
-      );
+      return NextResponse.json({ success: false, error: 'Session not found' }, { status: 404 });
     }
 
     return NextResponse.json({

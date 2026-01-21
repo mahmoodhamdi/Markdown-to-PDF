@@ -15,10 +15,7 @@ export async function POST(request: NextRequest) {
     // Check authentication
     const session = await getServerSession(authOptions);
     if (!session?.user?.id) {
-      return NextResponse.json(
-        { error: 'Authentication required' },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
     }
 
     const userId = session.user.id;
@@ -47,10 +44,7 @@ export async function POST(request: NextRequest) {
     const file = formData.get('file') as File | null;
 
     if (!file) {
-      return NextResponse.json(
-        { error: 'No file provided' },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'No file provided' }, { status: 400 });
     }
 
     // Validate MIME type
@@ -68,19 +62,10 @@ export async function POST(request: NextRequest) {
     const buffer = Buffer.from(arrayBuffer);
 
     // Upload file
-    const result = await uploadFile(
-      userId,
-      userPlan,
-      buffer,
-      file.name,
-      file.type
-    );
+    const result = await uploadFile(userId, userPlan, buffer, file.name, file.type);
 
     if (!result.success || !result.file) {
-      return NextResponse.json(
-        { error: result.error || 'Upload failed' },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: result.error || 'Upload failed' }, { status: 400 });
     }
 
     return NextResponse.json({
@@ -95,9 +80,6 @@ export async function POST(request: NextRequest) {
     });
   } catch (error) {
     console.error('Upload API error:', error);
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

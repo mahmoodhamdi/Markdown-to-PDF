@@ -242,9 +242,7 @@ export function ApiKeyList() {
                   <TableRow key={key.id} className={key.isExpired ? 'opacity-50' : ''}>
                     <TableCell className="font-medium">{key.name}</TableCell>
                     <TableCell>
-                      <code className="text-sm bg-muted px-2 py-1 rounded">
-                        {key.keyPrefix}...
-                      </code>
+                      <code className="text-sm bg-muted px-2 py-1 rounded">{key.keyPrefix}...</code>
                     </TableCell>
                     <TableCell>
                       <div className="flex flex-wrap gap-1">
@@ -307,12 +305,7 @@ export function ApiKeyList() {
               <p>{t('keyCreatedWarning')}</p>
               <div className="flex items-center gap-2 p-3 bg-muted rounded-lg">
                 <code className="flex-1 text-sm break-all">{newKey}</code>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={handleCopyKey}
-                  className="shrink-0"
-                >
+                <Button variant="ghost" size="sm" onClick={handleCopyKey} className="shrink-0">
                   {copied ? (
                     <Check className="h-4 w-4 text-green-500" />
                   ) : (
@@ -323,9 +316,7 @@ export function ApiKeyList() {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogAction onClick={handleCloseNewKeyDialog}>
-              {t('done')}
-            </AlertDialogAction>
+            <AlertDialogAction onClick={handleCloseNewKeyDialog}>{t('done')}</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>

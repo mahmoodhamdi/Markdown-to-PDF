@@ -105,11 +105,7 @@ export const paytabsGateway: PaymentGateway = {
 
           if (existingSub) {
             // Renew existing subscription
-            await existingSub.renew(
-              parsed.transactionRef,
-              parsed.amount * 100,
-              parsed.currency
-            );
+            await existingSub.renew(parsed.transactionRef, parsed.amount * 100, parsed.currency);
           } else {
             // Create new subscription
             await createRegionalSubscription({
@@ -247,7 +243,11 @@ export const paytabsGateway: PaymentGateway = {
     }
   },
 
-  async createCustomer(email: string, name?: string, metadata?: Record<string, string>): Promise<Customer> {
+  async createCustomer(
+    email: string,
+    name?: string,
+    metadata?: Record<string, string>
+  ): Promise<Customer> {
     // PayTabs doesn't have customer creation API
     return {
       id: email,

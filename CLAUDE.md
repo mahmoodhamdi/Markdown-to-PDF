@@ -57,8 +57,13 @@ docker-compose -f docker/docker-compose.prod.yml up     # Production mode
 | `PAYTABS_SERVER_KEY` / `PAYTABS_PROFILE_ID` | PayTabs payments (MENA) | Optional |
 | `PADDLE_API_KEY` / `PADDLE_WEBHOOK_SECRET` | Paddle payments (MoR) | Optional |
 | `EMAIL_SERVER_*` | SMTP configuration | Required for email features |
+| `EMAIL_FROM` | Default sender email | `noreply@markdown-to-pdf.com` |
 | `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` | Google OAuth credentials | Required for Google auth |
 | `UPSTASH_REDIS_REST_URL` / `UPSTASH_REDIS_REST_TOKEN` | Distributed rate limiting | Optional (falls back to in-memory) |
+| `CLOUDINARY_*` | Cloudinary storage (avatar uploads) | Optional |
+| `MAX_CONCURRENT_CONVERSIONS` | PDF browser pool size | `5` |
+| `MONGODB_MAX_POOL_SIZE` / `MONGODB_MIN_POOL_SIZE` | MongoDB connection pool | `10` / `2` |
+| `SLOW_QUERY_THRESHOLD_MS` | MongoDB slow query logging | `100` |
 
 ## Architecture Overview
 
@@ -212,9 +217,10 @@ Plan types in `src/lib/plans/config.ts`:
 
 - Unit tests: `__tests__/unit/` - Test utilities and pure functions
 - Integration tests: `__tests__/integration/` - API route testing (30s timeout)
-- E2E tests: `__tests__/e2e/` - Playwright browser tests
+- E2E tests: `__tests__/e2e/` - Playwright browser tests (Chromium, Firefox, WebKit)
 - Test setup: `src/test/setup.ts` - jsdom environment with testing-library
 - Vitest globals enabled (`describe`, `it`, `expect` available without imports)
+- E2E tests require dev server running at localhost:3000 (auto-started in CI)
 
 ## Key Database Models
 

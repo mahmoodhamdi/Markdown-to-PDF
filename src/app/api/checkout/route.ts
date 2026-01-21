@@ -29,10 +29,7 @@ export async function POST(request: NextRequest) {
   // Check authentication
   const session = await getServerSession(authOptions);
   if (!session?.user?.email) {
-    return NextResponse.json(
-      { error: 'You must be logged in to subscribe.' },
-      { status: 401 }
-    );
+    return NextResponse.json({ error: 'You must be logged in to subscribe.' }, { status: 401 });
   }
 
   try {
@@ -42,10 +39,7 @@ export async function POST(request: NextRequest) {
 
     if (!validation.success) {
       const errors = validation.error.errors.map((e) => e.message).join(', ');
-      return NextResponse.json(
-        { error: `Invalid request: ${errors}` },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: `Invalid request: ${errors}` }, { status: 400 });
     }
 
     const { plan, billing, gateway, countryCode, currency, quantity } = validation.data;
@@ -120,10 +114,7 @@ export async function POST(request: NextRequest) {
       }
       // Then check for general 'not configured' gateway errors
       if (error.message.includes('not configured')) {
-        return NextResponse.json(
-          { error: error.message },
-          { status: 503 }
-        );
+        return NextResponse.json({ error: error.message }, { status: 503 });
       }
     }
 
@@ -151,7 +142,9 @@ export async function GET(request: NextRequest) {
       id: 'stripe',
       name: 'Stripe',
       configured: isGatewayConfigured('stripe'),
-      recommended: !countryCode || !['EG', 'SA', 'AE', 'KW', 'BH', 'OM', 'QA', 'JO'].includes(countryCode.toUpperCase()),
+      recommended:
+        !countryCode ||
+        !['EG', 'SA', 'AE', 'KW', 'BH', 'OM', 'QA', 'JO'].includes(countryCode.toUpperCase()),
     },
     {
       id: 'paymob',
@@ -163,7 +156,9 @@ export async function GET(request: NextRequest) {
       id: 'paytabs',
       name: 'PayTabs',
       configured: isGatewayConfigured('paytabs'),
-      recommended: ['SA', 'AE', 'KW', 'BH', 'OM', 'QA', 'JO'].includes(countryCode?.toUpperCase() || ''),
+      recommended: ['SA', 'AE', 'KW', 'BH', 'OM', 'QA', 'JO'].includes(
+        countryCode?.toUpperCase() || ''
+      ),
     },
     {
       id: 'paddle',
@@ -177,10 +172,7 @@ export async function GET(request: NextRequest) {
   const availableGateways = gateways.filter((g) => g.configured);
 
   if (availableGateways.length === 0) {
-    return NextResponse.json(
-      { error: 'No payment gateways are configured.' },
-      { status: 503 }
-    );
+    return NextResponse.json({ error: 'No payment gateways are configured.' }, { status: 503 });
   }
 
   return NextResponse.json({

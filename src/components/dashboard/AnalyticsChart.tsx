@@ -3,12 +3,7 @@
 import { useState, memo, useMemo, useCallback } from 'react';
 import { useTranslations } from 'next-intl';
 import { cn } from '@/lib/utils';
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from '@/components/ui/tooltip';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 interface DailyUsageData {
   date: string;
@@ -26,17 +21,23 @@ interface AnalyticsChartProps {
   className?: string;
 }
 
-export const AnalyticsChart = memo(function AnalyticsChart({ data, className }: AnalyticsChartProps) {
+export const AnalyticsChart = memo(function AnalyticsChart({
+  data,
+  className,
+}: AnalyticsChartProps) {
   const t = useTranslations('dashboard.analytics');
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
 
   // Memoize calculated values
-  const { maxConversions, maxApiCalls, totalConversions, totalApiCalls } = useMemo(() => ({
-    maxConversions: Math.max(...data.map((d) => d.conversions), 1),
-    maxApiCalls: Math.max(...data.map((d) => d.apiCalls), 1),
-    totalConversions: data.reduce((sum, d) => sum + d.conversions, 0),
-    totalApiCalls: data.reduce((sum, d) => sum + d.apiCalls, 0),
-  }), [data]);
+  const { maxConversions, maxApiCalls, totalConversions, totalApiCalls } = useMemo(
+    () => ({
+      maxConversions: Math.max(...data.map((d) => d.conversions), 1),
+      maxApiCalls: Math.max(...data.map((d) => d.apiCalls), 1),
+      totalConversions: data.reduce((sum, d) => sum + d.conversions, 0),
+      totalApiCalls: data.reduce((sum, d) => sum + d.apiCalls, 0),
+    }),
+    [data]
+  );
 
   // Memoized format functions
   const formatDate = useCallback((dateStr: string) => {
@@ -168,9 +169,7 @@ export const AnalyticsChart = memo(function AnalyticsChart({ data, className }: 
                       </TooltipTrigger>
                       <TooltipContent side="top" className="z-50">
                         <div className="space-y-1.5 text-sm">
-                          <p className="font-semibold border-b pb-1">
-                            {formatFullDate(day.date)}
-                          </p>
+                          <p className="font-semibold border-b pb-1">{formatFullDate(day.date)}</p>
                           <div className="flex items-center gap-2">
                             <div className="w-2.5 h-2.5 rounded bg-primary" />
                             <span>

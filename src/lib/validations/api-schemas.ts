@@ -18,9 +18,7 @@ import { z } from 'zod';
  * MongoDB ObjectId validation
  * Validates 24-character hexadecimal string
  */
-export const mongoIdSchema = z
-  .string()
-  .regex(/^[a-f\d]{24}$/i, 'Invalid ID format');
+export const mongoIdSchema = z.string().regex(/^[a-f\d]{24}$/i, 'Invalid ID format');
 
 /**
  * Email schema with normalization
@@ -29,11 +27,7 @@ export const mongoIdSchema = z
 export const emailSchema = z
   .string()
   .transform((e) => e.trim().toLowerCase())
-  .pipe(
-    z.string()
-      .email('Invalid email address')
-      .max(255, 'Email too long')
-  );
+  .pipe(z.string().email('Invalid email address').max(255, 'Email too long'));
 
 /**
  * User name schema
@@ -42,11 +36,7 @@ export const emailSchema = z
 export const userNameSchema = z
   .string()
   .transform((s) => s.trim())
-  .pipe(
-    z.string()
-      .min(1, 'Name is required')
-      .max(100, 'Name too long')
-  );
+  .pipe(z.string().min(1, 'Name is required').max(100, 'Name too long'));
 
 /**
  * Pagination schema
@@ -94,27 +84,15 @@ export const safeUrlSchema = z
 /**
  * Safe string schema that removes angle brackets (basic XSS prevention)
  */
-export const safeStringSchema = z
-  .string()
-  .transform((s) => s.replace(/[<>]/g, '').trim());
+export const safeStringSchema = z.string().transform((s) => s.replace(/[<>]/g, '').trim());
 
 /**
  * Metadata schema for analytics - allow only safe primitive values
  */
 export const safeMetadataSchema = z
-  .record(
-    z.union([
-      z.string().max(500),
-      z.number(),
-      z.boolean(),
-      z.null(),
-    ])
-  )
+  .record(z.union([z.string().max(500), z.number(), z.boolean(), z.null()]))
   .optional()
-  .refine(
-    (obj) => !obj || Object.keys(obj).length <= 20,
-    'Too many metadata fields (max 20)'
-  );
+  .refine((obj) => !obj || Object.keys(obj).length <= 20, 'Too many metadata fields (max 20)');
 
 // =============================================================================
 // Theme Schemas
@@ -210,11 +188,7 @@ export const convertRequestSchema = z.object({
   theme: documentThemeSchema.optional().default('github'),
   codeTheme: codeThemeSchema.optional().default('github-light'),
   pageSettings: pageSettingsSchema.optional(),
-  customCss: z
-    .string()
-    .max(50000, 'Custom CSS exceeds maximum length')
-    .optional()
-    .default(''),
+  customCss: z.string().max(50000, 'Custom CSS exceeds maximum length').optional().default(''),
 });
 
 export type ConvertRequest = z.infer<typeof convertRequestSchema>;

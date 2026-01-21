@@ -190,7 +190,9 @@ export function PasswordChange({ hasPassword }: PasswordChangeProps) {
               </Button>
             </div>
             {errors.currentPassword && (
-              <p id="currentPassword-error" className="text-sm text-destructive" role="alert">{errors.currentPassword}</p>
+              <p id="currentPassword-error" className="text-sm text-destructive" role="alert">
+                {errors.currentPassword}
+              </p>
             )}
           </div>
 
@@ -205,7 +207,9 @@ export function PasswordChange({ hasPassword }: PasswordChangeProps) {
                 onChange={(e) => setNewPassword(e.target.value)}
                 placeholder={t('password.newPlaceholder')}
                 className={errors.newPassword ? 'border-destructive' : ''}
-                aria-describedby={errors.newPassword ? 'newPassword-error' : 'password-requirements'}
+                aria-describedby={
+                  errors.newPassword ? 'newPassword-error' : 'password-requirements'
+                }
                 aria-invalid={!!errors.newPassword}
               />
               <Button
@@ -220,7 +224,9 @@ export function PasswordChange({ hasPassword }: PasswordChangeProps) {
               </Button>
             </div>
             {errors.newPassword && (
-              <p id="newPassword-error" className="text-sm text-destructive" role="alert">{errors.newPassword}</p>
+              <p id="newPassword-error" className="text-sm text-destructive" role="alert">
+                {errors.newPassword}
+              </p>
             )}
             {/* Password strength indicator */}
             {newPassword && (
@@ -244,7 +250,10 @@ export function PasswordChange({ hasPassword }: PasswordChangeProps) {
                 <p className="text-xs text-muted-foreground">{passwordStrength.label}</p>
 
                 {/* Requirements checklist */}
-                <div id="password-requirements" className="mt-2 p-3 bg-muted/50 rounded-md space-y-1.5">
+                <div
+                  id="password-requirements"
+                  className="mt-2 p-3 bg-muted/50 rounded-md space-y-1.5"
+                >
                   <p className="text-xs font-medium text-muted-foreground mb-2">
                     {t('password.requirements')}
                   </p>
@@ -294,7 +303,9 @@ export function PasswordChange({ hasPassword }: PasswordChangeProps) {
               </Button>
             </div>
             {errors.confirmPassword && (
-              <p id="confirmPassword-error" className="text-sm text-destructive" role="alert">{errors.confirmPassword}</p>
+              <p id="confirmPassword-error" className="text-sm text-destructive" role="alert">
+                {errors.confirmPassword}
+              </p>
             )}
             {confirmPassword && newPassword === confirmPassword && (
               <p className="text-sm text-green-600 dark:text-green-400 flex items-center gap-1">

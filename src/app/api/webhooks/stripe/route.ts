@@ -18,10 +18,7 @@ const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
 export async function POST(request: NextRequest) {
   // Check if Stripe is configured
   if (!isStripeConfigured() || !stripe || !webhookSecret) {
-    return NextResponse.json(
-      { error: 'Webhook not configured' },
-      { status: 503 }
-    );
+    return NextResponse.json({ error: 'Webhook not configured' }, { status: 503 });
   }
 
   try {
@@ -29,11 +26,12 @@ export async function POST(request: NextRequest) {
     const signature = request.headers.get('stripe-signature');
 
     if (!signature) {
-      webhookLog('warn', 'Missing stripe-signature header', { gateway: 'stripe', eventId: 'unknown', eventType: 'unknown' });
-      return NextResponse.json(
-        { error: 'Missing signature' },
-        { status: 400 }
-      );
+      webhookLog('warn', 'Missing stripe-signature header', {
+        gateway: 'stripe',
+        eventId: 'unknown',
+        eventType: 'unknown',
+      });
+      return NextResponse.json({ error: 'Missing signature' }, { status: 400 });
     }
 
     // Verify webhook signature
@@ -47,10 +45,7 @@ export async function POST(request: NextRequest) {
         eventType: 'unknown',
         error: err instanceof Error ? err.message : 'Unknown error',
       });
-      return NextResponse.json(
-        { error: 'Invalid signature' },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'Invalid signature' }, { status: 400 });
     }
 
     // Log incoming webhook
@@ -171,10 +166,7 @@ export async function POST(request: NextRequest) {
       eventType: 'unknown',
       error: error instanceof Error ? error.message : 'Unknown error',
     });
-    return NextResponse.json(
-      { error: 'Webhook handler failed' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Webhook handler failed' }, { status: 500 });
   }
 }
 
@@ -217,23 +209,25 @@ async function handleCheckoutComplete(session: Stripe.Checkout.Session, eventId:
 
   // Send subscription confirmation email
   if (emailService.isConfigured()) {
-    emailService.sendSubscriptionConfirmation(
-      { email: userEmail, name: user?.name || '' },
-      {
-        plan: plan as PlanType,
-        billing: billing || 'monthly',
-        amount: session.amount_total ? session.amount_total / 100 : undefined,
-        currency: session.currency?.toUpperCase(),
-        gateway: 'stripe',
-      }
-    ).catch((err) => {
-      webhookLog('error', 'Failed to send subscription confirmation email', {
-        gateway: 'stripe',
-        eventId,
-        eventType: 'checkout.session.completed',
-        error: err instanceof Error ? err.message : 'Unknown error',
+    emailService
+      .sendSubscriptionConfirmation(
+        { email: userEmail, name: user?.name || '' },
+        {
+          plan: plan as PlanType,
+          billing: billing || 'monthly',
+          amount: session.amount_total ? session.amount_total / 100 : undefined,
+          currency: session.currency?.toUpperCase(),
+          gateway: 'stripe',
+        }
+      )
+      .catch((err) => {
+        webhookLog('error', 'Failed to send subscription confirmation email', {
+          gateway: 'stripe',
+          eventId,
+          eventType: 'checkout.session.completed',
+          error: err instanceof Error ? err.message : 'Unknown error',
+        });
       });
-    });
   }
 }
 
@@ -310,20 +304,22 @@ async function handleSubscriptionCanceled(subscription: Stripe.Subscription, eve
 
   // Send subscription canceled email
   if (emailService.isConfigured()) {
-    emailService.sendSubscriptionCanceled(
-      { email: userEmail, name: user?.name || '' },
-      {
-        plan: previousPlan as PlanType,
-        immediate: true,
-      }
-    ).catch((err) => {
-      webhookLog('error', 'Failed to send subscription canceled email', {
-        gateway: 'stripe',
-        eventId,
-        eventType: 'customer.subscription.deleted',
-        error: err instanceof Error ? err.message : 'Unknown error',
+    emailService
+      .sendSubscriptionCanceled(
+        { email: userEmail, name: user?.name || '' },
+        {
+          plan: previousPlan as PlanType,
+          immediate: true,
+        }
+      )
+      .catch((err) => {
+        webhookLog('error', 'Failed to send subscription canceled email', {
+          gateway: 'stripe',
+          eventId,
+          eventType: 'customer.subscription.deleted',
+          error: err instanceof Error ? err.message : 'Unknown error',
+        });
       });
-    });
   }
 }
 

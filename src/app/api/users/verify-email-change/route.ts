@@ -6,10 +6,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { connectDB } from '@/lib/db/mongodb';
 import { User } from '@/lib/db/models/User';
-import {
-  verifyEmailChangeToken,
-  markEmailTokenAsUsed,
-} from '@/lib/db/models/EmailChangeToken';
+import { verifyEmailChangeToken, markEmailTokenAsUsed } from '@/lib/db/models/EmailChangeToken';
 import { checkRateLimit, getRateLimitHeaders } from '@/lib/rate-limit';
 import { z } from 'zod';
 

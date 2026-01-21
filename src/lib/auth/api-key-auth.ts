@@ -41,9 +41,7 @@ export interface ApiKeyAuthResult {
  * Returns null if no API key is present (allows fallback to session auth)
  * Returns ApiKeyAuthResult with error if API key is invalid
  */
-export async function authenticateApiKey(
-  request: NextRequest
-): Promise<ApiKeyAuthResult | null> {
+export async function authenticateApiKey(request: NextRequest): Promise<ApiKeyAuthResult | null> {
   const authHeader = request.headers.get('authorization');
 
   // Check if Authorization header is present with Bearer token
@@ -117,10 +115,7 @@ export async function authenticateApiKey(
 /**
  * Check if API key user has a specific permission
  */
-export function hasPermission(
-  user: ApiKeyUser,
-  permission: ApiPermission
-): boolean {
+export function hasPermission(user: ApiKeyUser, permission: ApiPermission): boolean {
   return user.permissions.includes(permission);
 }
 
@@ -128,19 +123,14 @@ export function hasPermission(
  * Create an error response for API key auth failure
  */
 export function createApiKeyAuthError(result: ApiKeyAuthResult): NextResponse {
-  return NextResponse.json(
-    { error: result.error },
-    { status: result.statusCode || 401 }
-  );
+  return NextResponse.json({ error: result.error }, { status: result.statusCode || 401 });
 }
 
 /**
  * Check rate limit for API key requests
  * Uses the API key's configured rate limit
  */
-export async function checkApiKeyRateLimit(
-  user: ApiKeyUser
-): Promise<{
+export async function checkApiKeyRateLimit(user: ApiKeyUser): Promise<{
   success: boolean;
   headers: Record<string, string>;
   error?: string;
@@ -175,10 +165,7 @@ export function createApiKeyRateLimitError(
   headers: Record<string, string>,
   error: string
 ): NextResponse {
-  return NextResponse.json(
-    { error },
-    { status: 429, headers }
-  );
+  return NextResponse.json({ error }, { status: 429, headers });
 }
 
 /**
@@ -222,10 +209,7 @@ export async function requireApiKeyAuth(
   const rateLimitResult = await checkApiKeyRateLimit(authResult.user);
   if (!rateLimitResult.success) {
     return {
-      response: createApiKeyRateLimitError(
-        rateLimitResult.headers,
-        rateLimitResult.error!
-      ),
+      response: createApiKeyRateLimitError(rateLimitResult.headers, rateLimitResult.error!),
     };
   }
 

@@ -64,9 +64,7 @@ export function EmailVerificationBanner({ onDismiss }: EmailVerificationBannerPr
       <div className="flex items-start gap-3">
         <AlertTriangle className="h-5 w-5 text-yellow-600 dark:text-yellow-400 shrink-0 mt-0.5" />
         <div className="flex-1 min-w-0">
-          <h3 className="font-medium text-yellow-800 dark:text-yellow-200">
-            {t('bannerTitle')}
-          </h3>
+          <h3 className="font-medium text-yellow-800 dark:text-yellow-200">{t('bannerTitle')}</h3>
           <p className="text-sm text-yellow-700 dark:text-yellow-300 mt-1">
             {t('bannerDescription')}
           </p>

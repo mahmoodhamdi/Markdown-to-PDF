@@ -39,10 +39,7 @@ export async function GET(_request: NextRequest) {
     }
 
     if (!stripe) {
-      return NextResponse.json(
-        { error: 'Stripe is not configured' },
-        { status: 500 }
-      );
+      return NextResponse.json({ error: 'Stripe is not configured' }, { status: 500 });
     }
 
     await connectDB();
@@ -78,11 +75,12 @@ export async function GET(_request: NextRequest) {
         last4: pm.card?.last4,
         expiryMonth: pm.card?.exp_month,
         expiryYear: pm.card?.exp_year,
-        walletType: pm.card?.wallet?.type === 'apple_pay'
-          ? 'apple_pay'
-          : pm.card?.wallet?.type === 'google_pay'
-            ? 'google_pay'
-            : undefined,
+        walletType:
+          pm.card?.wallet?.type === 'apple_pay'
+            ? 'apple_pay'
+            : pm.card?.wallet?.type === 'google_pay'
+              ? 'google_pay'
+              : undefined,
         isDefault: pm.id === defaultPaymentMethodId,
         gateway: 'stripe' as const,
       }));
@@ -90,17 +88,11 @@ export async function GET(_request: NextRequest) {
       return NextResponse.json({ paymentMethods: methods });
     } catch (error) {
       console.error('Get payment methods error:', error);
-      return NextResponse.json(
-        { error: 'Failed to get payment methods' },
-        { status: 500 }
-      );
+      return NextResponse.json({ error: 'Failed to get payment methods' }, { status: 500 });
     }
   } catch (error) {
     console.error('Get payment methods error:', error);
-    return NextResponse.json(
-      { error: 'Failed to get payment methods' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Failed to get payment methods' }, { status: 500 });
   }
 }
 
@@ -120,17 +112,11 @@ export async function PUT(request: NextRequest) {
     const { paymentMethodId } = body;
 
     if (!paymentMethodId) {
-      return NextResponse.json(
-        { error: 'Payment method ID is required' },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'Payment method ID is required' }, { status: 400 });
     }
 
     if (!stripe) {
-      return NextResponse.json(
-        { error: 'Stripe is not configured' },
-        { status: 500 }
-      );
+      return NextResponse.json({ error: 'Stripe is not configured' }, { status: 500 });
     }
 
     await connectDB();
@@ -142,10 +128,7 @@ export async function PUT(request: NextRequest) {
     }
 
     if (!user.stripeCustomerId) {
-      return NextResponse.json(
-        { error: 'No Stripe customer found' },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'No Stripe customer found' }, { status: 400 });
     }
 
     try {
@@ -169,17 +152,11 @@ export async function PUT(request: NextRequest) {
       });
     } catch (error) {
       console.error('Set default payment method error:', error);
-      return NextResponse.json(
-        { error: 'Failed to set default payment method' },
-        { status: 500 }
-      );
+      return NextResponse.json({ error: 'Failed to set default payment method' }, { status: 500 });
     }
   } catch (error) {
     console.error('Set default payment method error:', error);
-    return NextResponse.json(
-      { error: 'Failed to set default payment method' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Failed to set default payment method' }, { status: 500 });
   }
 }
 
@@ -199,17 +176,11 @@ export async function DELETE(request: NextRequest) {
     const paymentMethodId = searchParams.get('id');
 
     if (!paymentMethodId) {
-      return NextResponse.json(
-        { error: 'Payment method ID is required' },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'Payment method ID is required' }, { status: 400 });
     }
 
     if (!stripe) {
-      return NextResponse.json(
-        { error: 'Stripe is not configured' },
-        { status: 500 }
-      );
+      return NextResponse.json({ error: 'Stripe is not configured' }, { status: 500 });
     }
 
     await connectDB();
@@ -221,20 +192,14 @@ export async function DELETE(request: NextRequest) {
     }
 
     if (!user.stripeCustomerId) {
-      return NextResponse.json(
-        { error: 'No Stripe customer found' },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'No Stripe customer found' }, { status: 400 });
     }
 
     try {
       // Verify the payment method belongs to this customer
       const paymentMethod = await stripe.paymentMethods.retrieve(paymentMethodId);
       if (paymentMethod.customer !== user.stripeCustomerId) {
-        return NextResponse.json(
-          { error: 'Payment method not found' },
-          { status: 404 }
-        );
+        return NextResponse.json({ error: 'Payment method not found' }, { status: 404 });
       }
 
       // Detach the payment method
@@ -246,16 +211,10 @@ export async function DELETE(request: NextRequest) {
       });
     } catch (error) {
       console.error('Remove payment method error:', error);
-      return NextResponse.json(
-        { error: 'Failed to remove payment method' },
-        { status: 500 }
-      );
+      return NextResponse.json({ error: 'Failed to remove payment method' }, { status: 500 });
     }
   } catch (error) {
     console.error('Remove payment method error:', error);
-    return NextResponse.json(
-      { error: 'Failed to remove payment method' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Failed to remove payment method' }, { status: 500 });
   }
 }

@@ -40,7 +40,12 @@ let redisClient: any = null;
  * Get or create Redis client
  * Uses dynamic require to avoid webpack bundling @upstash/redis
  */
-async function getRedisClient(): Promise<{ incr: (key: string) => Promise<number>; expire: (key: string, seconds: number) => Promise<unknown>; keys: (pattern: string) => Promise<string[]>; del: (...keys: string[]) => Promise<unknown> } | null> {
+async function getRedisClient(): Promise<{
+  incr: (key: string) => Promise<number>;
+  expire: (key: string, seconds: number) => Promise<unknown>;
+  keys: (pattern: string) => Promise<string[]>;
+  del: (...keys: string[]) => Promise<unknown>;
+} | null> {
   if (redisClient) return redisClient;
   if (redisAvailable === false) return null;
 
@@ -62,8 +67,10 @@ async function getRedisClient(): Promise<{ incr: (key: string) => Promise<number
   } catch (error) {
     // Only log warning on first failure (when redisAvailable is still null)
     if (redisAvailable === null) {
-      console.warn('Redis rate limiting unavailable, using in-memory:',
-        error instanceof Error ? error.message : 'Module not found');
+      console.warn(
+        'Redis rate limiting unavailable, using in-memory:',
+        error instanceof Error ? error.message : 'Module not found'
+      );
     }
     redisAvailable = false;
     return null;
@@ -112,11 +119,7 @@ async function checkRateLimitRedis(
 /**
  * Check rate limit using in-memory store (fixed window)
  */
-function checkRateLimitMemory(
-  key: string,
-  limit: number,
-  windowSeconds: number
-): RateLimitResult {
+function checkRateLimitMemory(key: string, limit: number, windowSeconds: number): RateLimitResult {
   startCleanupTimer();
 
   const now = Math.floor(Date.now() / 1000);

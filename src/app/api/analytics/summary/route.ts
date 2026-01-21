@@ -15,10 +15,7 @@ export async function GET(_request: NextRequest) {
     // Check authentication
     const session = await getServerSession(authOptions);
     if (!session?.user?.id) {
-      return NextResponse.json(
-        { error: 'Authentication required' },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
     }
 
     const userId = session.user.id;
@@ -43,21 +40,30 @@ export async function GET(_request: NextRequest) {
         thisWeek: summary.thisWeek,
         thisMonth: summary.thisMonth,
         limits: {
-          conversionsPerDay: summary.limits.conversionsPerDay === Infinity ? 'unlimited' : summary.limits.conversionsPerDay,
-          apiCallsPerDay: summary.limits.apiCallsPerDay === Infinity ? 'unlimited' : summary.limits.apiCallsPerDay,
+          conversionsPerDay:
+            summary.limits.conversionsPerDay === Infinity
+              ? 'unlimited'
+              : summary.limits.conversionsPerDay,
+          apiCallsPerDay:
+            summary.limits.apiCallsPerDay === Infinity
+              ? 'unlimited'
+              : summary.limits.apiCallsPerDay,
         },
         remaining: {
-          conversionsToday: summary.remaining.conversionsToday === Infinity ? 'unlimited' : summary.remaining.conversionsToday,
-          apiCallsToday: summary.remaining.apiCallsToday === Infinity ? 'unlimited' : summary.remaining.apiCallsToday,
+          conversionsToday:
+            summary.remaining.conversionsToday === Infinity
+              ? 'unlimited'
+              : summary.remaining.conversionsToday,
+          apiCallsToday:
+            summary.remaining.apiCallsToday === Infinity
+              ? 'unlimited'
+              : summary.remaining.apiCallsToday,
         },
         plan: userPlan,
       },
     });
   } catch (error) {
     console.error('Analytics summary API error:', error);
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

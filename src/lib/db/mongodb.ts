@@ -17,7 +17,17 @@ const SLOW_QUERY_THRESHOLD_MS = parseInt(process.env.SLOW_QUERY_THRESHOLD_MS || 
  */
 function slowQueryPlugin(schema: Schema): void {
   // Extend query prototype to add timing
-  const queryMethods = ['find', 'findOne', 'findOneAndUpdate', 'findOneAndDelete', 'updateOne', 'updateMany', 'deleteOne', 'deleteMany', 'countDocuments'] as const;
+  const queryMethods = [
+    'find',
+    'findOne',
+    'findOneAndUpdate',
+    'findOneAndDelete',
+    'updateOne',
+    'updateMany',
+    'deleteOne',
+    'deleteMany',
+    'countDocuments',
+  ] as const;
 
   queryMethods.forEach((method) => {
     schema.pre(method, function (this: mongoose.Query<unknown, unknown>) {

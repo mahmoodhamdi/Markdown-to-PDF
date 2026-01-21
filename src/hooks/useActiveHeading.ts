@@ -62,7 +62,7 @@ export function scrollToHeading(id: string): void {
   if (element) {
     element.scrollIntoView({
       behavior: 'smooth',
-      block: 'start'
+      block: 'start',
     });
   }
 }

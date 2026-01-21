@@ -18,9 +18,9 @@ export interface RateLimitConfig {
  */
 export const RATE_LIMITS: Record<string, RateLimitConfig> = {
   // Conversion endpoints
-  'convert': { limit: 60, window: 60, message: 'Conversion rate limit exceeded' },
+  convert: { limit: 60, window: 60, message: 'Conversion rate limit exceeded' },
   'convert:batch': { limit: 10, window: 60, message: 'Batch conversion rate limit exceeded' },
-  'preview': { limit: 120, window: 60, message: 'Preview rate limit exceeded' },
+  preview: { limit: 120, window: 60, message: 'Preview rate limit exceeded' },
 
   // Auth endpoints (stricter)
   'auth:login': { limit: 5, window: 900, message: 'Too many login attempts' }, // 5 per 15 min
@@ -62,7 +62,7 @@ export const RATE_LIMITS: Record<string, RateLimitConfig> = {
   'sso:oidc': { limit: 30, window: 60, message: 'SSO rate limit exceeded' },
 
   // Default fallback
-  'default': { limit: 60, window: 60, message: 'Rate limit exceeded' },
+  default: { limit: 60, window: 60, message: 'Rate limit exceeded' },
 };
 
 /**
@@ -77,8 +77,5 @@ export function getRateLimitConfig(endpoint: string): RateLimitConfig {
  * Check if Redis is configured
  */
 export function isRedisConfigured(): boolean {
-  return !!(
-    process.env.UPSTASH_REDIS_REST_URL &&
-    process.env.UPSTASH_REDIS_REST_TOKEN
-  );
+  return !!(process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN);
 }

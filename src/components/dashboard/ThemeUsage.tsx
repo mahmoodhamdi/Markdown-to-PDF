@@ -133,7 +133,10 @@ export function ThemeUsage({ data, loading }: ThemeUsageProps) {
                 </div>
                 <div className="h-2 bg-muted rounded-full overflow-hidden">
                   <div
-                    className={cn('h-full rounded-full transition-all duration-500', getThemeColor(theme.theme))}
+                    className={cn(
+                      'h-full rounded-full transition-all duration-500',
+                      getThemeColor(theme.theme)
+                    )}
                     style={{ width: `${theme.percentage}%` }}
                     role="progressbar"
                     aria-valuenow={theme.percentage}

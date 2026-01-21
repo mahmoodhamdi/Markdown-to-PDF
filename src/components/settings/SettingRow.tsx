@@ -13,9 +13,7 @@ export function SettingRow({ label, description, children }: SettingRowProps) {
     <div className="flex items-center justify-between py-3">
       <div className="space-y-0.5">
         <Label className="text-base">{label}</Label>
-        {description && (
-          <p className="text-sm text-muted-foreground">{description}</p>
-        )}
+        {description && <p className="text-sm text-muted-foreground">{description}</p>}
       </div>
       <div>{children}</div>
     </div>

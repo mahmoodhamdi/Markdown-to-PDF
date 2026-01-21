@@ -11,7 +11,13 @@ import crypto from 'crypto';
  */
 export type ApiPermission = 'convert' | 'preview' | 'batch' | 'templates' | 'themes';
 
-export const API_PERMISSIONS: ApiPermission[] = ['convert', 'preview', 'batch', 'templates', 'themes'];
+export const API_PERMISSIONS: ApiPermission[] = [
+  'convert',
+  'preview',
+  'batch',
+  'templates',
+  'themes',
+];
 
 /**
  * API key limits by plan
@@ -67,10 +73,12 @@ const ApiKeySchema = new Schema<IApiKeyDocument>(
     name: { type: String, required: true, maxlength: 100 },
     keyHash: { type: String, required: true },
     keyPrefix: { type: String, required: true },
-    permissions: [{
-      type: String,
-      enum: API_PERMISSIONS,
-    }],
+    permissions: [
+      {
+        type: String,
+        enum: API_PERMISSIONS,
+      },
+    ],
     rateLimit: {
       limit: { type: Number, default: 100 },
       window: { type: Number, default: 60 },
@@ -93,7 +101,7 @@ ApiKeySchema.index({ expiresAt: 1 }, { sparse: true });
  * Generate a new API key
  * Returns the plain key only once - it should be shown to the user immediately
  */
-ApiKeySchema.statics.generateKey = async function(
+ApiKeySchema.statics.generateKey = async function (
   userId: string,
   name: string,
   permissions: ApiPermission[],
@@ -129,9 +137,7 @@ ApiKeySchema.statics.generateKey = async function(
  * Verify an API key and update last used timestamp
  * Returns null if key is invalid, revoked, or expired
  */
-ApiKeySchema.statics.verifyKey = async function(
-  key: string
-): Promise<IApiKeyDocument | null> {
+ApiKeySchema.statics.verifyKey = async function (key: string): Promise<IApiKeyDocument | null> {
   // Validate key format
   if (!key || !key.startsWith('mk_') || key.length !== 67) {
     return null;
@@ -143,10 +149,7 @@ ApiKeySchema.statics.verifyKey = async function(
     {
       keyHash,
       revokedAt: null,
-      $or: [
-        { expiresAt: null },
-        { expiresAt: { $gt: new Date() } },
-      ],
+      $or: [{ expiresAt: null }, { expiresAt: { $gt: new Date() } }],
     },
     {
       $set: { lastUsedAt: new Date() },
@@ -160,9 +163,7 @@ ApiKeySchema.statics.verifyKey = async function(
 /**
  * Count the number of active API keys for a user
  */
-ApiKeySchema.statics.countUserKeys = async function(
-  userId: string
-): Promise<number> {
+ApiKeySchema.statics.countUserKeys = async function (userId: string): Promise<number> {
   return this.countDocuments({
     userId,
     revokedAt: null,
@@ -172,9 +173,7 @@ ApiKeySchema.statics.countUserKeys = async function(
 /**
  * Get all API keys for a user (excluding revoked)
  */
-ApiKeySchema.statics.getUserKeys = async function(
-  userId: string
-): Promise<IApiKeyDocument[]> {
+ApiKeySchema.statics.getUserKeys = async function (userId: string): Promise<IApiKeyDocument[]> {
   return this.find({
     userId,
     revokedAt: null,
@@ -185,10 +184,7 @@ ApiKeySchema.statics.getUserKeys = async function(
  * Revoke an API key
  * Returns true if key was revoked, false if not found or already revoked
  */
-ApiKeySchema.statics.revokeKey = async function(
-  keyId: string,
-  userId: string
-): Promise<boolean> {
+ApiKeySchema.statics.revokeKey = async function (keyId: string, userId: string): Promise<boolean> {
   const result = await this.findOneAndUpdate(
     {
       _id: keyId,
@@ -235,9 +231,10 @@ export async function canCreateApiKey(
 /**
  * Get the default rate limit for a plan
  */
-export function getDefaultRateLimit(
-  plan: 'free' | 'pro' | 'team' | 'enterprise'
-): { limit: number; window: number } {
+export function getDefaultRateLimit(plan: 'free' | 'pro' | 'team' | 'enterprise'): {
+  limit: number;
+  window: number;
+} {
   const limits = API_KEY_LIMITS[plan];
   return {
     limit: limits.rateLimit,

@@ -1,4 +1,10 @@
-import { ConversionOptions, ConversionResult, PageSettings, DocumentTheme, CodeTheme } from '@/types';
+import {
+  ConversionOptions,
+  ConversionResult,
+  PageSettings,
+  DocumentTheme,
+  CodeTheme,
+} from '@/types';
 import { parseMarkdownFull } from '../markdown/parser';
 import { getThemeCss, getCodeThemeStylesheet } from '../themes/manager';
 import {
@@ -14,9 +20,9 @@ const WARN_CONTENT_SIZE = 1 * 1024 * 1024; // 1MB warning threshold
 
 // Tiered timeout configuration based on content size
 const TIMEOUT_TIERS = {
-  small: { maxSize: 100000, timeout: 10000 },    // < 100KB: 10s
-  medium: { maxSize: 500000, timeout: 30000 },   // < 500KB: 30s
-  large: { maxSize: Infinity, timeout: 60000 },  // >= 500KB: 60s
+  small: { maxSize: 100000, timeout: 10000 }, // < 100KB: 10s
+  medium: { maxSize: 500000, timeout: 30000 }, // < 500KB: 30s
+  large: { maxSize: Infinity, timeout: 60000 }, // >= 500KB: 60s
 } as const;
 
 /**
@@ -191,7 +197,9 @@ export async function generatePdf(options: ConversionOptions): Promise<Conversio
 
   // Warn about large content
   if (contentSize > WARN_CONTENT_SIZE) {
-    console.warn(`[PDF] Large content detected: ${(contentSize / 1024 / 1024).toFixed(2)}MB. Conversion may be slow.`);
+    console.warn(
+      `[PDF] Large content detected: ${(contentSize / 1024 / 1024).toFixed(2)}MB. Conversion may be slow.`
+    );
   }
 
   const pageSettings: PageSettings = {
@@ -225,13 +233,7 @@ export async function generatePdf(options: ConversionOptions): Promise<Conversio
     metrics.pageCreateTime = Date.now() - browserAcquireStart;
 
     // Generate HTML document
-    const htmlContent = generateHtmlDocument(
-      markdown,
-      theme,
-      codeTheme,
-      customCss,
-      pageSettings
-    );
+    const htmlContent = generateHtmlDocument(markdown, theme, codeTheme, customCss, pageSettings);
 
     const contentSetStart = Date.now();
     await page.setContent(htmlContent, {
@@ -253,12 +255,13 @@ export async function generatePdf(options: ConversionOptions): Promise<Conversio
     });
 
     // Wait for mermaid to render
-    await page.waitForFunction(
-      () => !document.querySelector('.mermaid:not([data-processed])'),
-      { timeout: Math.min(5000, timeout / 2) }
-    ).catch(() => {
-      // Ignore timeout, mermaid may not be present
-    });
+    await page
+      .waitForFunction(() => !document.querySelector('.mermaid:not([data-processed])'), {
+        timeout: Math.min(5000, timeout / 2),
+      })
+      .catch(() => {
+        // Ignore timeout, mermaid may not be present
+      });
     metrics.waitForRenderTime = Date.now() - renderStart;
 
     // Generate PDF
@@ -309,7 +312,10 @@ export async function generatePdf(options: ConversionOptions): Promise<Conversio
  * @param theme - Document theme name (default: 'github')
  * @returns HTML document string for preview
  */
-export async function generateHtmlPreview(markdown: string, theme: string = 'github'): Promise<string> {
+export async function generateHtmlPreview(
+  markdown: string,
+  theme: string = 'github'
+): Promise<string> {
   return generateHtmlDocument(markdown, theme);
 }
 
@@ -339,7 +345,12 @@ export async function generatePdfBatch(
   files: BatchConversionItem[],
   options: Omit<ConversionOptions, 'markdown'>
 ): Promise<BatchConversionResult[]> {
-  const { theme = 'github', codeTheme = 'github-light', pageSettings: partialSettings, customCss } = options;
+  const {
+    theme = 'github',
+    codeTheme = 'github-light',
+    pageSettings: partialSettings,
+    customCss,
+  } = options;
 
   const batchStartTime = Date.now();
 
@@ -434,12 +445,13 @@ export async function generatePdfBatch(
         });
 
         // Wait for mermaid to render
-        await page.waitForFunction(
-          () => !document.querySelector('.mermaid:not([data-processed])'),
-          { timeout: Math.min(5000, timeout / 2) }
-        ).catch(() => {
-          // Ignore timeout, mermaid may not be present
-        });
+        await page
+          .waitForFunction(() => !document.querySelector('.mermaid:not([data-processed])'), {
+            timeout: Math.min(5000, timeout / 2),
+          })
+          .catch(() => {
+            // Ignore timeout, mermaid may not be present
+          });
         metrics.waitForRenderTime = Date.now() - renderStart;
 
         const pdfStart = Date.now();
@@ -485,9 +497,11 @@ export async function generatePdfBatch(
 
   // Log batch summary
   if (process.env.NODE_ENV === 'development' || process.env.PDF_METRICS_ENABLED === 'true') {
-    const successCount = results.filter(r => r.success).length;
+    const successCount = results.filter((r) => r.success).length;
     const totalTime = Date.now() - batchStartTime;
-    console.log(`[PDF] Batch conversion complete: ${successCount}/${files.length} successful in ${totalTime}ms`);
+    console.log(
+      `[PDF] Batch conversion complete: ${successCount}/${files.length} successful in ${totalTime}ms`
+    );
   }
 
   return results;

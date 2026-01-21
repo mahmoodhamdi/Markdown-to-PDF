@@ -96,8 +96,7 @@ TeamSchema.index({ ownerId: 1 });
 TeamSchema.index({ 'members.userId': 1 });
 TeamSchema.index({ 'members.email': 1 });
 
-export const Team: Model<ITeam> =
-  mongoose.models.Team || mongoose.model<ITeam>('Team', TeamSchema);
+export const Team: Model<ITeam> = mongoose.models.Team || mongoose.model<ITeam>('Team', TeamSchema);
 
 // TeamMember lookup collection for efficient queries
 export interface ITeamMemberLookup extends Document {

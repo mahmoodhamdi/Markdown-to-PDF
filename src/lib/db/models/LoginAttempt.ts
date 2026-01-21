@@ -37,8 +37,7 @@ LoginAttemptSchema.index({ lastAttempt: 1 }, { expireAfterSeconds: 86400 });
 
 // Prevent model recompilation in development
 export const LoginAttempt: Model<ILoginAttempt> =
-  mongoose.models.LoginAttempt ||
-  mongoose.model<ILoginAttempt>('LoginAttempt', LoginAttemptSchema);
+  mongoose.models.LoginAttempt || mongoose.model<ILoginAttempt>('LoginAttempt', LoginAttemptSchema);
 
 // Constants for rate limiting
 const MAX_ATTEMPTS = 5;
@@ -48,10 +47,7 @@ const ATTEMPT_WINDOW_MS = 15 * 60 * 1000; // 15 minutes
 /**
  * Record a failed login attempt
  */
-export async function recordFailedLogin(
-  email: string,
-  ip: string
-): Promise<void> {
+export async function recordFailedLogin(email: string, ip: string): Promise<void> {
   const now = new Date();
 
   // Update or create records for both email and IP
@@ -78,10 +74,7 @@ export async function recordFailedLogin(
 /**
  * Clear login attempts after successful login
  */
-export async function clearLoginAttempts(
-  email: string,
-  ip: string
-): Promise<void> {
+export async function clearLoginAttempts(email: string, ip: string): Promise<void> {
   await Promise.all([
     LoginAttempt.deleteOne({ identifier: email.toLowerCase(), type: 'email' }),
     LoginAttempt.deleteOne({ identifier: ip, type: 'ip' }),
@@ -114,9 +107,7 @@ export async function checkLoginBlocked(
 
   // Check if currently blocked
   if (emailRecord?.blockedUntil && emailRecord.blockedUntil > now) {
-    const remainingSeconds = Math.ceil(
-      (emailRecord.blockedUntil.getTime() - now.getTime()) / 1000
-    );
+    const remainingSeconds = Math.ceil((emailRecord.blockedUntil.getTime() - now.getTime()) / 1000);
     return {
       blocked: true,
       remainingSeconds,
@@ -125,9 +116,7 @@ export async function checkLoginBlocked(
   }
 
   if (ipRecord?.blockedUntil && ipRecord.blockedUntil > now) {
-    const remainingSeconds = Math.ceil(
-      (ipRecord.blockedUntil.getTime() - now.getTime()) / 1000
-    );
+    const remainingSeconds = Math.ceil((ipRecord.blockedUntil.getTime() - now.getTime()) / 1000);
     return {
       blocked: true,
       remainingSeconds,
@@ -138,10 +127,7 @@ export async function checkLoginBlocked(
   // Check if should be blocked (reached max attempts)
   if (emailRecord && emailRecord.attempts >= MAX_ATTEMPTS) {
     const blockedUntil = new Date(now.getTime() + BLOCK_DURATION_MS);
-    await LoginAttempt.updateOne(
-      { _id: emailRecord._id },
-      { $set: { blockedUntil } }
-    );
+    await LoginAttempt.updateOne({ _id: emailRecord._id }, { $set: { blockedUntil } });
     return {
       blocked: true,
       remainingSeconds: Math.ceil(BLOCK_DURATION_MS / 1000),
@@ -151,10 +137,7 @@ export async function checkLoginBlocked(
 
   if (ipRecord && ipRecord.attempts >= MAX_ATTEMPTS) {
     const blockedUntil = new Date(now.getTime() + BLOCK_DURATION_MS);
-    await LoginAttempt.updateOne(
-      { _id: ipRecord._id },
-      { $set: { blockedUntil } }
-    );
+    await LoginAttempt.updateOne({ _id: ipRecord._id }, { $set: { blockedUntil } });
     return {
       blocked: true,
       remainingSeconds: Math.ceil(BLOCK_DURATION_MS / 1000),
@@ -168,10 +151,7 @@ export async function checkLoginBlocked(
 /**
  * Get remaining attempts before block
  */
-export async function getRemainingAttempts(
-  email: string,
-  ip: string
-): Promise<number> {
+export async function getRemainingAttempts(email: string, ip: string): Promise<number> {
   const now = new Date();
   const windowStart = new Date(now.getTime() - ATTEMPT_WINDOW_MS);
 

@@ -6,7 +6,16 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { AvatarUpload } from './AvatarUpload';
-import { Mail, Calendar, Shield, CheckCircle, AlertCircle, FileText, FolderOpen, TrendingUp } from 'lucide-react';
+import {
+  Mail,
+  Calendar,
+  Shield,
+  CheckCircle,
+  AlertCircle,
+  FileText,
+  FolderOpen,
+  TrendingUp,
+} from 'lucide-react';
 
 interface QuickStats {
   totalConversions: number;
@@ -134,7 +143,9 @@ export function ProfileHeader({
                 {statsLoading ? (
                   <Skeleton className="h-7 w-16 mx-auto" />
                 ) : (
-                  <p className="text-2xl font-bold">{stats?.totalConversions?.toLocaleString() ?? 0}</p>
+                  <p className="text-2xl font-bold">
+                    {stats?.totalConversions?.toLocaleString() ?? 0}
+                  </p>
                 )}
               </div>
 
@@ -158,7 +169,9 @@ export function ProfileHeader({
                 {statsLoading ? (
                   <Skeleton className="h-7 w-16 mx-auto" />
                 ) : (
-                  <p className="text-2xl font-bold">{stats?.thisMonthConversions?.toLocaleString() ?? 0}</p>
+                  <p className="text-2xl font-bold">
+                    {stats?.thisMonthConversions?.toLocaleString() ?? 0}
+                  </p>
                 )}
               </div>
             </div>

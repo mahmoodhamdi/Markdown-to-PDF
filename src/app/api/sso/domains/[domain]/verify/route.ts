@@ -23,10 +23,7 @@ export async function POST(
     // Check authentication
     const session = await getServerSession(authOptions);
     if (!session?.user?.id) {
-      return NextResponse.json(
-        { error: 'Authentication required' },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
     }
 
     // Only enterprise users can verify domains
@@ -52,10 +49,7 @@ export async function POST(
     const mapping = await getDomainMapping(domain);
 
     if (!mapping) {
-      return NextResponse.json(
-        { error: 'Domain mapping not found' },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: 'Domain mapping not found' }, { status: 404 });
     }
 
     if (mapping.verified) {
@@ -67,10 +61,7 @@ export async function POST(
     }
 
     if (!mapping.verificationToken) {
-      return NextResponse.json(
-        { error: 'No verification token found' },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'No verification token found' }, { status: 400 });
     }
 
     // Attempt DNS verification
@@ -82,9 +73,7 @@ export async function POST(
       const flatRecords = txtRecords.flat();
 
       // Check if any TXT record contains our verification token
-      verified = flatRecords.some((record) =>
-        record.includes(mapping.verificationToken!)
-      );
+      verified = flatRecords.some((record) => record.includes(mapping.verificationToken!));
 
       if (!verified) {
         verificationError = 'Verification token not found in DNS TXT records';
@@ -99,7 +88,8 @@ export async function POST(
       if (body.skipDnsCheck === true && process.env.NODE_ENV === 'development') {
         verified = true;
       } else {
-        verificationError = 'Failed to lookup DNS records. Please ensure DNS is configured correctly.';
+        verificationError =
+          'Failed to lookup DNS records. Please ensure DNS is configured correctly.';
       }
     }
 
@@ -121,9 +111,6 @@ export async function POST(
     });
   } catch (error) {
     console.error('SSO domain verify error:', error);
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

@@ -36,10 +36,7 @@ export async function POST(_request: NextRequest) {
 
     // Check if pause is supported
     if (!stripeGateway.pauseSubscription) {
-      return NextResponse.json(
-        { error: 'Pause functionality is not configured' },
-        { status: 500 }
-      );
+      return NextResponse.json({ error: 'Pause functionality is not configured' }, { status: 500 });
     }
 
     try {
@@ -58,9 +55,6 @@ export async function POST(_request: NextRequest) {
     }
   } catch (error) {
     console.error('Pause subscription error:', error);
-    return NextResponse.json(
-      { error: 'Failed to pause subscription' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Failed to pause subscription' }, { status: 500 });
   }
 }

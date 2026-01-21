@@ -29,12 +29,7 @@ import {
   Save,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from '@/components/ui/tooltip';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { useEditorStore } from '@/stores/editor-store';
 import { useAutoSave } from '@/hooks/useAutoSave';
 import { cn } from '@/lib/utils';
@@ -252,9 +247,7 @@ export function EditorToolbar() {
                   </TooltipContent>
                 </Tooltip>
               ))}
-              {groupIndex < toolbarGroups.length - 1 && (
-                <div className="w-px h-6 bg-border mx-1" />
-              )}
+              {groupIndex < toolbarGroups.length - 1 && <div className="w-px h-6 bg-border mx-1" />}
             </div>
           ))}
         </div>

@@ -115,9 +115,7 @@ class EmailQueue {
     if (this.processing || this.queue.length === 0) return;
 
     const job = this.queue.find(
-      (j) =>
-        j.attempts < j.maxAttempts &&
-        (!j.scheduledAt || j.scheduledAt <= new Date())
+      (j) => j.attempts < j.maxAttempts && (!j.scheduledAt || j.scheduledAt <= new Date())
     );
 
     if (!job) {

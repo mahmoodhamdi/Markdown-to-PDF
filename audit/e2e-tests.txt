@@ -1,0 +1,755 @@
+
+> markdown-to-pdf@1.0.0 test:e2e
+> playwright test --project=chromium
+
+[1A[2K[2m[WebServer] [22mSTRIPE_SECRET_KEY is not set. Stripe functionality will be disabled.
+
+[1A[2K[2m[WebServer] [22mStorage quota API error: n [Error]: Dynamic server usage: Route /api/storage/quota couldn't be rendered statically because it used `headers`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error
+[2m[WebServer] [22m    at l [90m(/media/alash/New Volume/Markdown-to-PDF/[39m.next/server/chunks/8948.js:1:56329[90m)[39m
+[2m[WebServer] [22m    at c [90m(/media/alash/New Volume/Markdown-to-PDF/[39m.next/server/chunks/1615.js:1:1441[90m)[39m
+[2m[WebServer] [22m    at s [90m(/media/alash/New Volume/Markdown-to-PDF/[39m.next/server/chunks/4746.js:25:20859[90m)[39m
+[2m[WebServer] [22m    at c [90m(/media/alash/New Volume/Markdown-to-PDF/[39m.next/server/app/api/storage/quota/route.js:1:1432[90m)[39m
+[2m[WebServer] [22m    at [90m/media/alash/New Volume/Markdown-to-PDF/[39mnode_modules/[4mnext[24m/dist/compiled/next-server/app-route.runtime.prod.js:6:38417
+[2m[WebServer] [22m    at [90m/media/alash/New Volume/Markdown-to-PDF/[39mnode_modules/[4mnext[24m/dist/server/lib/trace/tracer.js:140:36
+[2m[WebServer] [22m    at NoopContextManager.with [90m(/media/alash/New Volume/Markdown-to-PDF/[39mnode_modules/[4m@opentelemetry/api[24m/build/src/context/NoopContextManager.js:25:19[90m)[39m
+[2m[WebServer] [22m    at ContextAPI.with [90m(/media/alash/New Volume/Markdown-to-PDF/[39mnode_modules/[4m@opentelemetry/api[24m/build/src/api/context.js:60:46[90m)[39m
+[2m[WebServer] [22m    at NoopTracer.startActiveSpan [90m(/media/alash/New Volume/Markdown-to-PDF/[39mnode_modules/[4m@opentelemetry/api[24m/build/src/trace/NoopTracer.js:65:31[90m)[39m
+[2m[WebServer] [22m    at ProxyTracer.startActiveSpan [90m(/media/alash/New Volume/Markdown-to-PDF/[39mnode_modules/[4m@opentelemetry/api[24m/build/src/trace/ProxyTracer.js:36:24[90m)[39m {
+[2m[WebServer] [22m  description: [32m"Route /api/storage/quota couldn't be rendered statically because it used `headers`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error"[39m,
+[2m[WebServer] [22m  digest: [32m'DYNAMIC_SERVER_USAGE'[39m
+[2m[WebServer] [22m}
+
+[1A[2K[2m[WebServer] [22mSSO metadata GET error: n [Error]: Dynamic server usage: Route /api/sso/metadata couldn't be rendered statically because it used `headers`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error
+[2m[WebServer] [22m    at l [90m(/media/alash/New Volume/Markdown-to-PDF/[39m.next/server/chunks/8948.js:1:56329[90m)[39m
+[2m[WebServer] [22m    at c [90m(/media/alash/New Volume/Markdown-to-PDF/[39m.next/server/chunks/1615.js:1:1441[90m)[39m
+[2m[WebServer] [22m    at s [90m(/media/alash/New Volume/Markdown-to-PDF/[39m.next/server/chunks/4746.js:25:20859[90m)[39m
+[2m[WebServer] [22m    at m [90m(/media/alash/New Volume/Markdown-to-PDF/[39m.next/server/app/api/sso/metadata/route.js:1:1311[90m)[39m
+[2m[WebServer] [22m    at [90m/media/alash/New Volume/Markdown-to-PDF/[39mnode_modules/[4mnext[24m/dist/compiled/next-server/app-route.runtime.prod.js:6:38417
+[2m[WebServer] [22m    at [90m/media/alash/New Volume/Markdown-to-PDF/[39mnode_modules/[4mnext[24m/dist/server/lib/trace/tracer.js:140:36
+[2m[WebServer] [22m    at NoopContextManager.with [90m(/media/alash/New Volume/Markdown-to-PDF/[39mnode_modules/[4m@opentelemetry/api[24m/build/src/context/NoopContextManager.js:25:19[90m)[39m
+[2m[WebServer] [22m    at ContextAPI.with [90m(/media/alash/New Volume/Markdown-to-PDF/[39mnode_modules/[4m@opentelemetry/api[24m/build/src/api/context.js:60:46[90m)[39m
+[2m[WebServer] [22m    at NoopTracer.startActiveSpan [90m(/media/alash/New Volume/Markdown-to-PDF/[39mnode_modules/[4m@opentelemetry/api[24m/build/src/trace/NoopTracer.js:65:31[90m)[39m
+[2m[WebServer] [22m    at ProxyTracer.startActiveSpan [90m(/media/alash/New Volume/Markdown-to-PDF/[39mnode_modules/[4m@opentelemetry/api[24m/build/src/trace/ProxyTracer.js:36:24[90m)[39m {
+[2m[WebServer] [22m  description: [32m"Route /api/sso/metadata couldn't be rendered statically because it used `headers`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error"[39m,
+[2m[WebServer] [22m  digest: [32m'DYNAMIC_SERVER_USAGE'[39m
+[2m[WebServer] [22m}
+[2m[WebServer] [22mAnalytics summary API error: n [Error]: Dynamic server usage: Route /api/analytics/summary couldn't be rendered statically because it used `headers`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error
+[2m[WebServer] [22m    at l [90m(/media/alash/New Volume/Markdown-to-PDF/[39m.next/server/chunks/8948.js:1:56329[90m)[39m
+[2m[WebServer] [22m    at c [90m(/media/alash/New Volume/Markdown-to-PDF/[39m.next/server/chunks/1615.js:1:1441[90m)[39m
+[2m[WebServer] [22m    at s [90m(/media/alash/New Volume/Markdown-to-PDF/[39m.next/server/chunks/4746.js:25:20859[90m)[39m
+[2m[WebServer] [22m    at u [90m(/media/alash/New Volume/Markdown-to-PDF/[39m.next/server/app/api/analytics/summary/route.js:1:1309[90m)[39m
+[2m[WebServer] [22m    at [90m/media/alash/New Volume/Markdown-to-PDF/[39mnode_modules/[4mnext[24m/dist/compiled/next-server/app-route.runtime.prod.js:6:38417
+[2m[WebServer] [22m    at [90m/media/alash/New Volume/Markdown-to-PDF/[39mnode_modules/[4mnext[24m/dist/server/lib/trace/tracer.js:140:36
+[2m[WebServer] [22m    at NoopContextManager.with [90m(/media/alash/New Volume/Markdown-to-PDF/[39mnode_modules/[4m@opentelemetry/api[24m/build/src/context/NoopContextManager.js:25:19[90m)[39m
+[2m[WebServer] [22m    at ContextAPI.with [90m(/media/alash/New Volume/Markdown-to-PDF/[39mnode_modules/[4m@opentelemetry/api[24m/build/src/api/context.js:60:46[90m)[39m
+[2m[WebServer] [22m    at NoopTracer.startActiveSpan [90m(/media/alash/New Volume/Markdown-to-PDF/[39mnode_modules/[4m@opentelemetry/api[24m/build/src/trace/NoopTracer.js:65:31[90m)[39m
+[2m[WebServer] [22m    at ProxyTracer.startActiveSpan [90m(/media/alash/New Volume/Markdown-to-PDF/[39mnode_modules/[4m@opentelemetry/api[24m/build/src/trace/ProxyTracer.js:36:24[90m)[39m {
+[2m[WebServer] [22m  description: [32m"Route /api/analytics/summary couldn't be rendered statically because it used `headers`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error"[39m,
+[2m[WebServer] [22m  digest: [32m'DYNAMIC_SERVER_USAGE'[39m
+[2m[WebServer] [22m}
+[2m[WebServer] [22mGet subscription error: n [Error]: Dynamic server usage: Route /api/subscriptions couldn't be rendered statically because it used `headers`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error
+[2m[WebServer] [22m    at l [90m(/media/alash/New Volume/Markdown-to-PDF/[39m.next/server/chunks/8948.js:1:56329[90m)[39m
+[2m[WebServer] [22m    at c [90m(/media/alash/New Volume/Markdown-to-PDF/[39m.next/server/chunks/1615.js:1:1441[90m)[39m
+[2m[WebServer] [22m    at s [90m(/media/alash/New Volume/Markdown-to-PDF/[39m.next/server/chunks/4746.js:25:20859[90m)[39m
+[2m[WebServer] [22m    at m [90m(/media/alash/New Volume/Markdown-to-PDF/[39m.next/server/app/api/subscriptions/route.js:1:1322[90m)[39m
+[2m[WebServer] [22m    at [90m/media/alash/New Volume/Markdown-to-PDF/[39mnode_modules/[4mnext[24m/dist/compiled/next-server/app-route.runtime.prod.js:6:38417
+[2m[WebServer] [22m    at [90m/media/alash/New Volume/Markdown-to-PDF/[39mnode_modules/[4mnext[24m/dist/server/lib/trace/tracer.js:140:36
+[2m[WebServer] [22m    at NoopContextManager.with [90m(/media/alash/New Volume/Markdown-to-PDF/[39mnode_modules/[4m@opentelemetry/api[24m/build/src/context/NoopContextManager.js:25:19[90m)[39m
+[2m[WebServer] [22m    at ContextAPI.with [90m(/media/alash/New Volume/Markdown-to-PDF/[39mnode_modules/[4m@opentelemetry/api[24m/build/src/api/context.js:60:46[90m)[39m
+[2m[WebServer] [22m    at NoopTracer.startActiveSpan [90m(/media/alash/New Volume/Markdown-to-PDF/[39mnode_modules/[4m@opentelemetry/api[24m/build/src/trace/NoopTracer.js:65:31[90m)[39m
+[2m[WebServer] [22m    at ProxyTracer.startActiveSpan [90m(/media/alash/New Volume/Markdown-to-PDF/[39mnode_modules/[4m@opentelemetry/api[24m/build/src/trace/ProxyTracer.js:36:24[90m)[39m {
+[2m[WebServer] [22m  description: [32m"Route /api/subscriptions couldn't be rendered statically because it used `headers`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error"[39m,
+[2m[WebServer] [22m  digest: [32m'DYNAMIC_SERVER_USAGE'[39m
+[2m[WebServer] [22m}
+[2m[WebServer] [22mGet user invitations API error: n [Error]: Dynamic server usage: Route /api/invitations couldn't be rendered statically because it used `headers`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error
+[2m[WebServer] [22m    at l [90m(/media/alash/New Volume/Markdown-to-PDF/[39m.next/server/chunks/8948.js:1:56329[90m)[39m
+[2m[WebServer] [22m    at c [90m(/media/alash/New Volume/Markdown-to-PDF/[39m.next/server/chunks/1615.js:1:1441[90m)[39m
+[2m[WebServer] [22m    at s [90m(/media/alash/New Volume/Markdown-to-PDF/[39m.next/server/chunks/4746.js:25:20859[90m)[39m
+[2m[WebServer] [22m    at u [90m(/media/alash/New Volume/Markdown-to-PDF/[39m.next/server/app/api/invitations/route.js:1:1598[90m)[39m
+[2m[WebServer] [22m    at [90m/media/alash/New Volume/Markdown-to-PDF/[39mnode_modules/[4mnext[24m/dist/compiled/next-server/app-route.runtime.prod.js:6:38417
+[2m[WebServer] [22m    at [90m/media/alash/New Volume/Markdown-to-PDF/[39mnode_modules/[4mnext[24m/dist/server/lib/trace/tracer.js:140:36
+[2m[WebServer] [22m    at NoopContextManager.with [90m(/media/alash/New Volume/Markdown-to-PDF/[39mnode_modules/[4m@opentelemetry/api[24m/build/src/context/NoopContextManager.js:25:19[90m)[39m
+[2m[WebServer] [22m    at ContextAPI.with [90m(/media/alash/New Volume/Markdown-to-PDF/[39mnode_modules/[4m@opentelemetry/api[24m/build/src/api/context.js:60:46[90m)[39m
+[2m[WebServer] [22m    at NoopTracer.startActiveSpan [90m(/media/alash/New Volume/Markdown-to-PDF/[39mnode_modules/[4m@opentelemetry/api[24m/build/src/trace/NoopTracer.js:65:31[90m)[39m
+[2m[WebServer] [22m    at ProxyTracer.startActiveSpan [90m(/media/alash/New Volume/Markdown-to-PDF/[39mnode_modules/[4m@opentelemetry/api[24m/build/src/trace/ProxyTracer.js:36:24[90m)[39m {
+[2m[WebServer] [22m  description: [32m"Route /api/invitations couldn't be rendered statically because it used `headers`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error"[39m,
+[2m[WebServer] [22m  digest: [32m'DYNAMIC_SERVER_USAGE'[39m
+[2m[WebServer] [22m}
+
+[1A[2K[2m[WebServer] [22mAnalytics history API error: n [Error]: Dynamic server usage: Route /api/analytics/history couldn't be rendered statically because it used `headers`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error
+[2m[WebServer] [22m    at l [90m(/media/alash/New Volume/Markdown-to-PDF/[39m.next/server/chunks/8948.js:1:56329[90m)[39m
+[2m[WebServer] [22m    at c [90m(/media/alash/New Volume/Markdown-to-PDF/[39m.next/server/chunks/1615.js:1:1441[90m)[39m
+[2m[WebServer] [22m    at s [90m(/media/alash/New Volume/Markdown-to-PDF/[39m.next/server/chunks/4746.js:25:20859[90m)[39m
+[2m[WebServer] [22m    at u [90m(/media/alash/New Volume/Markdown-to-PDF/[39m.next/server/app/api/analytics/history/route.js:1:1311[90m)[39m
+[2m[WebServer] [22m    at [90m/media/alash/New Volume/Markdown-to-PDF/[39mnode_modules/[4mnext[24m/dist/compiled/next-server/app-route.runtime.prod.js:6:38417
+[2m[WebServer] [22m    at [90m/media/alash/New Volume/Markdown-to-PDF/[39mnode_modules/[4mnext[24m/dist/server/lib/trace/tracer.js:140:36
+[2m[WebServer] [22m    at NoopContextManager.with [90m(/media/alash/New Volume/Markdown-to-PDF/[39mnode_modules/[4m@opentelemetry/api[24m/build/src/context/NoopContextManager.js:25:19[90m)[39m
+[2m[WebServer] [22m    at ContextAPI.with [90m(/media/alash/New Volume/Markdown-to-PDF/[39mnode_modules/[4m@opentelemetry/api[24m/build/src/api/context.js:60:46[90m)[39m
+[2m[WebServer] [22m    at NoopTracer.startActiveSpan [90m(/media/alash/New Volume/Markdown-to-PDF/[39mnode_modules/[4m@opentelemetry/api[24m/build/src/trace/NoopTracer.js:65:31[90m)[39m
+[2m[WebServer] [22m    at ProxyTracer.startActiveSpan [90m(/media/alash/New Volume/Markdown-to-PDF/[39mnode_modules/[4m@opentelemetry/api[24m/build/src/trace/ProxyTracer.js:36:24[90m)[39m {
+[2m[WebServer] [22m  description: [32m"Route /api/analytics/history couldn't be rendered statically because it used `headers`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error"[39m,
+[2m[WebServer] [22m  digest: [32m'DYNAMIC_SERVER_USAGE'[39m
+[2m[WebServer] [22m}
+[2m[WebServer] [22mGet invoices error: n [Error]: Dynamic server usage: Route /api/subscriptions/invoices couldn't be rendered statically because it used `headers`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error
+[2m[WebServer] [22m    at l [90m(/media/alash/New Volume/Markdown-to-PDF/[39m.next/server/chunks/8948.js:1:56329[90m)[39m
+[2m[WebServer] [22m    at c [90m(/media/alash/New Volume/Markdown-to-PDF/[39m.next/server/chunks/1615.js:1:1441[90m)[39m
+[2m[WebServer] [22m    at s [90m(/media/alash/New Volume/Markdown-to-PDF/[39m.next/server/chunks/4746.js:25:20859[90m)[39m
+[2m[WebServer] [22m    at m [90m(/media/alash/New Volume/Markdown-to-PDF/[39m.next/server/app/api/subscriptions/invoices/route.js:1:1320[90m)[39m
+[2m[WebServer] [22m    at [90m/media/alash/New Volume/Markdown-to-PDF/[39mnode_modules/[4mnext[24m/dist/compiled/next-server/app-route.runtime.prod.js:6:38417
+[2m[WebServer] [22m    at [90m/media/alash/New Volume/Markdown-to-PDF/[39mnode_modules/[4mnext[24m/dist/server/lib/trace/tracer.js:140:36
+[2m[WebServer] [22m    at NoopContextManager.with [90m(/media/alash/New Volume/Markdown-to-PDF/[39mnode_modules/[4m@opentelemetry/api[24m/build/src/context/NoopContextManager.js:25:19[90m)[39m
+[2m[WebServer] [22m    at ContextAPI.with [90m(/media/alash/New Volume/Markdown-to-PDF/[39mnode_modules/[4m@opentelemetry/api[24m/build/src/api/context.js:60:46[90m)[39m
+[2m[WebServer] [22m    at NoopTracer.startActiveSpan [90m(/media/alash/New Volume/Markdown-to-PDF/[39mnode_modules/[4m@opentelemetry/api[24m/build/src/trace/NoopTracer.js:65:31[90m)[39m
+[2m[WebServer] [22m    at ProxyTracer.startActiveSpan [90m(/media/alash/New Volume/Markdown-to-PDF/[39mnode_modules/[4m@opentelemetry/api[24m/build/src/trace/ProxyTracer.js:36:24[90m)[39m {
+[2m[WebServer] [22m  description: [32m"Route /api/subscriptions/invoices couldn't be rendered statically because it used `headers`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error"[39m,
+[2m[WebServer] [22m  digest: [32m'DYNAMIC_SERVER_USAGE'[39m
+[2m[WebServer] [22m}
+[2m[WebServer] [22mSSO audit GET error: n [Error]: Dynamic server usage: Route /api/sso/audit couldn't be rendered statically because it used `headers`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error
+[2m[WebServer] [22m    at l [90m(/media/alash/New Volume/Markdown-to-PDF/[39m.next/server/chunks/8948.js:1:56329[90m)[39m
+[2m[WebServer] [22m    at c [90m(/media/alash/New Volume/Markdown-to-PDF/[39m.next/server/chunks/1615.js:1:1441[90m)[39m
+[2m[WebServer] [22m    at s [90m(/media/alash/New Volume/Markdown-to-PDF/[39m.next/server/chunks/4746.js:25:20859[90m)[39m
+[2m[WebServer] [22m    at d [90m(/media/alash/New Volume/Markdown-to-PDF/[39m.next/server/app/api/sso/audit/route.js:1:1311[90m)[39m
+[2m[WebServer] [22m    at [90m/media/alash/New Volume/Markdown-to-PDF/[39mnode_modules/[4mnext[24m/dist/compiled/next-server/app-route.runtime.prod.js:6:38417
+[2m[WebServer] [22m    at [90m/media/alash/New Volume/Markdown-to-PDF/[39mnode_modules/[4mnext[24m/dist/server/lib/trace/tracer.js:140:36
+[2m[WebServer] [22m    at NoopContextManager.with [90m(/media/alash/New Volume/Markdown-to-PDF/[39mnode_modules/[4m@opentelemetry/api[24m/build/src/context/NoopContextManager.js:25:19[90m)[39m
+[2m[WebServer] [22m    at ContextAPI.with [90m(/media/alash/New Volume/Markdown-to-PDF/[39mnode_modules/[4m@opentelemetry/api[24m/build/src/api/context.js:60:46[90m)[39m
+[2m[WebServer] [22m    at NoopTracer.startActiveSpan [90m(/media/alash/New Volume/Markdown-to-PDF/[39mnode_modules/[4m@opentelemetry/api[24m/build/src/trace/NoopTracer.js:65:31[90m)[39m
+[2m[WebServer] [22m    at ProxyTracer.startActiveSpan [90m(/media/alash/New Volume/Markdown-to-PDF/[39mnode_modules/[4m@opentelemetry/api[24m/build/src/trace/ProxyTracer.js:36:24[90m)[39m {
+[2m[WebServer] [22m  description: [32m"Route /api/sso/audit couldn't be rendered statically because it used `headers`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error"[39m,
+[2m[WebServer] [22m  digest: [32m'DYNAMIC_SERVER_USAGE'[39m
+[2m[WebServer] [22m}
+
+[1A[2K[2m[WebServer] [22mList files API error: n [Error]: Dynamic server usage: Route /api/storage/files couldn't be rendered statically because it used `headers`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error
+[2m[WebServer] [22m    at l [90m(/media/alash/New Volume/Markdown-to-PDF/[39m.next/server/chunks/8948.js:1:56329[90m)[39m
+[2m[WebServer] [22m    at c [90m(/media/alash/New Volume/Markdown-to-PDF/[39m.next/server/chunks/1615.js:1:1441[90m)[39m
+[2m[WebServer] [22m    at s [90m(/media/alash/New Volume/Markdown-to-PDF/[39m.next/server/chunks/4746.js:25:20859[90m)[39m
+[2m[WebServer] [22m    at m [90m(/media/alash/New Volume/Markdown-to-PDF/[39m.next/server/app/api/storage/files/route.js:1:1432[90m)[39m
+[2m[WebServer] [22m    at [90m/media/alash/New Volume/Markdown-to-PDF/[39mnode_modules/[4mnext[24m/dist/compiled/next-server/app-route.runtime.prod.js:6:38417
+[2m[WebServer] [22m    at [90m/media/alash/New Volume/Markdown-to-PDF/[39mnode_modules/[4mnext[24m/dist/server/lib/trace/tracer.js:140:36
+[2m[WebServer] [22m    at NoopContextManager.with [90m(/media/alash/New Volume/Markdown-to-PDF/[39mnode_modules/[4m@opentelemetry/api[24m/build/src/context/NoopContextManager.js:25:19[90m)[39m
+[2m[WebServer] [22m    at ContextAPI.with [90m(/media/alash/New Volume/Markdown-to-PDF/[39mnode_modules/[4m@opentelemetry/api[24m/build/src/api/context.js:60:46[90m)[39m
+[2m[WebServer] [22m    at NoopTracer.startActiveSpan [90m(/media/alash/New Volume/Markdown-to-PDF/[39mnode_modules/[4m@opentelemetry/api[24m/build/src/trace/NoopTracer.js:65:31[90m)[39m
+[2m[WebServer] [22m    at ProxyTracer.startActiveSpan [90m(/media/alash/New Volume/Markdown-to-PDF/[39mnode_modules/[4m@opentelemetry/api[24m/build/src/trace/ProxyTracer.js:36:24[90m)[39m {
+[2m[WebServer] [22m  description: [32m"Route /api/storage/files couldn't be rendered statically because it used `headers`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error"[39m,
+[2m[WebServer] [22m  digest: [32m'DYNAMIC_SERVER_USAGE'[39m
+[2m[WebServer] [22m}
+
+[1A[2K[2m[WebServer] [22m
+[2m[WebServer] [22mThe `locale` parameter in `getRequestConfig` is deprecated, please switch to `await requestLocale`. See https://next-intl.dev/blog/next-intl-3-22#await-request-locale
+[2m[WebServer] [22m
+[2m[WebServer] [22m
+[2m[WebServer] [22mA `locale` is expected to be returned from `getRequestConfig`, but none was returned. This will be an error in the next major version of next-intl.
+[2m[WebServer] [22m
+[2m[WebServer] [22mSee: https://next-intl.dev/blog/next-intl-3-22#await-request-locale
+[2m[WebServer] [22m
+[2m[WebServer] [22m
+[2m[WebServer] [22mThe `locale` parameter in `getRequestConfig` is deprecated, please switch to `await requestLocale`. See https://next-intl.dev/blog/next-intl-3-22#await-request-locale
+[2m[WebServer] [22m
+[2m[WebServer] [22m
+[2m[WebServer] [22mA `locale` is expected to be returned from `getRequestConfig`, but none was returned. This will be an error in the next major version of next-intl.
+[2m[WebServer] [22m
+[2m[WebServer] [22mSee: https://next-intl.dev/blog/next-intl-3-22#await-request-locale
+[2m[WebServer] [22m
+[2m[WebServer] [22mExport error: n [Error]: Dynamic server usage: Route /api/users/export couldn't be rendered statically because it used `headers`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error
+[2m[WebServer] [22m    at l [90m(/media/alash/New Volume/Markdown-to-PDF/[39m.next/server/chunks/8948.js:1:56329[90m)[39m
+[2m[WebServer] [22m    at c [90m(/media/alash/New Volume/Markdown-to-PDF/[39m.next/server/chunks/1615.js:1:1441[90m)[39m
+[2m[WebServer] [22m    at s [90m(/media/alash/New Volume/Markdown-to-PDF/[39m.next/server/chunks/4746.js:25:20859[90m)[39m
+[2m[WebServer] [22m    at m [90m(/media/alash/New Volume/Markdown-to-PDF/[39m.next/server/app/api/users/export/route.js:1:1602[90m)[39m
+[2m[WebServer] [22m    at [90m/media/alash/New Volume/Markdown-to-PDF/[39mnode_modules/[4mnext[24m/dist/compiled/next-server/app-route.runtime.prod.js:6:38417
+[2m[WebServer] [22m    at [90m/media/alash/New Volume/Markdown-to-PDF/[39mnode_modules/[4mnext[24m/dist/server/lib/trace/tracer.js:140:36
+[2m[WebServer] [22m    at NoopContextManager.with [90m(/media/alash/New Volume/Markdown-to-PDF/[39mnode_modules/[4m@opentelemetry/api[24m/build/src/context/NoopContextManager.js:25:19[90m)[39m
+[2m[WebServer] [22m    at ContextAPI.with [90m(/media/alash/New Volume/Markdown-to-PDF/[39mnode_modules/[4m@opentelemetry/api[24m/build/src/api/context.js:60:46[90m)[39m
+[2m[WebServer] [22m    at NoopTracer.startActiveSpan [90m(/media/alash/New Volume/Markdown-to-PDF/[39mnode_modules/[4m@opentelemetry/api[24m/build/src/trace/NoopTracer.js:65:31[90m)[39m
+[2m[WebServer] [22m    at ProxyTracer.startActiveSpan [90m(/media/alash/New Volume/Markdown-to-PDF/[39mnode_modules/[4m@opentelemetry/api[24m/build/src/trace/ProxyTracer.js:36:24[90m)[39m {
+[2m[WebServer] [22m  description: [32m"Route /api/users/export couldn't be rendered statically because it used `headers`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error"[39m,
+[2m[WebServer] [22m  digest: [32m'DYNAMIC_SERVER_USAGE'[39m
+[2m[WebServer] [22m}
+
+[1A[2K[2m[WebServer] [22mSTRIPE_SECRET_KEY is not set. Stripe functionality will be disabled.
+[2m[WebServer] [22m
+[2m[WebServer] [22mThe `locale` parameter in `getRequestConfig` is deprecated, please switch to `await requestLocale`. See https://next-intl.dev/blog/next-intl-3-22#await-request-locale
+[2m[WebServer] [22m
+[2m[WebServer] [22m
+[2m[WebServer] [22mA `locale` is expected to be returned from `getRequestConfig`, but none was returned. This will be an error in the next major version of next-intl.
+[2m[WebServer] [22m
+[2m[WebServer] [22mSee: https://next-intl.dev/blog/next-intl-3-22#await-request-locale
+[2m[WebServer] [22m
+[2m[WebServer] [22m
+[2m[WebServer] [22mThe `locale` parameter in `getRequestConfig` is deprecated, please switch to `await requestLocale`. See https://next-intl.dev/blog/next-intl-3-22#await-request-locale
+[2m[WebServer] [22m
+[2m[WebServer] [22m
+[2m[WebServer] [22mA `locale` is expected to be returned from `getRequestConfig`, but none was returned. This will be an error in the next major version of next-intl.
+[2m[WebServer] [22m
+[2m[WebServer] [22mSee: https://next-intl.dev/blog/next-intl-3-22#await-request-locale
+[2m[WebServer] [22m
+[2m[WebServer] [22m
+[2m[WebServer] [22mThe `locale` parameter in `getRequestConfig` is deprecated, please switch to `await requestLocale`. See https://next-intl.dev/blog/next-intl-3-22#await-request-locale
+[2m[WebServer] [22m
+[2m[WebServer] [22m
+[2m[WebServer] [22mA `locale` is expected to be returned from `getRequestConfig`, but none was returned. This will be an error in the next major version of next-intl.
+[2m[WebServer] [22m
+[2m[WebServer] [22mSee: https://next-intl.dev/blog/next-intl-3-22#await-request-locale
+[2m[WebServer] [22m
+[2m[WebServer] [22m
+[2m[WebServer] [22mThe `locale` parameter in `getRequestConfig` is deprecated, please switch to `await requestLocale`. See https://next-intl.dev/blog/next-intl-3-22#await-request-locale
+[2m[WebServer] [22m
+[2m[WebServer] [22m
+[2m[WebServer] [22mA `locale` is expected to be returned from `getRequestConfig`, but none was returned. This will be an error in the next major version of next-intl.
+[2m[WebServer] [22m
+[2m[WebServer] [22mSee: https://next-intl.dev/blog/next-intl-3-22#await-request-locale
+[2m[WebServer] [22m
+[2m[WebServer] [22m
+[2m[WebServer] [22mThe `locale` parameter in `getRequestConfig` is deprecated, please switch to `await requestLocale`. See https://next-intl.dev/blog/next-intl-3-22#await-request-locale
+[2m[WebServer] [22m
+[2m[WebServer] [22m
+[2m[WebServer] [22mA `locale` is expected to be returned from `getRequestConfig`, but none was returned. This will be an error in the next major version of next-intl.
+[2m[WebServer] [22m
+[2m[WebServer] [22mSee: https://next-intl.dev/blog/next-intl-3-22#await-request-locale
+[2m[WebServer] [22m
+[2m[WebServer] [22mGet accounts error: n [Error]: Dynamic server usage: Route /api/users/accounts couldn't be rendered statically because it used `headers`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error
+[2m[WebServer] [22m    at l [90m(/media/alash/New Volume/Markdown-to-PDF/[39m.next/server/chunks/8948.js:1:56329[90m)[39m
+[2m[WebServer] [22m    at c [90m(/media/alash/New Volume/Markdown-to-PDF/[39m.next/server/chunks/1615.js:1:1441[90m)[39m
+[2m[WebServer] [22m    at s [90m(/media/alash/New Volume/Markdown-to-PDF/[39m.next/server/chunks/4746.js:25:20859[90m)[39m
+[2m[WebServer] [22m    at d [90m(/media/alash/New Volume/Markdown-to-PDF/[39m.next/server/app/api/users/accounts/route.js:1:1298[90m)[39m
+[2m[WebServer] [22m    at [90m/media/alash/New Volume/Markdown-to-PDF/[39mnode_modules/[4mnext[24m/dist/compiled/next-server/app-route.runtime.prod.js:6:38417
+[2m[WebServer] [22m    at [90m/media/alash/New Volume/Markdown-to-PDF/[39mnode_modules/[4mnext[24m/dist/server/lib/trace/tracer.js:140:36
+[2m[WebServer] [22m    at NoopContextManager.with [90m(/media/alash/New Volume/Markdown-to-PDF/[39mnode_modules/[4m@opentelemetry/api[24m/build/src/context/NoopContextManager.js:25:19[90m)[39m
+[2m[WebServer] [22m    at ContextAPI.with [90m(/media/alash/New Volume/Markdown-to-PDF/[39mnode_modules/[4m@opentelemetry/api[24m/build/src/api/context.js:60:46[90m)[39m
+[2m[WebServer] [22m    at NoopTracer.startActiveSpan [90m(/media/alash/New Volume/Markdown-to-PDF/[39mnode_modules/[4m@opentelemetry/api[24m/build/src/trace/NoopTracer.js:65:31[90m)[39m
+[2m[WebServer] [22m    at ProxyTracer.startActiveSpan [90m(/media/alash/New Volume/Markdown-to-PDF/[39mnode_modules/[4m@opentelemetry/api[24m/build/src/trace/ProxyTracer.js:36:24[90m)[39m {
+[2m[WebServer] [22m  description: [32m"Route /api/users/accounts couldn't be rendered statically because it used `headers`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error"[39m,
+[2m[WebServer] [22m  digest: [32m'DYNAMIC_SERVER_USAGE'[39m
+[2m[WebServer] [22m}
+[2m[WebServer] [22mGet portal URL error: n [Error]: Dynamic server usage: Route /api/subscriptions/portal-url couldn't be rendered statically because it used `headers`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error
+[2m[WebServer] [22m    at l [90m(/media/alash/New Volume/Markdown-to-PDF/[39m.next/server/chunks/8948.js:1:56329[90m)[39m
+[2m[WebServer] [22m    at c [90m(/media/alash/New Volume/Markdown-to-PDF/[39m.next/server/chunks/1615.js:1:1441[90m)[39m
+[2m[WebServer] [22m    at s [90m(/media/alash/New Volume/Markdown-to-PDF/[39m.next/server/chunks/4746.js:25:20859[90m)[39m
+[2m[WebServer] [22m    at m [90m(/media/alash/New Volume/Markdown-to-PDF/[39m.next/server/app/api/subscriptions/portal-url/route.js:1:1373[90m)[39m
+[2m[WebServer] [22m    at [90m/media/alash/New Volume/Markdown-to-PDF/[39mnode_modules/[4mnext[24m/dist/compiled/next-server/app-route.runtime.prod.js:6:38417
+[2m[WebServer] [22m    at [90m/media/alash/New Volume/Markdown-to-PDF/[39mnode_modules/[4mnext[24m/dist/server/lib/trace/tracer.js:140:36
+[2m[WebServer] [22m    at NoopContextManager.with [90m(/media/alash/New Volume/Markdown-to-PDF/[39mnode_modules/[4m@opentelemetry/api[24m/build/src/context/NoopContextManager.js:25:19[90m)[39m
+[2m[WebServer] [22m    at ContextAPI.with [90m(/media/alash/New Volume/Markdown-to-PDF/[39mnode_modules/[4m@opentelemetry/api[24m/build/src/api/context.js:60:46[90m)[39m
+[2m[WebServer] [22m    at NoopTracer.startActiveSpan [90m(/media/alash/New Volume/Markdown-to-PDF/[39mnode_modules/[4m@opentelemetry/api[24m/build/src/trace/NoopTracer.js:65:31[90m)[39m
+[2m[WebServer] [22m    at ProxyTracer.startActiveSpan [90m(/media/alash/New Volume/Markdown-to-PDF/[39mnode_modules/[4m@opentelemetry/api[24m/build/src/trace/ProxyTracer.js:36:24[90m)[39m {
+[2m[WebServer] [22m  description: [32m"Route /api/subscriptions/portal-url couldn't be rendered statically because it used `headers`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error"[39m,
+[2m[WebServer] [22m  digest: [32m'DYNAMIC_SERVER_USAGE'[39m
+[2m[WebServer] [22m}
+
+[1A[2K[2m[WebServer] [22m
+[2m[WebServer] [22mThe `locale` parameter in `getRequestConfig` is deprecated, please switch to `await requestLocale`. See https://next-intl.dev/blog/next-intl-3-22#await-request-locale
+[2m[WebServer] [22m
+[2m[WebServer] [22m
+[2m[WebServer] [22mA `locale` is expected to be returned from `getRequestConfig`, but none was returned. This will be an error in the next major version of next-intl.
+[2m[WebServer] [22m
+[2m[WebServer] [22mSee: https://next-intl.dev/blog/next-intl-3-22#await-request-locale
+[2m[WebServer] [22m
+[2m[WebServer] [22m
+[2m[WebServer] [22mThe `locale` parameter in `getRequestConfig` is deprecated, please switch to `await requestLocale`. See https://next-intl.dev/blog/next-intl-3-22#await-request-locale
+[2m[WebServer] [22m
+[2m[WebServer] [22m
+[2m[WebServer] [22mA `locale` is expected to be returned from `getRequestConfig`, but none was returned. This will be an error in the next major version of next-intl.
+[2m[WebServer] [22m
+[2m[WebServer] [22mSee: https://next-intl.dev/blog/next-intl-3-22#await-request-locale
+[2m[WebServer] [22m
+[2m[WebServer] [22m
+[2m[WebServer] [22mThe `locale` parameter in `getRequestConfig` is deprecated, please switch to `await requestLocale`. See https://next-intl.dev/blog/next-intl-3-22#await-request-locale
+[2m[WebServer] [22m
+[2m[WebServer] [22m
+[2m[WebServer] [22mA `locale` is expected to be returned from `getRequestConfig`, but none was returned. This will be an error in the next major version of next-intl.
+[2m[WebServer] [22m
+[2m[WebServer] [22mSee: https://next-intl.dev/blog/next-intl-3-22#await-request-locale
+[2m[WebServer] [22m
+[2m[WebServer] [22m
+[2m[WebServer] [22mThe `locale` parameter in `getRequestConfig` is deprecated, please switch to `await requestLocale`. See https://next-intl.dev/blog/next-intl-3-22#await-request-locale
+[2m[WebServer] [22m
+[2m[WebServer] [22m
+[2m[WebServer] [22mA `locale` is expected to be returned from `getRequestConfig`, but none was returned. This will be an error in the next major version of next-intl.
+[2m[WebServer] [22m
+[2m[WebServer] [22mSee: https://next-intl.dev/blog/next-intl-3-22#await-request-locale
+[2m[WebServer] [22m
+
+[1A[2K[2m[WebServer] [22m
+[2m[WebServer] [22mThe `locale` parameter in `getRequestConfig` is deprecated, please switch to `await requestLocale`. See https://next-intl.dev/blog/next-intl-3-22#await-request-locale
+[2m[WebServer] [22m
+
+[1A[2K[2m[WebServer] [22m
+[2m[WebServer] [22mThe `locale` parameter in `getRequestConfig` is deprecated, please switch to `await requestLocale`. See https://next-intl.dev/blog/next-intl-3-22#await-request-locale
+[2m[WebServer] [22m
+
+[1A[2K[2m[WebServer] [22m
+[2m[WebServer] [22mThe `locale` parameter in `getRequestConfig` is deprecated, please switch to `await requestLocale`. See https://next-intl.dev/blog/next-intl-3-22#await-request-locale
+[2m[WebServer] [22m
+
+[1A[2K[2m[WebServer] [22m
+[2m[WebServer] [22mA `locale` is expected to be returned from `getRequestConfig`, but none was returned. This will be an error in the next major version of next-intl.
+[2m[WebServer] [22m
+[2m[WebServer] [22mSee: https://next-intl.dev/blog/next-intl-3-22#await-request-locale
+[2m[WebServer] [22m
+
+[1A[2K[2m[WebServer] [22m
+[2m[WebServer] [22mA `locale` is expected to be returned from `getRequestConfig`, but none was returned. This will be an error in the next major version of next-intl.
+[2m[WebServer] [22m
+[2m[WebServer] [22mSee: https://next-intl.dev/blog/next-intl-3-22#await-request-locale
+[2m[WebServer] [22m
+
+[1A[2K[2m[WebServer] [22m
+[2m[WebServer] [22mThe `locale` parameter in `getRequestConfig` is deprecated, please switch to `await requestLocale`. See https://next-intl.dev/blog/next-intl-3-22#await-request-locale
+[2m[WebServer] [22m
+
+[1A[2K[2m[WebServer] [22m
+[2m[WebServer] [22mThe `locale` parameter in `getRequestConfig` is deprecated, please switch to `await requestLocale`. See https://next-intl.dev/blog/next-intl-3-22#await-request-locale
+[2m[WebServer] [22m
+
+[1A[2K[2m[WebServer] [22m
+[2m[WebServer] [22mA `locale` is expected to be returned from `getRequestConfig`, but none was returned. This will be an error in the next major version of next-intl.
+[2m[WebServer] [22m
+[2m[WebServer] [22mSee: https://next-intl.dev/blog/next-intl-3-22#await-request-locale
+[2m[WebServer] [22m
+
+[1A[2K[2m[WebServer] [22m
+[2m[WebServer] [22mThe `locale` parameter in `getRequestConfig` is deprecated, please switch to `await requestLocale`. See https://next-intl.dev/blog/next-intl-3-22#await-request-locale
+[2m[WebServer] [22m
+
+[1A[2K[2m[WebServer] [22m
+[2m[WebServer] [22mA `locale` is expected to be returned from `getRequestConfig`, but none was returned. This will be an error in the next major version of next-intl.
+[2m[WebServer] [22m
+[2m[WebServer] [22mSee: https://next-intl.dev/blog/next-intl-3-22#await-request-locale
+[2m[WebServer] [22m
+
+[1A[2K[2m[WebServer] [22m
+[2m[WebServer] [22mA `locale` is expected to be returned from `getRequestConfig`, but none was returned. This will be an error in the next major version of next-intl.
+[2m[WebServer] [22m
+[2m[WebServer] [22mSee: https://next-intl.dev/blog/next-intl-3-22#await-request-locale
+[2m[WebServer] [22m
+
+[1A[2K[2m[WebServer] [22m
+[2m[WebServer] [22mA `locale` is expected to be returned from `getRequestConfig`, but none was returned. This will be an error in the next major version of next-intl.
+[2m[WebServer] [22m
+[2m[WebServer] [22mSee: https://next-intl.dev/blog/next-intl-3-22#await-request-locale
+[2m[WebServer] [22m
+
+[1A[2K[2m[WebServer] [22mu [Error]: MISSING_MESSAGE: themes.codeThemes.githublight (en)
+[2m[WebServer] [22m    at b [90m(/media/alash/New Volume/Markdown-to-PDF/[39m.next/server/chunks/7597.js:1:138268[90m)[39m
+[2m[WebServer] [22m    at E [90m(/media/alash/New Volume/Markdown-to-PDF/[39m.next/server/chunks/7597.js:1:138424[90m)[39m
+[2m[WebServer] [22m    at w [90m(/media/alash/New Volume/Markdown-to-PDF/[39m.next/server/chunks/7597.js:1:139757[90m)[39m
+[2m[WebServer] [22m    at [90m/media/alash/New Volume/Markdown-to-PDF/[39m.next/server/app/[locale]/settings/page.js:1:4469
+[2m[WebServer] [22m    at Array.map (<anonymous>)
+[2m[WebServer] [22m    at g [90m(/media/alash/New Volume/Markdown-to-PDF/[39m.next/server/app/[locale]/settings/page.js:1:4401[90m)[39m
+[2m[WebServer] [22m    at nj [90m(/media/alash/New Volume/Markdown-to-PDF/[39mnode_modules/[4mnext[24m/dist/compiled/next-server/app-page.runtime.prod.js:12:46252[90m)[39m
+[2m[WebServer] [22m    at nM [90m(/media/alash/New Volume/Markdown-to-PDF/[39mnode_modules/[4mnext[24m/dist/compiled/next-server/app-page.runtime.prod.js:12:47572[90m)[39m
+[2m[WebServer] [22m    at nL [90m(/media/alash/New Volume/Markdown-to-PDF/[39mnode_modules/[4mnext[24m/dist/compiled/next-server/app-page.runtime.prod.js:12:64547[90m)[39m
+[2m[WebServer] [22m    at nB [90m(/media/alash/New Volume/Markdown-to-PDF/[39mnode_modules/[4mnext[24m/dist/compiled/next-server/app-page.runtime.prod.js:12:67539[90m)[39m {
+[2m[WebServer] [22m  code: [32m'MISSING_MESSAGE'[39m,
+[2m[WebServer] [22m  originalMessage: [32m'themes.codeThemes.githublight (en)'[39m
+[2m[WebServer] [22m}
+
+[1A[2K[2m[WebServer] [22mu [Error]: MISSING_MESSAGE: themes.codeThemes.githubdark (en)
+[2m[WebServer] [22m    at b [90m(/media/alash/New Volume/Markdown-to-PDF/[39m.next/server/chunks/7597.js:1:138268[90m)[39m
+[2m[WebServer] [22m    at E [90m(/media/alash/New Volume/Markdown-to-PDF/[39m.next/server/chunks/7597.js:1:138424[90m)[39m
+[2m[WebServer] [22m    at w [90m(/media/alash/New Volume/Markdown-to-PDF/[39m.next/server/chunks/7597.js:1:139757[90m)[39m
+[2m[WebServer] [22m    at [90m/media/alash/New Volume/Markdown-to-PDF/[39m.next/server/app/[locale]/settings/page.js:1:4469
+[2m[WebServer] [22m    at Array.map (<anonymous>)
+[2m[WebServer] [22m    at g [90m(/media/alash/New Volume/Markdown-to-PDF/[39m.next/server/app/[locale]/settings/page.js:1:4401[90m)[39m
+[2m[WebServer] [22m    at nj [90m(/media/alash/New Volume/Markdown-to-PDF/[39mnode_modules/[4mnext[24m/dist/compiled/next-server/app-page.runtime.prod.js:12:46252[90m)[39m
+[2m[WebServer] [22m    at nM [90m(/media/alash/New Volume/Markdown-to-PDF/[39mnode_modules/[4mnext[24m/dist/compiled/next-server/app-page.runtime.prod.js:12:47572[90m)[39m
+[2m[WebServer] [22m    at nL [90m(/media/alash/New Volume/Markdown-to-PDF/[39mnode_modules/[4mnext[24m/dist/compiled/next-server/app-page.runtime.prod.js:12:64547[90m)[39m
+[2m[WebServer] [22m    at nB [90m(/media/alash/New Volume/Markdown-to-PDF/[39mnode_modules/[4mnext[24m/dist/compiled/next-server/app-page.runtime.prod.js:12:67539[90m)[39m {
+[2m[WebServer] [22m  code: [32m'MISSING_MESSAGE'[39m,
+[2m[WebServer] [22m  originalMessage: [32m'themes.codeThemes.githubdark (en)'[39m
+[2m[WebServer] [22m}
+
+[1A[2K[2m[WebServer] [22mu [Error]: MISSING_MESSAGE: themes.codeThemes.onedark (en)
+[2m[WebServer] [22m    at b [90m(/media/alash/New Volume/Markdown-to-PDF/[39m.next/server/chunks/7597.js:1:138268[90m)[39m
+[2m[WebServer] [22m    at E [90m(/media/alash/New Volume/Markdown-to-PDF/[39m.next/server/chunks/7597.js:1:138424[90m)[39m
+[2m[WebServer] [22m    at w [90m(/media/alash/New Volume/Markdown-to-PDF/[39m.next/server/chunks/7597.js:1:139757[90m)[39m
+[2m[WebServer] [22m    at [90m/media/alash/New Volume/Markdown-to-PDF/[39m.next/server/app/[locale]/settings/page.js:1:4469
+[2m[WebServer] [22m    at Array.map (<anonymous>)
+[2m[WebServer] [22m    at g [90m(/media/alash/New Volume/Markdown-to-PDF/[39m.next/server/app/[locale]/settings/page.js:1:4401[90m)[39m
+[2m[WebServer] [22m    at nj [90m(/media/alash/New Volume/Markdown-to-PDF/[39mnode_modules/[4mnext[24m/dist/compiled/next-server/app-page.runtime.prod.js:12:46252[90m)[39m
+[2m[WebServer] [22m    at nM [90m(/media/alash/New Volume/Markdown-to-PDF/[39mnode_modules/[4mnext[24m/dist/compiled/next-server/app-page.runtime.prod.js:12:47572[90m)[39m
+[2m[WebServer] [22m    at nL [90m(/media/alash/New Volume/Markdown-to-PDF/[39mnode_modules/[4mnext[24m/dist/compiled/next-server/app-page.runtime.prod.js:12:64547[90m)[39m
+[2m[WebServer] [22m    at nB [90m(/media/alash/New Volume/Markdown-to-PDF/[39mnode_modules/[4mnext[24m/dist/compiled/next-server/app-page.runtime.prod.js:12:67539[90m)[39m {
+[2m[WebServer] [22m  code: [32m'MISSING_MESSAGE'[39m,
+[2m[WebServer] [22m  originalMessage: [32m'themes.codeThemes.onedark (en)'[39m
+[2m[WebServer] [22m}
+
+[1A[2K[2m[WebServer] [22mu [Error]: MISSING_MESSAGE: themes.codeThemes.vscode (en)
+[2m[WebServer] [22m    at b [90m(/media/alash/New Volume/Markdown-to-PDF/[39m.next/server/chunks/7597.js:1:138268[90m)[39m
+[2m[WebServer] [22m    at E [90m(/media/alash/New Volume/Markdown-to-PDF/[39m.next/server/chunks/7597.js:1:138424[90m)[39m
+[2m[WebServer] [22m    at w [90m(/media/alash/New Volume/Markdown-to-PDF/[39m.next/server/chunks/7597.js:1:139757[90m)[39m
+[2m[WebServer] [22m    at [90m/media/alash/New Volume/Markdown-to-PDF/[39m.next/server/app/[locale]/settings/page.js:1:4469
+[2m[WebServer] [22m    at Array.map (<anonymous>)
+[2m[WebServer] [22m    at g [90m(/media/alash/New Volume/Markdown-to-PDF/[39m.next/server/app/[locale]/settings/page.js:1:4401[90m)[39m
+[2m[WebServer] [22m    at nj [90m(/media/alash/New Volume/Markdown-to-PDF/[39mnode_modules/[4mnext[24m/dist/compiled/next-server/app-page.runtime.prod.js:12:46252[90m)[39m
+[2m[WebServer] [22m    at nM [90m(/media/alash/New Volume/Markdown-to-PDF/[39mnode_modules/[4mnext[24m/dist/compiled/next-server/app-page.runtime.prod.js:12:47572[90m)[39m
+[2m[WebServer] [22m    at nL [90m(/media/alash/New Volume/Markdown-to-PDF/[39mnode_modules/[4mnext[24m/dist/compiled/next-server/app-page.runtime.prod.js:12:64547[90m)[39m
+[2m[WebServer] [22m    at nB [90m(/media/alash/New Volume/Markdown-to-PDF/[39mnode_modules/[4mnext[24m/dist/compiled/next-server/app-page.runtime.prod.js:12:67539[90m)[39m {
+[2m[WebServer] [22m  code: [32m'MISSING_MESSAGE'[39m,
+[2m[WebServer] [22m  originalMessage: [32m'themes.codeThemes.vscode (en)'[39m
+[2m[WebServer] [22m}
+
+[1A[2K[2m[WebServer] [22m
+[2m[WebServer] [22mThe `locale` parameter in `getRequestConfig` is deprecated, please switch to `await requestLocale`. See https://next-intl.dev/blog/next-intl-3-22#await-request-locale
+[2m[WebServer] [22m
+[2m[WebServer] [22m
+[2m[WebServer] [22mA `locale` is expected to be returned from `getRequestConfig`, but none was returned. This will be an error in the next major version of next-intl.
+[2m[WebServer] [22m
+[2m[WebServer] [22mSee: https://next-intl.dev/blog/next-intl-3-22#await-request-locale
+[2m[WebServer] [22m
+[2m[WebServer] [22m
+[2m[WebServer] [22mThe `locale` parameter in `getRequestConfig` is deprecated, please switch to `await requestLocale`. See https://next-intl.dev/blog/next-intl-3-22#await-request-locale
+[2m[WebServer] [22m
+[2m[WebServer] [22m
+[2m[WebServer] [22mA `locale` is expected to be returned from `getRequestConfig`, but none was returned. This will be an error in the next major version of next-intl.
+[2m[WebServer] [22m
+[2m[WebServer] [22mSee: https://next-intl.dev/blog/next-intl-3-22#await-request-locale
+[2m[WebServer] [22m
+
+[1A[2K[2m[WebServer] [22m
+[2m[WebServer] [22mThe `locale` parameter in `getRequestConfig` is deprecated, please switch to `await requestLocale`. See https://next-intl.dev/blog/next-intl-3-22#await-request-locale
+[2m[WebServer] [22m
+[2m[WebServer] [22m
+[2m[WebServer] [22mA `locale` is expected to be returned from `getRequestConfig`, but none was returned. This will be an error in the next major version of next-intl.
+[2m[WebServer] [22m
+[2m[WebServer] [22mSee: https://next-intl.dev/blog/next-intl-3-22#await-request-locale
+[2m[WebServer] [22m
+[2m[WebServer] [22m
+[2m[WebServer] [22mThe `locale` parameter in `getRequestConfig` is deprecated, please switch to `await requestLocale`. See https://next-intl.dev/blog/next-intl-3-22#await-request-locale
+[2m[WebServer] [22m
+[2m[WebServer] [22m
+[2m[WebServer] [22mA `locale` is expected to be returned from `getRequestConfig`, but none was returned. This will be an error in the next major version of next-intl.
+[2m[WebServer] [22m
+[2m[WebServer] [22mSee: https://next-intl.dev/blog/next-intl-3-22#await-request-locale
+[2m[WebServer] [22m
+[2m[WebServer] [22m
+[2m[WebServer] [22mThe `locale` parameter in `getRequestConfig` is deprecated, please switch to `await requestLocale`. See https://next-intl.dev/blog/next-intl-3-22#await-request-locale
+[2m[WebServer] [22m
+[2m[WebServer] [22m
+[2m[WebServer] [22mA `locale` is expected to be returned from `getRequestConfig`, but none was returned. This will be an error in the next major version of next-intl.
+[2m[WebServer] [22m
+[2m[WebServer] [22mSee: https://next-intl.dev/blog/next-intl-3-22#await-request-locale
+[2m[WebServer] [22m
+[2m[WebServer] [22m
+[2m[WebServer] [22mThe `locale` parameter in `getRequestConfig` is deprecated, please switch to `await requestLocale`. See https://next-intl.dev/blog/next-intl-3-22#await-request-locale
+[2m[WebServer] [22m
+[2m[WebServer] [22m
+[2m[WebServer] [22mA `locale` is expected to be returned from `getRequestConfig`, but none was returned. This will be an error in the next major version of next-intl.
+[2m[WebServer] [22m
+[2m[WebServer] [22mSee: https://next-intl.dev/blog/next-intl-3-22#await-request-locale
+[2m[WebServer] [22m
+[2m[WebServer] [22m
+[2m[WebServer] [22mThe `locale` parameter in `getRequestConfig` is deprecated, please switch to `await requestLocale`. See https://next-intl.dev/blog/next-intl-3-22#await-request-locale
+[2m[WebServer] [22m
+[2m[WebServer] [22m
+[2m[WebServer] [22mA `locale` is expected to be returned from `getRequestConfig`, but none was returned. This will be an error in the next major version of next-intl.
+[2m[WebServer] [22m
+[2m[WebServer] [22mSee: https://next-intl.dev/blog/next-intl-3-22#await-request-locale
+[2m[WebServer] [22m
+
+[1A[2K[2m[WebServer] [22m
+[2m[WebServer] [22mThe `locale` parameter in `getRequestConfig` is deprecated, please switch to `await requestLocale`. See https://next-intl.dev/blog/next-intl-3-22#await-request-locale
+[2m[WebServer] [22m
+[2m[WebServer] [22m
+[2m[WebServer] [22mA `locale` is expected to be returned from `getRequestConfig`, but none was returned. This will be an error in the next major version of next-intl.
+[2m[WebServer] [22m
+[2m[WebServer] [22mSee: https://next-intl.dev/blog/next-intl-3-22#await-request-locale
+[2m[WebServer] [22m
+[2m[WebServer] [22m
+[2m[WebServer] [22mThe `locale` parameter in `getRequestConfig` is deprecated, please switch to `await requestLocale`. See https://next-intl.dev/blog/next-intl-3-22#await-request-locale
+[2m[WebServer] [22m
+[2m[WebServer] [22m
+[2m[WebServer] [22mA `locale` is expected to be returned from `getRequestConfig`, but none was returned. This will be an error in the next major version of next-intl.
+[2m[WebServer] [22m
+[2m[WebServer] [22mSee: https://next-intl.dev/blog/next-intl-3-22#await-request-locale
+[2m[WebServer] [22m
+
+[1A[2K[2m[WebServer] [22m
+[2m[WebServer] [22mThe `locale` parameter in `getRequestConfig` is deprecated, please switch to `await requestLocale`. See https://next-intl.dev/blog/next-intl-3-22#await-request-locale
+[2m[WebServer] [22m
+[2m[WebServer] [22m
+[2m[WebServer] [22mA `locale` is expected to be returned from `getRequestConfig`, but none was returned. This will be an error in the next major version of next-intl.
+[2m[WebServer] [22m
+[2m[WebServer] [22mSee: https://next-intl.dev/blog/next-intl-3-22#await-request-locale
+[2m[WebServer] [22m
+
+[1A[2K[2m[WebServer] [22mu [Error]: MISSING_MESSAGE: themes.codeThemes.githublight (ar)
+[2m[WebServer] [22m    at b [90m(/media/alash/New Volume/Markdown-to-PDF/[39m.next/server/chunks/7597.js:1:138268[90m)[39m
+[2m[WebServer] [22m    at E [90m(/media/alash/New Volume/Markdown-to-PDF/[39m.next/server/chunks/7597.js:1:138424[90m)[39m
+[2m[WebServer] [22m    at w [90m(/media/alash/New Volume/Markdown-to-PDF/[39m.next/server/chunks/7597.js:1:139757[90m)[39m
+[2m[WebServer] [22m    at [90m/media/alash/New Volume/Markdown-to-PDF/[39m.next/server/app/[locale]/settings/page.js:1:4469
+[2m[WebServer] [22m    at Array.map (<anonymous>)
+[2m[WebServer] [22m    at g [90m(/media/alash/New Volume/Markdown-to-PDF/[39m.next/server/app/[locale]/settings/page.js:1:4401[90m)[39m
+[2m[WebServer] [22m    at nj [90m(/media/alash/New Volume/Markdown-to-PDF/[39mnode_modules/[4mnext[24m/dist/compiled/next-server/app-page.runtime.prod.js:12:46252[90m)[39m
+[2m[WebServer] [22m    at nM [90m(/media/alash/New Volume/Markdown-to-PDF/[39mnode_modules/[4mnext[24m/dist/compiled/next-server/app-page.runtime.prod.js:12:47572[90m)[39m
+[2m[WebServer] [22m    at nL [90m(/media/alash/New Volume/Markdown-to-PDF/[39mnode_modules/[4mnext[24m/dist/compiled/next-server/app-page.runtime.prod.js:12:64547[90m)[39m
+[2m[WebServer] [22m    at nB [90m(/media/alash/New Volume/Markdown-to-PDF/[39mnode_modules/[4mnext[24m/dist/compiled/next-server/app-page.runtime.prod.js:12:67539[90m)[39m {
+[2m[WebServer] [22m  code: [32m'MISSING_MESSAGE'[39m,
+[2m[WebServer] [22m  originalMessage: [32m'themes.codeThemes.githublight (ar)'[39m
+[2m[WebServer] [22m}
+[2m[WebServer] [22mu [Error]: MISSING_MESSAGE: themes.codeThemes.githubdark (ar)
+[2m[WebServer] [22m    at b [90m(/media/alash/New Volume/Markdown-to-PDF/[39m.next/server/chunks/7597.js:1:138268[90m)[39m
+[2m[WebServer] [22m    at E [90m(/media/alash/New Volume/Markdown-to-PDF/[39m.next/server/chunks/7597.js:1:138424[90m)[39m
+[2m[WebServer] [22m    at w [90m(/media/alash/New Volume/Markdown-to-PDF/[39m.next/server/chunks/7597.js:1:139757[90m)[39m
+[2m[WebServer] [22m    at [90m/media/alash/New Volume/Markdown-to-PDF/[39m.next/server/app/[locale]/settings/page.js:1:4469
+[2m[WebServer] [22m    at Array.map (<anonymous>)
+[2m[WebServer] [22m    at g [90m(/media/alash/New Volume/Markdown-to-PDF/[39m.next/server/app/[locale]/settings/page.js:1:4401[90m)[39m
+[2m[WebServer] [22m    at nj [90m(/media/alash/New Volume/Markdown-to-PDF/[39mnode_modules/[4mnext[24m/dist/compiled/next-server/app-page.runtime.prod.js:12:46252[90m)[39m
+[2m[WebServer] [22m    at nM [90m(/media/alash/New Volume/Markdown-to-PDF/[39mnode_modules/[4mnext[24m/dist/compiled/next-server/app-page.runtime.prod.js:12:47572[90m)[39m
+[2m[WebServer] [22m    at nL [90m(/media/alash/New Volume/Markdown-to-PDF/[39mnode_modules/[4mnext[24m/dist/compiled/next-server/app-page.runtime.prod.js:12:64547[90m)[39m
+[2m[WebServer] [22m    at nB [90m(/media/alash/New Volume/Markdown-to-PDF/[39mnode_modules/[4mnext[24m/dist/compiled/next-server/app-page.runtime.prod.js:12:67539[90m)[39m {
+[2m[WebServer] [22m  code: [32m'MISSING_MESSAGE'[39m,
+[2m[WebServer] [22m  originalMessage: [32m'themes.codeThemes.githubdark (ar)'[39m
+[2m[WebServer] [22m}
+[2m[WebServer] [22mu [Error]: MISSING_MESSAGE: themes.codeThemes.onedark (ar)
+[2m[WebServer] [22m    at b [90m(/media/alash/New Volume/Markdown-to-PDF/[39m.next/server/chunks/7597.js:1:138268[90m)[39m
+[2m[WebServer] [22m    at E [90m(/media/alash/New Volume/Markdown-to-PDF/[39m.next/server/chunks/7597.js:1:138424[90m)[39m
+[2m[WebServer] [22m    at w [90m(/media/alash/New Volume/Markdown-to-PDF/[39m.next/server/chunks/7597.js:1:139757[90m)[39m
+[2m[WebServer] [22m    at [90m/media/alash/New Volume/Markdown-to-PDF/[39m.next/server/app/[locale]/settings/page.js:1:4469
+[2m[WebServer] [22m    at Array.map (<anonymous>)
+[2m[WebServer] [22m    at g [90m(/media/alash/New Volume/Markdown-to-PDF/[39m.next/server/app/[locale]/settings/page.js:1:4401[90m)[39m
+[2m[WebServer] [22m    at nj [90m(/media/alash/New Volume/Markdown-to-PDF/[39mnode_modules/[4mnext[24m/dist/compiled/next-server/app-page.runtime.prod.js:12:46252[90m)[39m
+[2m[WebServer] [22m    at nM [90m(/media/alash/New Volume/Markdown-to-PDF/[39mnode_modules/[4mnext[24m/dist/compiled/next-server/app-page.runtime.prod.js:12:47572[90m)[39m
+[2m[WebServer] [22m    at nL [90m(/media/alash/New Volume/Markdown-to-PDF/[39mnode_modules/[4mnext[24m/dist/compiled/next-server/app-page.runtime.prod.js:12:64547[90m)[39m
+[2m[WebServer] [22m    at nB [90m(/media/alash/New Volume/Markdown-to-PDF/[39mnode_modules/[4mnext[24m/dist/compiled/next-server/app-page.runtime.prod.js:12:67539[90m)[39m {
+[2m[WebServer] [22m  code: [32m'MISSING_MESSAGE'[39m,
+[2m[WebServer] [22m  originalMessage: [32m'themes.codeThemes.onedark (ar)'[39m
+[2m[WebServer] [22m}
+[2m[WebServer] [22mu [Error]: MISSING_MESSAGE: themes.codeThemes.vscode (ar)
+[2m[WebServer] [22m    at b [90m(/media/alash/New Volume/Markdown-to-PDF/[39m.next/server/chunks/7597.js:1:138268[90m)[39m
+[2m[WebServer] [22m    at E [90m(/media/alash/New Volume/Markdown-to-PDF/[39m.next/server/chunks/7597.js:1:138424[90m)[39m
+[2m[WebServer] [22m    at w [90m(/media/alash/New Volume/Markdown-to-PDF/[39m.next/server/chunks/7597.js:1:139757[90m)[39m
+[2m[WebServer] [22m    at [90m/media/alash/New Volume/Markdown-to-PDF/[39m.next/server/app/[locale]/settings/page.js:1:4469
+[2m[WebServer] [22m    at Array.map (<anonymous>)
+[2m[WebServer] [22m    at g [90m(/media/alash/New Volume/Markdown-to-PDF/[39m.next/server/app/[locale]/settings/page.js:1:4401[90m)[39m
+[2m[WebServer] [22m    at nj [90m(/media/alash/New Volume/Markdown-to-PDF/[39mnode_modules/[4mnext[24m/dist/compiled/next-server/app-page.runtime.prod.js:12:46252[90m)[39m
+[2m[WebServer] [22m    at nM [90m(/media/alash/New Volume/Markdown-to-PDF/[39mnode_modules/[4mnext[24m/dist/compiled/next-server/app-page.runtime.prod.js:12:47572[90m)[39m
+[2m[WebServer] [22m    at nL [90m(/media/alash/New Volume/Markdown-to-PDF/[39mnode_modules/[4mnext[24m/dist/compiled/next-server/app-page.runtime.prod.js:12:64547[90m)[39m
+[2m[WebServer] [22m    at nB [90m(/media/alash/New Volume/Markdown-to-PDF/[39mnode_modules/[4mnext[24m/dist/compiled/next-server/app-page.runtime.prod.js:12:67539[90m)[39m {
+[2m[WebServer] [22m  code: [32m'MISSING_MESSAGE'[39m,
+[2m[WebServer] [22m  originalMessage: [32m'themes.codeThemes.vscode (ar)'[39m
+[2m[WebServer] [22m}
+
+[1A[2K[2m[WebServer] [22m [33m[1m⚠[22m[39m "next start" does not work with "output: standalone" configuration. Use "node .next/standalone/server.js" instead.
+
+
+Running 203 tests using 14 workers
+
+[1A[2K[1/203] [chromium] › __tests__/e2e/accessibility.spec.ts:268:7 › Form Accessibility › form inputs should have labels
+[1A[2K[2/203] [chromium] › __tests__/e2e/accessibility.spec.ts:155:7 › Keyboard Navigation › should support Escape to close dialogs
+[1A[2K[3/203] [chromium] › __tests__/e2e/accessibility.spec.ts:120:7 › Accessibility Tests › Mobile view should be accessible
+[1A[2K[4/203] [chromium] › __tests__/e2e/accessibility.spec.ts:253:7 › Screen Reader Support › images should have alt text
+[1A[2K[5/203] [chromium] › __tests__/e2e/accessibility.spec.ts:228:7 › Screen Reader Support › buttons should have accessible names
+[1A[2K[6/203] [chromium] › __tests__/e2e/accessibility.spec.ts:189:7 › Color Contrast › should have sufficient color contrast in light mode
+[1A[2K[7/203] [chromium] › __tests__/e2e/accessibility.spec.ts:26:7 › Accessibility Tests › Home page should have no critical accessibility violations
+[1A[2K[8/203] [chromium] › __tests__/e2e/accessibility.spec.ts:52:7 › Accessibility Tests › Templates page should have no critical accessibility violations
+[1A[2K[9/203] [chromium] › __tests__/e2e/accessibility.spec.ts:220:7 › Screen Reader Support › main content should have proper landmark
+[1A[2K[10/203] [chromium] › __tests__/e2e/accessibility.spec.ts:164:7 › Keyboard Navigation › should have visible focus indicators
+[1A[2K[11/203] [chromium] › __tests__/e2e/accessibility.spec.ts:73:7 › Accessibility Tests › Themes page should have no critical accessibility violations
+[1A[2K[12/203] [chromium] › __tests__/e2e/accessibility.spec.ts:297:7 › Skip Link › should have working skip link
+[1A[2K[13/203] [chromium] › __tests__/e2e/accessibility.spec.ts:94:7 › Accessibility Tests › Arabic locale should maintain accessibility
+[1A[2K[14/203] [chromium] › __tests__/e2e/accessibility.spec.ts:143:7 › Keyboard Navigation › should be able to navigate with keyboard
+[1A[2K[15/203] [chromium] › __tests__/e2e/accessibility.spec.ts:321:7 › Skip Link › main content should have correct id
+[1A[2K[16/203] [chromium] › __tests__/e2e/accessibility.spec.ts:331:7 › Navigation Accessibility › navigation should have aria-label
+[1A[2K[17/203] [chromium] › __tests__/e2e/accessibility.spec.ts:340:7 › Navigation Accessibility › mobile menu toggle should have proper aria attributes
+[1A[2K[18/203] [chromium] › __tests__/e2e/auth.spec.ts:10:9 › Authentication Flow › Login Page › should display login form
+[1A[2K[19/203] [chromium] › __tests__/e2e/auth.spec.ts:22:9 › Authentication Flow › Login Page › should show OAuth providers
+[1A[2K[20/203] [chromium] › __tests__/e2e/auth.spec.ts:51:9 › Authentication Flow › Login Page › should show error for invalid credentials
+[1A[2K[21/203] [chromium] › __tests__/e2e/auth.spec.ts:71:9 › Authentication Flow › Login Page › should have link to register page
+[1A[2K[22/203] [chromium] › __tests__/e2e/auth.spec.ts:82:9 › Authentication Flow › Login Page › should disable buttons during loading
+[1A[2K[23/203] [chromium] › __tests__/e2e/auth.spec.ts:39:9 › Authentication Flow › Login Page › should validate required fields
+[1A[2K[24/203] [chromium] › __tests__/e2e/auth.spec.ts:101:9 › Authentication Flow › Register Page › should display registration form
+[1A[2K[25/203] [chromium] › __tests__/e2e/auth.spec.ts:135:9 › Authentication Flow › Register Page › should validate minimum password length
+[1A[2K[26/203] [chromium] › __tests__/e2e/auth.spec.ts:115:9 › Authentication Flow › Register Page › should validate password mismatch
+[1A[2K[27/203] [chromium] › __tests__/e2e/auth.spec.ts:155:9 › Authentication Flow › Register Page › should have link to login page
+[1A[2K[chromium] › __tests__/e2e/accessibility.spec.ts:189:7 › Color Contrast › should have sufficient color contrast in light mode
+Color contrast issues found: 1
+
+[1A[2K  - <span class="text-amber-500">Unsaved changes</span>...
+
+[1A[2K[28/203] [chromium] › __tests__/e2e/auth.spec.ts:168:9 › Authentication Flow › Register Page › should validate email format
+[1A[2K[29/203] [chromium] › __tests__/e2e/auth.spec.ts:184:9 › Authentication Flow › Register Page › should show error for existing email
+[1A[2K[30/203] [chromium] › __tests__/e2e/auth.spec.ts:205:9 › Authentication Flow › Password Reset › should have forgot password link
+[1A[2K[31/203] [chromium] › __tests__/e2e/auth.spec.ts:219:9 › Authentication Flow › Protected Routes › should redirect to login when accessing dashboard
+[1A[2K[32/203] [chromium] › __tests__/e2e/auth.spec.ts:232:9 › Authentication Flow › Protected Routes › should redirect to login when accessing subscription
+[1A[2K[33/203] [chromium] › __tests__/e2e/auth.spec.ts:226:9 › Authentication Flow › Protected Routes › should redirect to login when accessing profile
+[1A[2K[34/203] [chromium] › __tests__/e2e/auth.spec.ts:238:9 › Authentication Flow › Protected Routes › should redirect to login when accessing teams
+[1A[2K[35/203] [chromium] › __tests__/e2e/auth.spec.ts:244:9 › Authentication Flow › Protected Routes › should redirect to login when accessing settings
+[1A[2K[36/203] [chromium] › __tests__/e2e/auth.spec.ts:252:9 › Authentication Flow › Session Persistence › should maintain locale during auth flow
+[1A[2K[37/203] [chromium] › __tests__/e2e/auth.spec.ts:262:9 › Authentication Flow › Session Persistence › should maintain locale in Arabic
+[1A[2K[38/203] [chromium] › __tests__/e2e/auth.spec.ts:276:7 › Authentication Responsive Design › login page on mobile
+[1A[2K[39/203] [chromium] › __tests__/e2e/auth.spec.ts:286:7 › Authentication Responsive Design › register page on mobile
+[1A[2K[40/203] [chromium] › __tests__/e2e/auth.spec.ts:296:7 › Authentication Responsive Design › login page on tablet
+[1A[2K[41/203] [chromium] › __tests__/e2e/auth.spec.ts:303:7 › Authentication Responsive Design › register page on tablet
+[1A[2K[42/203] [chromium] › __tests__/e2e/auth.spec.ts:312:7 › Authentication Arabic Locale › login page in Arabic
+[1A[2K[43/203] [chromium] › __tests__/e2e/auth.spec.ts:321:7 › Authentication Arabic Locale › register page in Arabic
+[1A[2K[44/203] [chromium] › __tests__/e2e/conversion-full.spec.ts:15:9 › Full Conversion Flow › Editor Functionality › should load with default content
+[1A[2K[45/203] [chromium] › __tests__/e2e/conversion-full.spec.ts:25:9 › Full Conversion Flow › Editor Functionality › should type markdown and see preview update
+[1A[2K[46/203] [chromium] › __tests__/e2e/conversion-full.spec.ts:36:9 › Full Conversion Flow › Editor Functionality › should apply bold formatting
+[1A[2K[47/203] [chromium] › __tests__/e2e/conversion-full.spec.ts:51:9 › Full Conversion Flow › Editor Functionality › should apply italic formatting
+[1A[2K[48/203] [chromium] › __tests__/e2e/conversion-full.spec.ts:66:9 › Full Conversion Flow › Editor Functionality › should insert code block
+[1A[2K[49/203] [chromium] › __tests__/e2e/conversion-full.spec.ts:81:9 › Full Conversion Flow › Editor Functionality › should insert link
+[1A[2K[50/203] [chromium] › __tests__/e2e/conversion-full.spec.ts:125:9 › Full Conversion Flow › Theme Selection › should have theme selector
+[1A[2K[51/203] [chromium] › __tests__/e2e/conversion-full.spec.ts:96:9 › Full Conversion Flow › Editor Functionality › should have working undo/redo
+[1A[2K[52/203] [chromium] › __tests__/e2e/conversion-full.spec.ts:137:9 › Full Conversion Flow › Theme Selection › should change document theme
+[1A[2K[53/203] [chromium] › __tests__/e2e/conversion-full.spec.ts:162:9 › Full Conversion Flow › View Modes › should toggle fullscreen mode
+[1A[2K[54/203] [chromium] › __tests__/e2e/conversion-full.spec.ts:180:9 › Full Conversion Flow › View Modes › should toggle preview mode
+[1A[2K[55/203] [chromium] › __tests__/e2e/conversion-full.spec.ts:196:9 › Full Conversion Flow › View Modes › should toggle table of contents
+[1A[2K[56/203] [chromium] › __tests__/e2e/conversion-full.spec.ts:211:9 › Full Conversion Flow › PDF Conversion › should have enabled convert button with content
+[1A[2K[57/203] [chromium] › __tests__/e2e/conversion-full.spec.ts:217:9 › Full Conversion Flow › PDF Conversion › should have format selector
+[1A[2K[58/203] [chromium] › __tests__/e2e/conversion-full.spec.ts:228:9 › Full Conversion Flow › PDF Conversion › should have print button
+[1A[2K[59/203] [chromium] › __tests__/e2e/conversion-full.spec.ts:233:9 › Full Conversion Flow › PDF Conversion › should open page settings dialog
+[1A[2K[60/203] [chromium] › __tests__/e2e/conversion-full.spec.ts:256:9 › Full Conversion Flow › File Upload › should have file input
+[1A[2K[61/203] [chromium] › __tests__/e2e/conversion-full.spec.ts:277:9 › Full Conversion Flow › Preview Rendering › should render headings correctly
+[1A[2K[62/203] [chromium] › __tests__/e2e/conversion-full.spec.ts:262:9 › Full Conversion Flow › File Upload › should accept markdown files
+[1A[2K[63/203] [chromium] › __tests__/e2e/conversion-full.spec.ts:287:9 › Full Conversion Flow › Preview Rendering › should render code blocks with syntax highlighting
+[1A[2K[64/203] [chromium] › __tests__/e2e/conversion-full.spec.ts:303:9 › Full Conversion Flow › Preview Rendering › should render lists correctly
+[1A[2K[65/203] [chromium] › __tests__/e2e/conversion-full.spec.ts:313:9 › Full Conversion Flow › Preview Rendering › should render links correctly
+[1A[2K[66/203] [chromium] › __tests__/e2e/conversion-full.spec.ts:329:9 › Full Conversion Flow › Preview Rendering › should render blockquotes correctly
+[1A[2K[67/203] [chromium] › __tests__/e2e/conversion-full.spec.ts:345:9 › Full Conversion Flow › Preview Rendering › should render tables correctly
+[1A[2K[68/203] [chromium] › __tests__/e2e/conversion-full.spec.ts:370:7 › Conversion Mobile Experience › should show tabs on mobile
+[1A[2K[69/203] [chromium] › __tests__/e2e/conversion-full.spec.ts:377:7 › Conversion Mobile Experience › should switch between editor and preview tabs
+[1A[2K[70/203] [chromium] › __tests__/e2e/conversion-full.spec.ts:405:7 › Conversion Mobile Experience › should have working convert button on mobile
+[1A[2K[71/203] [chromium] › __tests__/e2e/conversion-full.spec.ts:415:7 › Conversion Tablet Experience › should work on tablet landscape
+[1A[2K[72/203] [chromium] › __tests__/e2e/conversion-full.spec.ts:426:7 › Conversion Tablet Experience › should work on tablet portrait
+[1A[2K[73/203] [chromium] › __tests__/e2e/conversion-full.spec.ts:436:7 › Conversion Arabic Support › should display in RTL mode
+[1A[2K[74/203] [chromium] › __tests__/e2e/conversion-full.spec.ts:446:7 › Conversion Arabic Support › should have working editor in Arabic
+[1A[2K[75/203] [chromium] › __tests__/e2e/conversion-full.spec.ts:461:7 › Conversion Arabic Support › should have Arabic mobile view
+[1A[2K[76/203] [chromium] › __tests__/e2e/conversion.spec.ts:8:7 › Markdown to PDF Conversion › should show editor and preview on desktop
+[1A[2K[77/203] [chromium] › __tests__/e2e/conversion.spec.ts:18:7 › Markdown to PDF Conversion › should have working toolbar
+[1A[2K[78/203] [chromium] › __tests__/e2e/conversion.spec.ts:26:7 › Markdown to PDF Conversion › should show preview panel
+[1A[2K[79/203] [chromium] › __tests__/e2e/conversion.spec.ts:33:7 › Markdown to PDF Conversion › should have convert button
+[1A[2K[80/203] [chromium] › __tests__/e2e/conversion.spec.ts:42:7 › Markdown to PDF Conversion › should navigate to templates page
+[1A[2K[81/203] [chromium] › __tests__/e2e/conversion.spec.ts:49:7 › Markdown to PDF Conversion › should navigate to themes page
+[1A[2K[82/203] [chromium] › __tests__/e2e/conversion.spec.ts:56:7 › Markdown to PDF Conversion › should navigate to batch page
+[1A[2K[83/203] [chromium] › __tests__/e2e/conversion.spec.ts:63:7 › Markdown to PDF Conversion › should navigate to API docs page
+[1A[2K[84/203] [chromium] › __tests__/e2e/conversion.spec.ts:72:7 › Internationalization › should load Arabic locale with RTL
+[1A[2K[85/203] [chromium] › __tests__/e2e/conversion.spec.ts:82:7 › Internationalization › should switch language
+[1A[2K[86/203] [chromium] › __tests__/e2e/conversion.spec.ts:110:7 › Internationalization › Arabic templates page
+[1A[2K[87/203] [chromium] › __tests__/e2e/conversion.spec.ts:119:7 › Responsive Design › Mobile view
+[1A[2K[88/203] [chromium] › __tests__/e2e/conversion.spec.ts:129:7 › Responsive Design › Tablet view
+[1A[2K[89/203] [chromium] › __tests__/e2e/conversion.spec.ts:136:7 › Responsive Design › Desktop view
+[1A[2K[90/203] [chromium] › __tests__/e2e/conversion.spec.ts:143:7 › Responsive Design › Mobile Arabic RTL
+[1A[2K[91/203] [chromium] › __tests__/e2e/conversion.spec.ts:154:7 › Theme Toggle › should toggle between themes
+[1A[2K[92/203] [chromium] › __tests__/e2e/conversion.spec.ts:172:7 › Conversion Flow › should disable convert button when content is empty
+[1A[2K[93/203] [chromium] › __tests__/e2e/conversion.spec.ts:198:7 › Conversion Flow › should show print button
+[1A[2K[94/203] [chromium] › __tests__/e2e/conversion.spec.ts:186:7 › Conversion Flow › should enable convert button when content is present
+[1A[2K[95/203] [chromium] › __tests__/e2e/conversion.spec.ts:216:7 › Conversion Flow › should show preview with rendered markdown
+[1A[2K[96/203] [chromium] › __tests__/e2e/conversion.spec.ts:207:7 › Conversion Flow › should show format selector
+[1A[2K[97/203] [chromium] › __tests__/e2e/conversion.spec.ts:228:7 › Conversion Flow › should toggle Table of Contents
+[1A[2K[98/203] [chromium] › __tests__/e2e/conversion.spec.ts:244:7 › Conversion Flow › should toggle fullscreen mode
+[1A[2K[99/203] [chromium] › __tests__/e2e/conversion.spec.ts:283:7 › Conversion Flow › should apply toolbar formatting
+[1A[2K[100/203] [chromium] › __tests__/e2e/conversion.spec.ts:263:7 › Conversion Flow › should switch between editor and preview views
+[1A[2K[101/203] [chromium] › __tests__/e2e/conversion.spec.ts:299:7 › Conversion Flow › should have working undo/redo buttons
+[1A[2K[102/203] [chromium] › __tests__/e2e/conversion.spec.ts:318:7 › Settings Page › should navigate to settings page
+[1A[2K[103/203] [chromium] › __tests__/e2e/dashboard.spec.ts:9:9 › Dashboard › Unauthenticated Access › should redirect to login when accessing dashboard without auth
+[1A[2K[104/203] [chromium] › __tests__/e2e/dashboard.spec.ts:16:9 › Dashboard › Unauthenticated Access › should redirect from usage page without auth
+[1A[2K[105/203] [chromium] › __tests__/e2e/dashboard.spec.ts:22:9 › Dashboard › Unauthenticated Access › should redirect from subscription page without auth
+[1A[2K[106/203] [chromium] › __tests__/e2e/dashboard.spec.ts:28:9 › Dashboard › Unauthenticated Access › should redirect from teams page without auth
+[1A[2K[107/203] [chromium] › __tests__/e2e/dashboard.spec.ts:34:9 › Dashboard › Unauthenticated Access › should redirect from profile page without auth
+[1A[2K[108/203] [chromium] › __tests__/e2e/dashboard.spec.ts:40:9 › Dashboard › Unauthenticated Access › should redirect from analytics page without auth
+[1A[2K[109/203] [chromium] › __tests__/e2e/dashboard.spec.ts:48:9 › Dashboard › Login Page › should display login form
+[1A[2K[110/203] [chromium] › __tests__/e2e/dashboard.spec.ts:59:9 › Dashboard › Login Page › should show validation on empty submit
+[1A[2K[111/203] [chromium] › __tests__/e2e/dashboard.spec.ts:70:9 › Dashboard › Login Page › should have link to register page
+[1A[2K[112/203] [chromium] › __tests__/e2e/dashboard.spec.ts:79:9 › Dashboard › Login Page › should have OAuth buttons
+[1A[2K[113/203] [chromium] › __tests__/e2e/dashboard.spec.ts:95:9 › Dashboard › Register Page › should display registration form
+[1A[2K[114/203] [chromium] › __tests__/e2e/dashboard.spec.ts:114:9 › Dashboard › Register Page › should have link to login page
+[1A[2K[115/203] [chromium] › __tests__/e2e/dashboard.spec.ts:125:9 › Dashboard › Navigation Links › should have dashboard link in header when applicable
+[1A[2K[116/203] [chromium] › __tests__/e2e/dashboard.spec.ts:135:7 › Dashboard Responsive Layout › should hide sidebar on mobile
+[1A[2K[117/203] [chromium] › __tests__/e2e/dashboard.spec.ts:143:7 › Dashboard Responsive Layout › should show sidebar on desktop
+[1A[2K[118/203] [chromium] › __tests__/e2e/dashboard.spec.ts:159:7 › Dashboard Arabic Locale › should support Arabic locale with RTL
+[1A[2K[119/203] [chromium] › __tests__/e2e/dashboard.spec.ts:150:7 › Dashboard Responsive Layout › should work on tablet size
+[1A[2K[120/203] [chromium] › __tests__/e2e/dashboard.spec.ts:170:7 › Dashboard Arabic Locale › should redirect to Arabic login when accessing Arabic dashboard
+[1A[2K[121/203] [chromium] › __tests__/e2e/profile.spec.ts:9:9 › Profile Page › Unauthenticated Access › should redirect to login when accessing profile without auth
+[1A[2K[122/203] [chromium] › __tests__/e2e/profile.spec.ts:18:9 › Profile Page › Profile Page Structure › should load profile page
+[1A[2K[123/203] [chromium] › __tests__/e2e/profile.spec.ts:39:9 › Profile Page › Profile Header › should display avatar placeholder
+[1A[2K[124/203] [chromium] › __tests__/e2e/profile.spec.ts:26:9 › Profile Page › Profile Page Structure › should display profile title
+[1A[2K[125/203] [chromium] › __tests__/e2e/profile.spec.ts:52:9 › Profile Page › Profile Header › should display user info section
+[1A[2K[126/203] [chromium] › __tests__/e2e/profile.spec.ts:65:9 › Profile Page › Profile Form › should display profile form
+[1A[2K[127/203] [chromium] › __tests__/e2e/profile.spec.ts:76:9 › Profile Page › Profile Form › should have name input field
+[1A[2K[128/203] [chromium] › __tests__/e2e/profile.spec.ts:99:9 › Profile Page › Profile Form › should have save/update button
+[1A[2K[129/203] [chromium] › __tests__/e2e/profile.spec.ts:88:9 › Profile Page › Profile Form › should have email display
+[1A[2K[130/203] [chromium] › __tests__/e2e/profile.spec.ts:115:9 › Profile Page › Update Profile Name › should enable update button when name changes
+[1A[2K[131/203] [chromium] › __tests__/e2e/profile.spec.ts:134:9 › Profile Page › Avatar Upload › should have avatar change option
+[1A[2K[132/203] [chromium] › __tests__/e2e/profile.spec.ts:149:9 › Profile Page › Password Change › should have password change option
+[1A[2K[133/203] [chromium] › __tests__/e2e/profile.spec.ts:162:9 › Profile Page › Account Details › should display account creation date
+[1A[2K[134/203] [chromium] › __tests__/e2e/profile.spec.ts:173:9 › Profile Page › Account Details › should display current plan
+[1A[2K[135/203] [chromium] › __tests__/e2e/profile.spec.ts:187:7 › Profile Responsive Layout › should work on mobile
+[1A[2K[136/203] [chromium] › __tests__/e2e/profile.spec.ts:194:7 › Profile Responsive Layout › should work on tablet
+[1A[2K[137/203] [chromium] › __tests__/e2e/profile.spec.ts:201:7 › Profile Responsive Layout › should work on desktop
+[1A[2K[138/203] [chromium] › __tests__/e2e/profile.spec.ts:210:7 › Profile Arabic Locale › should support Arabic with RTL
+[1A[2K[139/203] [chromium] › __tests__/e2e/profile.spec.ts:220:7 › Profile Arabic Locale › should have Arabic text in form labels
+[1A[2K[140/203] [chromium] › __tests__/e2e/profile.spec.ts:231:7 › Profile Error States › should show loading skeleton
+[1A[2K[141/203] [chromium] › __tests__/e2e/profile.spec.ts:241:7 › Security Page › should redirect to login when accessing security without auth
+[1A[2K[142/203] [chromium] › __tests__/e2e/profile.spec.ts:247:7 › Security Page › should load security page
+[1A[2K[143/203] [chromium] › __tests__/e2e/profile.spec.ts:257:7 › Account Page › should redirect to login when accessing account without auth
+[1A[2K[144/203] [chromium] › __tests__/e2e/profile.spec.ts:263:7 › Account Page › should load account page
+[1A[2K[145/203] [chromium] › __tests__/e2e/settings.spec.ts:13:9 › Settings Page › Page Structure › should load settings page
+[1A[2K[146/203] [chromium] › __tests__/e2e/settings.spec.ts:21:9 › Settings Page › Page Structure › should display settings sections
+[1A[2K[147/203] [chromium] › __tests__/e2e/settings.spec.ts:29:9 › Settings Page › Page Structure › should have proper page layout
+[1A[2K[148/203] [chromium] › __tests__/e2e/settings.spec.ts:37:9 › Settings Page › Theme Mode Toggle › should have theme toggle option
+[1A[2K[149/203] [chromium] › __tests__/e2e/settings.spec.ts:52:9 › Settings Page › Theme Mode Toggle › should toggle between light and dark themes
+[1A[2K[150/203] [chromium] › __tests__/e2e/settings.spec.ts:87:9 › Settings Page › Editor Settings › should display editor settings section
+[1A[2K[151/203] [chromium] › __tests__/e2e/settings.spec.ts:96:9 › Settings Page › Editor Settings › should have font size controls
+[1A[2K[152/203] [chromium] › __tests__/e2e/settings.spec.ts:107:9 › Settings Page › Export Settings › should display export settings
+[1A[2K[153/203] [chromium] › __tests__/e2e/settings.spec.ts:118:9 › Settings Page › Reset Settings › should have reset to defaults option
+[1A[2K[154/203] [chromium] › __tests__/e2e/settings.spec.ts:132:9 › Settings Page › Settings Persistence › should persist settings after refresh
+[1A[2K[155/203] [chromium] › __tests__/e2e/settings.spec.ts:163:7 › Settings Responsive Layout › should work on mobile
+[1A[2K[156/203] [chromium] › __tests__/e2e/settings.spec.ts:170:7 › Settings Responsive Layout › should work on tablet
+[1A[2K[157/203] [chromium] › __tests__/e2e/settings.spec.ts:177:7 › Settings Responsive Layout › should work on desktop
+[1A[2K[158/203] [chromium] › __tests__/e2e/settings.spec.ts:186:7 › Settings Arabic Locale › should support Arabic with RTL
+[1A[2K[159/203] [chromium] › __tests__/e2e/settings.spec.ts:196:7 › Settings Arabic Locale › should have Arabic translations
+[1A[2K[160/203] [chromium] › __tests__/e2e/subscription.spec.ts:9:9 › Subscription Page › Unauthenticated Access › should redirect to login when accessing subscription without auth
+[1A[2K[161/203] [chromium] › __tests__/e2e/subscription.spec.ts:18:9 › Subscription Page › Subscription Page Structure › should load subscription page
+[1A[2K[162/203] [chromium] › __tests__/e2e/subscription.spec.ts:26:9 › Subscription Page › Subscription Page Structure › should display subscription title
+[1A[2K[163/203] [chromium] › __tests__/e2e/subscription.spec.ts:39:9 › Subscription Page › Current Plan Display › should display current plan section
+[1A[2K[164/203] [chromium] › __tests__/e2e/subscription.spec.ts:50:9 › Subscription Page › Current Plan Display › should show plan name
+[1A[2K[165/203] [chromium] › __tests__/e2e/subscription.spec.ts:74:9 › Subscription Page › Upgrade Flow › should have upgrade/change plan button
+[1A[2K[166/203] [chromium] › __tests__/e2e/subscription.spec.ts:61:9 › Subscription Page › Current Plan Display › should show billing period info
+[1A[2K[167/203] [chromium] › __tests__/e2e/subscription.spec.ts:88:9 › Subscription Page › Upgrade Flow › should show plan comparison on upgrade click
+[1A[2K[168/203] [chromium] › __tests__/e2e/subscription.spec.ts:106:9 › Subscription Page › Billing History › should display billing history section
+[1A[2K[169/203] [chromium] › __tests__/e2e/subscription.spec.ts:118:9 › Subscription Page › Billing History › should show invoice list or empty state
+[1A[2K[170/203] [chromium] › __tests__/e2e/subscription.spec.ts:139:9 › Subscription Page › Cancel Subscription › should have cancel option for paid plans
+[1A[2K[171/203] [chromium] › __tests__/e2e/subscription.spec.ts:152:9 › Subscription Page › Cancel Subscription › should show cancel confirmation dialog
+[1A[2K[172/203] [chromium] › __tests__/e2e/subscription.spec.ts:183:9 › Subscription Page › Subscription Status › should display subscription status
+[1A[2K[173/203] [chromium] › __tests__/e2e/subscription.spec.ts:194:9 › Subscription Page › Subscription Status › should show renewal date for active subscriptions
+[1A[2K[174/203] [chromium] › __tests__/e2e/subscription.spec.ts:208:7 › Subscription Responsive Layout › should work on mobile
+[1A[2K[175/203] [chromium] › __tests__/e2e/subscription.spec.ts:215:7 › Subscription Responsive Layout › should work on tablet
+[1A[2K[176/203] [chromium] › __tests__/e2e/subscription.spec.ts:222:7 › Subscription Responsive Layout › should work on desktop
+[1A[2K[177/203] [chromium] › __tests__/e2e/subscription.spec.ts:231:7 › Subscription Arabic Locale › should support Arabic with RTL
+[1A[2K[178/203] [chromium] › __tests__/e2e/subscription.spec.ts:243:7 › Pricing Page › should load pricing page
+[1A[2K[179/203] [chromium] › __tests__/e2e/subscription.spec.ts:251:7 › Pricing Page › should display plan options
+[1A[2K[180/203] [chromium] › __tests__/e2e/subscription.spec.ts:261:7 › Pricing Page › should have billing toggle
+[1A[2K[181/203] [chromium] › __tests__/e2e/subscription.spec.ts:274:7 › Pricing Page › should have CTA buttons
+[1A[2K[182/203] [chromium] › __tests__/e2e/subscription.spec.ts:303:7 › Usage Page › should redirect to login when accessing usage without auth
+[1A[2K[183/203] [chromium] › __tests__/e2e/subscription.spec.ts:309:7 › Usage Page › should load usage page
+[1A[2K[184/203] [chromium] › __tests__/e2e/subscription.spec.ts:317:7 › Usage Page › should display usage statistics
+[1A[2K[185/203] [chromium] › __tests__/e2e/subscription.spec.ts:330:7 › Analytics Page › should redirect to login when accessing analytics without auth
+[1A[2K[186/203] [chromium] › __tests__/e2e/subscription.spec.ts:336:7 › Analytics Page › should load analytics page
+[1A[2K[187/203] [chromium] › __tests__/e2e/teams.spec.ts:9:9 › Teams Page › Unauthenticated Access › should redirect to login when accessing teams without auth
+[1A[2K[188/203] [chromium] › __tests__/e2e/teams.spec.ts:16:9 › Teams Page › Unauthenticated Access › should redirect from team details page without auth
+[1A[2K[189/203] [chromium] › __tests__/e2e/teams.spec.ts:33:9 › Teams Page › Teams Page Structure › should show teams icon and title
+[1A[2K[190/203] [chromium] › __tests__/e2e/teams.spec.ts:24:9 › Teams Page › Teams Page Structure › should load teams page
+[1A[2K[2m[WebServer] [22m
+[2m[WebServer] [22mThe `locale` parameter in `getRequestConfig` is deprecated, please switch to `await requestLocale`. See https://next-intl.dev/blog/next-intl-3-22#await-request-locale
+[2m[WebServer] [22m
+
+[1A[2K[191/203] [chromium] › __tests__/e2e/teams.spec.ts:46:9 › Teams Page › Create Team Flow › should have create team button for authorized users
+[1A[2K[2m[WebServer] [22m
+[2m[WebServer] [22mA `locale` is expected to be returned from `getRequestConfig`, but none was returned. This will be an error in the next major version of next-intl.
+[2m[WebServer] [22m
+[2m[WebServer] [22mSee: https://next-intl.dev/blog/next-intl-3-22#await-request-locale
+[2m[WebServer] [22m
+
+[1A[2K[192/203] [chromium] › __tests__/e2e/teams.spec.ts:61:9 › Teams Page › Create Team Flow › should show upgrade prompt for free users
+[1A[2K[193/203] [chromium] › __tests__/e2e/teams.spec.ts:75:9 › Teams Page › Team List › should display team list or empty state
+[1A[2K[194/203] [chromium] › __tests__/e2e/teams.spec.ts:87:9 › Teams Page › Team List › should have loading skeleton
+[1A[2K[195/203] [chromium] › __tests__/e2e/teams.spec.ts:97:9 › Teams Page › Team Member Management › should navigate to team details
+[1A[2K[196/203] [chromium] › __tests__/e2e/teams.spec.ts:114:9 › Teams Page › Team Actions › should have member actions available
+[1A[2K[197/203] [chromium] › __tests__/e2e/teams.spec.ts:130:7 › Teams Responsive Layout › should work on mobile
+[1A[2K[198/203] [chromium] › __tests__/e2e/teams.spec.ts:137:7 › Teams Responsive Layout › should work on tablet
+[1A[2K[199/203] [chromium] › __tests__/e2e/teams.spec.ts:144:7 › Teams Responsive Layout › should work on desktop
+[1A[2K[200/203] [chromium] › __tests__/e2e/teams.spec.ts:153:7 › Teams Arabic Locale › should support Arabic with RTL
+[1A[2K[201/203] [chromium] › __tests__/e2e/teams.spec.ts:165:7 › Team Invitation Flow › should show invite member option
+[1A[2K[202/203] [chromium] › __tests__/e2e/teams.spec.ts:180:7 › Team Role Management › should display role badges
+[1A[2K[203/203] [chromium] › __tests__/e2e/teams.spec.ts:193:7 › Leave Team Flow › should have leave team option
+[1A[2K  203 passed (1.2m)

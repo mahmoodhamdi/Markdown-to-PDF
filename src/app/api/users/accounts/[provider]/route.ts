@@ -18,20 +18,14 @@ export async function DELETE(
     const session = await getServerSession(authOptions);
 
     if (!session?.user?.email) {
-      return NextResponse.json(
-        { success: false, error: 'Unauthorized' },
-        { status: 401 }
-      );
+      return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 });
     }
 
     const { provider } = await context.params;
 
     // Validate provider
     if (!validProviders.includes(provider as OAuthProvider)) {
-      return NextResponse.json(
-        { success: false, error: 'Invalid provider' },
-        { status: 400 }
-      );
+      return NextResponse.json({ success: false, error: 'Invalid provider' }, { status: 400 });
     }
 
     const userId = session.user.email;

@@ -60,10 +60,7 @@ export function MarkdownEditor({ className }: MarkdownEditorProps) {
   if (!mounted) {
     return (
       <div
-        className={cn(
-          'w-full h-full bg-background flex items-center justify-center',
-          className
-        )}
+        className={cn('w-full h-full bg-background flex items-center justify-center', className)}
       >
         <div className="text-muted-foreground">{t('title')}</div>
       </div>

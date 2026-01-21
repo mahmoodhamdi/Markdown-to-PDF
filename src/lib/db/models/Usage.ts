@@ -27,7 +27,14 @@ const UsageEventSchema = new Schema<IUsageEvent>(
     userId: { type: String, required: true, index: true },
     eventType: {
       type: String,
-      enum: ['conversion', 'api_call', 'file_upload', 'file_download', 'template_used', 'batch_conversion'],
+      enum: [
+        'conversion',
+        'api_call',
+        'file_upload',
+        'file_download',
+        'template_used',
+        'batch_conversion',
+      ],
       required: true,
     },
     metadata: { type: Schema.Types.Mixed },

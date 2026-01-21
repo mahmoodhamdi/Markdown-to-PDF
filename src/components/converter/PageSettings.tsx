@@ -51,9 +51,7 @@ export function PageSettingsForm() {
             <Input
               type="number"
               value={pageSettings.customWidth || 210}
-              onChange={(e) =>
-                setPageSettings({ customWidth: parseInt(e.target.value) || 210 })
-              }
+              onChange={(e) => setPageSettings({ customWidth: parseInt(e.target.value) || 210 })}
             />
           </div>
           <div className="space-y-2">
@@ -61,9 +59,7 @@ export function PageSettingsForm() {
             <Input
               type="number"
               value={pageSettings.customHeight || 297}
-              onChange={(e) =>
-                setPageSettings({ customHeight: parseInt(e.target.value) || 297 })
-              }
+              onChange={(e) => setPageSettings({ customHeight: parseInt(e.target.value) || 297 })}
             />
           </div>
         </div>
@@ -74,9 +70,7 @@ export function PageSettingsForm() {
         <Label>{t('orientation')}</Label>
         <Select
           value={pageSettings.orientation}
-          onValueChange={(value) =>
-            setPageSettings({ orientation: value as Orientation })
-          }
+          onValueChange={(value) => setPageSettings({ orientation: value as Orientation })}
         >
           <SelectTrigger>
             <SelectValue />
@@ -241,7 +235,10 @@ export function PageSettingsForm() {
               value={pageSettings.pageNumbers.position}
               onValueChange={(value) =>
                 setPageSettings({
-                  pageNumbers: { ...pageSettings.pageNumbers, position: value as PageNumberPosition },
+                  pageNumbers: {
+                    ...pageSettings.pageNumbers,
+                    position: value as PageNumberPosition,
+                  },
                 })
               }
             >
@@ -249,7 +246,9 @@ export function PageSettingsForm() {
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="bottom-center">{t('pageNumberPositions.bottomCenter')}</SelectItem>
+                <SelectItem value="bottom-center">
+                  {t('pageNumberPositions.bottomCenter')}
+                </SelectItem>
                 <SelectItem value="bottom-right">{t('pageNumberPositions.bottomRight')}</SelectItem>
                 <SelectItem value="bottom-left">{t('pageNumberPositions.bottomLeft')}</SelectItem>
                 <SelectItem value="top-center">{t('pageNumberPositions.topCenter')}</SelectItem>

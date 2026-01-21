@@ -177,9 +177,7 @@ export function SessionList() {
       </CardHeader>
       <CardContent className="space-y-4">
         {sessions.length === 0 ? (
-          <div className="text-center py-8 text-muted-foreground">
-            {t('sessions.noSessions')}
-          </div>
+          <div className="text-center py-8 text-muted-foreground">{t('sessions.noSessions')}</div>
         ) : (
           <>
             {sessions.map((session) => (
@@ -223,11 +221,7 @@ export function SessionList() {
                 {!session.isCurrent && (
                   <AlertDialog>
                     <AlertDialogTrigger asChild>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        disabled={revoking === session.id}
-                      >
+                      <Button variant="outline" size="sm" disabled={revoking === session.id}>
                         {revoking === session.id ? (
                           <Loader2 className="h-4 w-4 animate-spin" />
                         ) : (

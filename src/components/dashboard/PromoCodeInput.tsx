@@ -126,17 +126,11 @@ export function PromoCodeInput({
             }}
             onKeyDown={handleKeyDown}
             placeholder={t('promoPlaceholder')}
-            className={cn(
-              'ps-9',
-              validationResult?.valid === false && 'border-destructive'
-            )}
+            className={cn('ps-9', validationResult?.valid === false && 'border-destructive')}
             disabled={disabled || isValidating}
           />
         </div>
-        <Button
-          onClick={handleValidate}
-          disabled={!code.trim() || isValidating || disabled}
-        >
+        <Button onClick={handleValidate} disabled={!code.trim() || isValidating || disabled}>
           {isValidating ? (
             <>
               <Loader2 className="h-4 w-4 me-2 animate-spin" />

@@ -238,10 +238,7 @@ export async function getRecentEvents(
   await connectDB();
 
   const query = gateway ? { gateway } : {};
-  return WebhookEvent.find(query)
-    .sort({ createdAt: -1 })
-    .limit(limit)
-    .lean();
+  return WebhookEvent.find(query).sort({ createdAt: -1 }).limit(limit).lean();
 }
 
 /**

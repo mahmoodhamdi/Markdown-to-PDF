@@ -24,10 +24,7 @@ export async function GET(_request: NextRequest, { params }: RouteParams) {
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user?.id) {
-      return NextResponse.json(
-        { error: 'Authentication required' },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
     }
 
     const { teamId } = await params;
@@ -47,10 +44,7 @@ export async function GET(_request: NextRequest, { params }: RouteParams) {
     });
   } catch (error) {
     console.error('Get team invitations API error:', error);
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
 
@@ -58,10 +52,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user?.id || !session?.user?.email) {
-      return NextResponse.json(
-        { error: 'Authentication required' },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
     }
 
     const userId = session.user.id;
@@ -109,9 +100,6 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     });
   } catch (error) {
     console.error('Create invitation API error:', error);
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

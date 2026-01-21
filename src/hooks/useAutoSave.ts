@@ -9,14 +9,8 @@ import { useSettingsStore } from '@/stores/settings-store';
  * Uses the editor store's persist middleware for actual storage
  */
 export function useAutoSave() {
-  const {
-    content,
-    isDirty,
-    setIsDirty,
-    saveStatus,
-    setSaveStatus,
-    setLastSaved,
-  } = useEditorStore();
+  const { content, isDirty, setIsDirty, saveStatus, setSaveStatus, setLastSaved } =
+    useEditorStore();
 
   const { editorSettings } = useSettingsStore();
   const { autoSave, autoSaveInterval } = editorSettings;

@@ -111,13 +111,7 @@ export const REGIONAL_PRICE_MULTIPLIERS: Record<string, number> = {
 };
 
 // PayTabs transaction classes
-export type PayTabsTransactionType =
-  | 'sale'
-  | 'auth'
-  | 'capture'
-  | 'void'
-  | 'refund'
-  | 'register';
+export type PayTabsTransactionType = 'sale' | 'auth' | 'capture' | 'void' | 'refund' | 'register';
 
 // PayTabs payment response status
 export type PayTabsResponseStatus =

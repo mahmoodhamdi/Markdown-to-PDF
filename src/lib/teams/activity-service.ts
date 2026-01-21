@@ -4,7 +4,11 @@
  */
 
 import { connectDB } from '@/lib/db/mongodb';
-import { TeamActivity, type ITeamActivity, type TeamActivityAction } from '@/lib/db/models/TeamActivity';
+import {
+  TeamActivity,
+  type ITeamActivity,
+  type TeamActivityAction,
+} from '@/lib/db/models/TeamActivity';
 import { Team, type ITeamMember } from '@/lib/db/models/Team';
 
 export interface LogActivityInput {
@@ -107,10 +111,7 @@ export async function getTeamActivities(
     const skip = options.skip || 0;
 
     const [activities, total] = await Promise.all([
-      TeamActivity.find(query)
-        .sort({ createdAt: -1 })
-        .skip(skip)
-        .limit(limit),
+      TeamActivity.find(query).sort({ createdAt: -1 }).skip(skip).limit(limit),
       TeamActivity.countDocuments(query),
     ]);
 
@@ -154,9 +155,7 @@ export async function exportTeamActivities(
       return { success: false, error: 'Only admins can export activity data' };
     }
 
-    const activities = await TeamActivity.find({ teamId })
-      .sort({ createdAt: -1 })
-      .limit(1000);
+    const activities = await TeamActivity.find({ teamId }).sort({ createdAt: -1 }).limit(1000);
 
     // Build CSV
     const headers = ['Date', 'User', 'Email', 'Action', 'Details'];

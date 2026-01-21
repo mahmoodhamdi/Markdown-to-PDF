@@ -30,9 +30,18 @@ const TEMPLATE_ICONS: Record<string, typeof FileCode> = {
 // Template color mapping
 const TEMPLATE_COLORS: Record<string, { bg: string; text: string }> = {
   resume: { bg: 'bg-blue-100 dark:bg-blue-900/30', text: 'text-blue-600 dark:text-blue-400' },
-  'meeting-notes': { bg: 'bg-green-100 dark:bg-green-900/30', text: 'text-green-600 dark:text-green-400' },
-  readme: { bg: 'bg-purple-100 dark:bg-purple-900/30', text: 'text-purple-600 dark:text-purple-400' },
-  report: { bg: 'bg-orange-100 dark:bg-orange-900/30', text: 'text-orange-600 dark:text-orange-400' },
+  'meeting-notes': {
+    bg: 'bg-green-100 dark:bg-green-900/30',
+    text: 'text-green-600 dark:text-green-400',
+  },
+  readme: {
+    bg: 'bg-purple-100 dark:bg-purple-900/30',
+    text: 'text-purple-600 dark:text-purple-400',
+  },
+  report: {
+    bg: 'bg-orange-100 dark:bg-orange-900/30',
+    text: 'text-orange-600 dark:text-orange-400',
+  },
   default: { bg: 'bg-gray-100 dark:bg-gray-800', text: 'text-gray-600 dark:text-gray-400' },
 };
 
@@ -104,7 +113,10 @@ export function TemplateUsage({ data, loading, totalTemplatesUsed = 0 }: Templat
         <CardContent>
           <div className="space-y-3">
             {Array.from({ length: 4 }).map((_, i) => (
-              <div key={i} className="flex justify-between items-center py-2 border-b last:border-0">
+              <div
+                key={i}
+                className="flex justify-between items-center py-2 border-b last:border-0"
+              >
                 <div className="flex items-center gap-3">
                   <Skeleton className="h-8 w-8 rounded" />
                   <Skeleton className="h-4 w-24" />
@@ -139,16 +151,22 @@ export function TemplateUsage({ data, loading, totalTemplatesUsed = 0 }: Templat
                   className="flex justify-between items-center py-2.5 border-b last:border-0 group hover:bg-muted/50 -mx-2 px-2 rounded-md transition-colors"
                 >
                   <span className="flex items-center gap-3">
-                    <span className="text-sm text-muted-foreground font-medium w-4">{index + 1}.</span>
+                    <span className="text-sm text-muted-foreground font-medium w-4">
+                      {index + 1}.
+                    </span>
                     <div className={cn('p-1.5 rounded', colors.bg)}>
                       <Icon className={cn('h-4 w-4', colors.text)} aria-hidden="true" />
                     </div>
-                    <span className="font-medium text-sm">{getTemplateName(template.template)}</span>
+                    <span className="font-medium text-sm">
+                      {getTemplateName(template.template)}
+                    </span>
                   </span>
                   <span className="text-sm tabular-nums">
                     <span className="font-semibold">{template.count.toLocaleString()}</span>
                     <span className="text-muted-foreground ml-1">{t('uses')}</span>
-                    <span className="text-xs text-muted-foreground ml-1.5">({template.percentage}%)</span>
+                    <span className="text-xs text-muted-foreground ml-1.5">
+                      ({template.percentage}%)
+                    </span>
                   </span>
                 </div>
               );

@@ -19,12 +19,8 @@ export function ExportSettings() {
   const t = useTranslations('settings');
   const tPageSettings = useTranslations('pageSettings');
 
-  const {
-    defaultPageSize,
-    setDefaultPageSize,
-    defaultOrientation,
-    setDefaultOrientation,
-  } = useSettingsStore();
+  const { defaultPageSize, setDefaultPageSize, defaultOrientation, setDefaultOrientation } =
+    useSettingsStore();
 
   return (
     <Card>

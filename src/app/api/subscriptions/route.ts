@@ -87,9 +87,6 @@ export async function GET(_request: NextRequest) {
     return NextResponse.json(response);
   } catch (error) {
     console.error('Get subscription error:', error);
-    return NextResponse.json(
-      { error: 'Failed to get subscription' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Failed to get subscription' }, { status: 500 });
   }
 }

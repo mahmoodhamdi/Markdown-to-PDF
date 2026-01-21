@@ -16,7 +16,10 @@ import { checkRateLimit, getRateLimitHeaders } from '@/lib/rate-limit';
 import { z } from 'zod';
 
 const createDomainSchema = z.object({
-  domain: z.string().min(3).regex(/^[a-z0-9.-]+\.[a-z]{2,}$/i, 'Invalid domain format'),
+  domain: z
+    .string()
+    .min(3)
+    .regex(/^[a-z0-9.-]+\.[a-z]{2,}$/i, 'Invalid domain format'),
   organizationId: z.string().min(1),
   ssoConfigId: z.string().min(1),
 });
@@ -26,10 +29,7 @@ export async function GET(request: NextRequest) {
     // Check authentication
     const session = await getServerSession(authOptions);
     if (!session?.user?.id) {
-      return NextResponse.json(
-        { error: 'Authentication required' },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
     }
 
     // Only enterprise users can access SSO
@@ -54,10 +54,7 @@ export async function GET(request: NextRequest) {
     // Get organization ID from query params
     const organizationId = request.nextUrl.searchParams.get('organizationId');
     if (!organizationId) {
-      return NextResponse.json(
-        { error: 'Organization ID required' },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'Organization ID required' }, { status: 400 });
     }
 
     // Get SSO config for organization first
@@ -78,10 +75,7 @@ export async function GET(request: NextRequest) {
     });
   } catch (error) {
     console.error('SSO domains GET error:', error);
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
 
@@ -90,10 +84,7 @@ export async function POST(request: NextRequest) {
     // Check authentication
     const session = await getServerSession(authOptions);
     if (!session?.user?.id) {
-      return NextResponse.json(
-        { error: 'Authentication required' },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
     }
 
     // Only enterprise users can configure SSO
@@ -131,10 +122,7 @@ export async function POST(request: NextRequest) {
     // Verify SSO config exists and belongs to organization
     const ssoConfig = await getSSOConfigByOrganization(organizationId);
     if (!ssoConfig || ssoConfig.id !== ssoConfigId) {
-      return NextResponse.json(
-        { error: 'Invalid SSO configuration' },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'Invalid SSO configuration' }, { status: 400 });
     }
 
     // Create domain mapping
@@ -151,9 +139,6 @@ export async function POST(request: NextRequest) {
     });
   } catch (error) {
     console.error('SSO domains POST error:', error);
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

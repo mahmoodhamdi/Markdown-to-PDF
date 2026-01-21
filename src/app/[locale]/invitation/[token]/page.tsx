@@ -35,7 +35,10 @@ export default function InvitationPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [processing, setProcessing] = useState(false);
-  const [actionResult, setActionResult] = useState<{ success: boolean; action: 'accept' | 'decline' } | null>(null);
+  const [actionResult, setActionResult] = useState<{
+    success: boolean;
+    action: 'accept' | 'decline';
+  } | null>(null);
 
   useEffect(() => {
     async function fetchInvitation() {
@@ -112,7 +115,9 @@ export default function InvitationPage() {
   };
 
   const isExpired = invitation ? new Date(invitation.expiresAt) < new Date() : false;
-  const emailMismatch = session?.user?.email && invitation &&
+  const emailMismatch =
+    session?.user?.email &&
+    invitation &&
     session.user.email.toLowerCase() !== invitation.email.toLowerCase();
 
   if (loading) {
@@ -158,9 +163,11 @@ export default function InvitationPage() {
       <div className="min-h-screen flex items-center justify-center p-4">
         <Card className="w-full max-w-md">
           <CardHeader className="text-center">
-            <div className={`h-12 w-12 rounded-full flex items-center justify-center mx-auto mb-4 ${
-              actionResult.action === 'accept' ? 'bg-green-100' : 'bg-muted'
-            }`}>
+            <div
+              className={`h-12 w-12 rounded-full flex items-center justify-center mx-auto mb-4 ${
+                actionResult.action === 'accept' ? 'bg-green-100' : 'bg-muted'
+              }`}
+            >
               {actionResult.action === 'accept' ? (
                 <Check className="h-6 w-6 text-green-600" />
               ) : (
@@ -203,8 +210,8 @@ export default function InvitationPage() {
               {invitation.status === 'accepted'
                 ? t('alreadyAccepted')
                 : invitation.status === 'declined'
-                ? t('alreadyDeclined')
-                : t('expired')}
+                  ? t('alreadyDeclined')
+                  : t('expired')}
             </CardDescription>
           </CardHeader>
           <CardContent className="text-center">
@@ -254,7 +261,10 @@ export default function InvitationPage() {
             <p className="text-sm text-muted-foreground mb-1">{t('team')}</p>
             <p className="text-xl font-semibold">{invitation.teamName}</p>
             <div className="mt-2 flex items-center justify-center gap-2">
-              <Badge variant={invitation.role === 'admin' ? 'default' : 'secondary'} className="gap-1">
+              <Badge
+                variant={invitation.role === 'admin' ? 'default' : 'secondary'}
+                className="gap-1"
+              >
                 {invitation.role === 'admin' ? (
                   <Shield className="h-3 w-3" />
                 ) : (
@@ -301,11 +311,7 @@ export default function InvitationPage() {
                 <X className="h-4 w-4 me-2" />
                 {t('decline')}
               </Button>
-              <Button
-                className="flex-1"
-                onClick={handleAccept}
-                disabled={processing}
-              >
+              <Button className="flex-1" onClick={handleAccept} disabled={processing}>
                 <Check className="h-4 w-4 me-2" />
                 {processing ? t('accepting') : t('accept')}
               </Button>
@@ -315,7 +321,10 @@ export default function InvitationPage() {
           {/* Email mismatch - sign out and sign in with correct account */}
           {emailMismatch && (
             <div className="text-center">
-              <Button variant="outline" onClick={() => signIn(undefined, { callbackUrl: window.location.href })}>
+              <Button
+                variant="outline"
+                onClick={() => signIn(undefined, { callbackUrl: window.location.href })}
+              >
                 {t('signInWithDifferentAccount')}
               </Button>
             </div>

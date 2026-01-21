@@ -90,29 +90,29 @@ export default function FilesPage() {
   };
 
   const handleUploadSuccess = (file: UserFile) => {
-    setFiles(prev => [file, ...prev]);
+    setFiles((prev) => [file, ...prev]);
     // Refresh quota after upload
     fetch('/api/storage/quota')
-      .then(res => res.json())
-      .then(data => setQuota(data.quota))
+      .then((res) => res.json())
+      .then((data) => setQuota(data.quota))
       .catch(console.error);
   };
 
   const handleFileDelete = (fileId: string) => {
-    setFiles(prev => prev.filter(f => f.id !== fileId));
+    setFiles((prev) => prev.filter((f) => f.id !== fileId));
     // Refresh quota after delete
     fetch('/api/storage/quota')
-      .then(res => res.json())
-      .then(data => setQuota(data.quota))
+      .then((res) => res.json())
+      .then((data) => setQuota(data.quota))
       .catch(console.error);
   };
 
   const handleFilesDelete = (fileIds: string[]) => {
-    setFiles(prev => prev.filter(f => !fileIds.includes(f.id)));
+    setFiles((prev) => prev.filter((f) => !fileIds.includes(f.id)));
     // Refresh quota after bulk delete
     fetch('/api/storage/quota')
-      .then(res => res.json())
-      .then(data => setQuota(data.quota))
+      .then((res) => res.json())
+      .then((data) => setQuota(data.quota))
       .catch(console.error);
   };
 

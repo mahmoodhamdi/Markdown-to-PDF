@@ -41,15 +41,26 @@ export async function GET(_request: NextRequest) {
     // Get regional subscriptions history
     const regionalSubs = await RegionalSubscription.find({
       userId: session.user.email,
-    }).sort({ createdAt: -1 }).limit(12);
+    })
+      .sort({ createdAt: -1 })
+      .limit(12);
 
     for (const sub of regionalSubs) {
       // Generate invoice from subscription data
       // In production, you would fetch actual invoices from the payment gateway
       if (sub.status === 'active' || sub.status === 'canceled') {
-        const amount = sub.billing === 'yearly'
-          ? (sub.plan === 'pro' ? 48 : sub.plan === 'team' ? 144 : 948)
-          : (sub.plan === 'pro' ? 5 : sub.plan === 'team' ? 15 : 99);
+        const amount =
+          sub.billing === 'yearly'
+            ? sub.plan === 'pro'
+              ? 48
+              : sub.plan === 'team'
+                ? 144
+                : 948
+            : sub.plan === 'pro'
+              ? 5
+              : sub.plan === 'team'
+                ? 15
+                : 99;
 
         invoices.push({
           id: sub.gatewayTransactionId,
@@ -69,9 +80,6 @@ export async function GET(_request: NextRequest) {
     return NextResponse.json({ invoices });
   } catch (error) {
     console.error('Get invoices error:', error);
-    return NextResponse.json(
-      { error: 'Failed to get invoices' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Failed to get invoices' }, { status: 500 });
   }
 }

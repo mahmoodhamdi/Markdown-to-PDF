@@ -14,11 +14,7 @@ import {
 } from './usage';
 import { getPlanLimits, PlanType } from './config';
 import { checkRateLimit, getRateLimitHeaders } from '@/lib/rate-limit';
-import {
-  authenticateApiKey,
-  checkApiKeyRateLimit,
-  type ApiKeyUser,
-} from '@/lib/auth/api-key-auth';
+import { authenticateApiKey, checkApiKeyRateLimit, type ApiKeyUser } from '@/lib/auth/api-key-auth';
 
 // Anonymous user limits (stricter than free plan)
 const ANONYMOUS_LIMITS = {
@@ -51,9 +47,7 @@ export interface RateLimitResult {
  * Supports both session-based and API key authentication
  * API key auth takes precedence when present
  */
-export async function getRequestContext(
-  request: NextRequest
-): Promise<RateLimitContext> {
+export async function getRequestContext(request: NextRequest): Promise<RateLimitContext> {
   const ip =
     request.headers.get('x-forwarded-for')?.split(',')[0] ||
     request.headers.get('x-real-ip') ||
@@ -164,10 +158,7 @@ export async function checkConversionRateLimit(
   }
 
   // Session authenticated user - use plan-based limits
-  const limitCheck = await checkConversionLimit(
-    context.userEmail,
-    context.userPlan
-  );
+  const limitCheck = await checkConversionLimit(context.userEmail, context.userPlan);
 
   headers['X-RateLimit-Limit'] = limitCheck.limit.toString();
   headers['X-RateLimit-Remaining'] = limitCheck.remaining.toString();
@@ -302,10 +293,7 @@ export async function checkApiRateLimit(
 /**
  * Check file size limit
  */
-export function checkFileSizeLimit(
-  fileSize: number,
-  context: RateLimitContext
-): RateLimitResult {
+export function checkFileSizeLimit(fileSize: number, context: RateLimitContext): RateLimitResult {
   const maxSize = context.isAuthenticated
     ? getPlanLimits(context.userPlan).maxFileSize
     : ANONYMOUS_LIMITS.maxFileSize;

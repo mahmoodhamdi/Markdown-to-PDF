@@ -48,7 +48,12 @@ function toSSOConfiguration(doc: ISSOConfiguration): SSOConfiguration {
     organizationId: doc.organizationId,
     provider: doc.provider,
     status: doc.status,
-    config: doc.config as unknown as SAMLConfig | OIDCConfig | AzureADConfig | OktaConfig | GoogleWorkspaceConfig,
+    config: doc.config as unknown as
+      | SAMLConfig
+      | OIDCConfig
+      | AzureADConfig
+      | OktaConfig
+      | GoogleWorkspaceConfig,
     domain: doc.domain,
     enforceSSO: doc.enforceSSO,
     allowBypass: doc.allowBypass,
@@ -124,7 +129,13 @@ export async function createSSOConfig(
   });
 
   // Log audit
-  await logSSOAudit(organizationId, 'config_created', undefined, undefined, ssoConfig._id.toString());
+  await logSSOAudit(
+    organizationId,
+    'config_created',
+    undefined,
+    undefined,
+    ssoConfig._id.toString()
+  );
 
   return toSSOConfiguration(ssoConfig);
 }
@@ -147,7 +158,9 @@ export async function getSSOConfig(configId: string): Promise<SSOConfiguration |
 /**
  * Get SSO configuration for an organization
  */
-export async function getSSOConfigByOrganization(organizationId: string): Promise<SSOConfiguration | null> {
+export async function getSSOConfigByOrganization(
+  organizationId: string
+): Promise<SSOConfiguration | null> {
   await connectDB();
 
   const doc = await SSOConfigurationModel.findOne({ organizationId });
@@ -342,10 +355,7 @@ export async function deleteDomainMapping(domain: string): Promise<boolean> {
 /**
  * Test SSO configuration
  */
-export async function testSSOConfig(
-  configId: string,
-  testedBy?: string
-): Promise<SSOTestResult> {
+export async function testSSOConfig(configId: string, testedBy?: string): Promise<SSOTestResult> {
   const config = await getSSOConfig(configId);
 
   if (!config) {
@@ -709,8 +719,12 @@ export function generateSPMetadata(
                                  Location="${acsUrl}"
                                  index="0"
                                  isDefault="true"/>
-    ${sloUrl ? `<md:SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST"
-                              Location="${sloUrl}"/>` : ''}
+    ${
+      sloUrl
+        ? `<md:SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST"
+                              Location="${sloUrl}"/>`
+        : ''
+    }
   </md:SPSSODescriptor>
 </md:EntityDescriptor>`;
 

@@ -45,10 +45,7 @@ export async function GET(_request: NextRequest) {
     // Get session
     const session = await getServerSession(authOptions);
     if (!session?.user?.email) {
-      return NextResponse.json(
-        { error: 'Unauthorized', code: 'unauthorized' },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: 'Unauthorized', code: 'unauthorized' }, { status: 401 });
     }
 
     // Rate limit
@@ -65,10 +62,7 @@ export async function GET(_request: NextRequest) {
     // Fetch user from database
     const user = await User.findById(session.user.email);
     if (!user) {
-      return NextResponse.json(
-        { error: 'User not found', code: 'not_found' },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: 'User not found', code: 'not_found' }, { status: 404 });
     }
 
     // Return user profile (excluding sensitive fields)
@@ -105,10 +99,7 @@ export async function PATCH(request: NextRequest) {
     // Get session
     const session = await getServerSession(authOptions);
     if (!session?.user?.email) {
-      return NextResponse.json(
-        { error: 'Unauthorized', code: 'unauthorized' },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: 'Unauthorized', code: 'unauthorized' }, { status: 401 });
     }
 
     // Rate limit
@@ -148,17 +139,10 @@ export async function PATCH(request: NextRequest) {
     await connectDB();
 
     // Update user
-    const user = await User.findByIdAndUpdate(
-      session.user.email,
-      { $set: updates },
-      { new: true }
-    );
+    const user = await User.findByIdAndUpdate(session.user.email, { $set: updates }, { new: true });
 
     if (!user) {
-      return NextResponse.json(
-        { error: 'User not found', code: 'not_found' },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: 'User not found', code: 'not_found' }, { status: 404 });
     }
 
     return NextResponse.json({
@@ -201,10 +185,7 @@ export async function DELETE(request: NextRequest) {
     // Get session
     const session = await getServerSession(authOptions);
     if (!session?.user?.email) {
-      return NextResponse.json(
-        { error: 'Unauthorized', code: 'unauthorized' },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: 'Unauthorized', code: 'unauthorized' }, { status: 401 });
     }
 
     const userEmail = session.user.email;
@@ -246,10 +227,7 @@ export async function DELETE(request: NextRequest) {
     // Find user first to check if they exist
     const user = await User.findById(userEmail);
     if (!user) {
-      return NextResponse.json(
-        { error: 'User not found', code: 'not_found' },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: 'User not found', code: 'not_found' }, { status: 404 });
     }
 
     // Verify password
@@ -315,7 +293,10 @@ export async function DELETE(request: NextRequest) {
 /**
  * Cancel any active subscriptions for the user
  */
-async function cancelUserSubscriptions(userEmail: string, user: { stripeSubscriptionId?: string; plan: string }) {
+async function cancelUserSubscriptions(
+  userEmail: string,
+  user: { stripeSubscriptionId?: string; plan: string }
+) {
   // Cancel Stripe subscription
   if (user.stripeSubscriptionId) {
     try {
@@ -369,9 +350,7 @@ async function handleTeamMemberships(userEmail: string) {
 
   for (const team of ownedTeams) {
     // Check if there are other admins (all members in the array are active)
-    const admins = team.members.filter(
-      (m) => m.role === 'admin' && m.userId !== userEmail
-    );
+    const admins = team.members.filter((m) => m.role === 'admin' && m.userId !== userEmail);
 
     if (admins.length > 0) {
       // Transfer ownership to the first admin

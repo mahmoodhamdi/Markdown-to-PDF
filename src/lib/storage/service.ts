@@ -99,10 +99,7 @@ async function updateStorageQuota(userId: string, bytesChange: number): Promise<
   );
 
   // Ensure used doesn't go negative
-  await StorageQuota.updateOne(
-    { userId, used: { $lt: 0 } },
-    { $set: { used: 0 } }
-  );
+  await StorageQuota.updateOne({ userId, used: { $lt: 0 } }, { $set: { used: 0 } });
 }
 
 /**
@@ -152,21 +149,23 @@ export async function uploadFile(
     const safeFilename = sanitizeFilename(filename);
 
     // Upload to Cloudinary
-    const uploadResult = await new Promise<{ secure_url: string; public_id: string }>((resolve, reject) => {
-      const uploadStream = cloudinary.uploader.upload_stream(
-        {
-          folder: `md2pdf/users/${userId}`,
-          public_id: `${Date.now()}_${safeFilename}`,
-          resource_type: resourceType,
-        },
-        (error, result) => {
-          if (error) reject(error);
-          else if (result) resolve(result);
-          else reject(new Error('Upload failed'));
-        }
-      );
-      uploadStream.end(fileBuffer);
-    });
+    const uploadResult = await new Promise<{ secure_url: string; public_id: string }>(
+      (resolve, reject) => {
+        const uploadStream = cloudinary.uploader.upload_stream(
+          {
+            folder: `md2pdf/users/${userId}`,
+            public_id: `${Date.now()}_${safeFilename}`,
+            resource_type: resourceType,
+          },
+          (error, result) => {
+            if (error) reject(error);
+            else if (result) resolve(result);
+            else reject(new Error('Upload failed'));
+          }
+        );
+        uploadStream.end(fileBuffer);
+      }
+    );
 
     // Create file record in MongoDB
     const userFile = await UserFile.create({
@@ -209,10 +208,7 @@ export async function uploadFile(
 /**
  * List all files for a user
  */
-export async function listFiles(
-  userId: string,
-  planType: PlanType
-): Promise<ListFilesResult> {
+export async function listFiles(userId: string, planType: PlanType): Promise<ListFilesResult> {
   try {
     await connectDB();
 

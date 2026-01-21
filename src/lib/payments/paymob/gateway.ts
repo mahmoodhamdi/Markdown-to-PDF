@@ -117,11 +117,7 @@ export const paymobGateway: PaymentGateway = {
 
           if (existingSub) {
             // Renew existing subscription
-            await existingSub.renew(
-              String(parsed.transactionId),
-              parsed.amount,
-              parsed.currency
-            );
+            await existingSub.renew(String(parsed.transactionId), parsed.amount, parsed.currency);
           } else {
             // Create new subscription
             await createRegionalSubscription({
@@ -285,7 +281,11 @@ export const paymobGateway: PaymentGateway = {
     }
   },
 
-  async createCustomer(email: string, name?: string, metadata?: Record<string, string>): Promise<Customer> {
+  async createCustomer(
+    email: string,
+    name?: string,
+    metadata?: Record<string, string>
+  ): Promise<Customer> {
     // Paymob doesn't have customer creation API
     // We just return the user data
     return {

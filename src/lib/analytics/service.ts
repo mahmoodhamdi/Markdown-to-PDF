@@ -238,10 +238,7 @@ export async function getUsageRange(
 /**
  * Get usage summary for a user
  */
-export async function getUsageSummary(
-  userId: string,
-  planType: PlanType
-): Promise<UsageSummary> {
+export async function getUsageSummary(userId: string, planType: PlanType): Promise<UsageSummary> {
   const today = getCurrentDate();
   const weekStart = getWeekStart();
   const monthStart = getMonthStart();
@@ -278,10 +275,7 @@ export async function getUsageSummary(
 /**
  * Get usage history for a user (last N days)
  */
-export async function getUsageHistory(
-  userId: string,
-  days: number = 30
-): Promise<UsageHistory> {
+export async function getUsageHistory(userId: string, days: number = 30): Promise<UsageHistory> {
   const endDate = getCurrentDate();
   const startDateObj = new Date();
   startDateObj.setDate(startDateObj.getDate() - days + 1);
@@ -294,7 +288,9 @@ export async function getUsageHistory(
     const usageData = await DailyUsage.find({
       userId,
       date: { $gte: startDate, $lte: endDate },
-    }).sort({ date: 1 }).lean();
+    })
+      .sort({ date: 1 })
+      .lean();
 
     // Create a map of existing data
     const usageMap = new Map<string, DailyUsageData>();

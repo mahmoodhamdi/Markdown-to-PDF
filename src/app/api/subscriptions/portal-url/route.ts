@@ -18,7 +18,8 @@ export async function GET(request: NextRequest) {
     }
 
     const { searchParams } = new URL(request.url);
-    const returnUrl = searchParams.get('returnUrl') || `${process.env.NEXT_PUBLIC_APP_URL}/dashboard/subscription`;
+    const returnUrl =
+      searchParams.get('returnUrl') || `${process.env.NEXT_PUBLIC_APP_URL}/dashboard/subscription`;
 
     await connectDB();
 
@@ -38,33 +39,21 @@ export async function GET(request: NextRequest) {
 
     // Check if portal URL is supported
     if (!stripeGateway.getCustomerPortalUrl) {
-      return NextResponse.json(
-        { error: 'Customer portal is not configured' },
-        { status: 500 }
-      );
+      return NextResponse.json({ error: 'Customer portal is not configured' }, { status: 500 });
     }
 
     try {
-      const portalUrl = await stripeGateway.getCustomerPortalUrl(
-        user.stripeCustomerId,
-        returnUrl
-      );
+      const portalUrl = await stripeGateway.getCustomerPortalUrl(user.stripeCustomerId, returnUrl);
 
       return NextResponse.json({
         url: portalUrl,
       });
     } catch (error) {
       console.error('Stripe portal URL error:', error);
-      return NextResponse.json(
-        { error: 'Failed to generate portal URL' },
-        { status: 500 }
-      );
+      return NextResponse.json({ error: 'Failed to generate portal URL' }, { status: 500 });
     }
   } catch (error) {
     console.error('Get portal URL error:', error);
-    return NextResponse.json(
-      { error: 'Failed to get portal URL' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Failed to get portal URL' }, { status: 500 });
   }
 }

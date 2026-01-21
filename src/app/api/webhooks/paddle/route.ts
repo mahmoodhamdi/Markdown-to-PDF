@@ -25,10 +25,7 @@ export async function POST(request: NextRequest) {
   try {
     // Check if Paddle is configured
     if (!isPaddleConfigured()) {
-      return NextResponse.json(
-        { error: 'Paddle not configured' },
-        { status: 503 }
-      );
+      return NextResponse.json({ error: 'Paddle not configured' }, { status: 503 });
     }
 
     // Get the raw body for signature verification
@@ -44,10 +41,7 @@ export async function POST(request: NextRequest) {
           eventId: 'unknown',
           eventType: 'unknown',
         });
-        return NextResponse.json(
-          { error: 'Invalid signature' },
-          { status: 400 }
-        );
+        return NextResponse.json({ error: 'Invalid signature' }, { status: 400 });
       }
     }
 
@@ -161,10 +155,7 @@ export async function POST(request: NextRequest) {
       eventType: 'unknown',
       error: error instanceof Error ? error.message : 'Unknown error',
     });
-    return NextResponse.json(
-      { error: 'Webhook handler failed' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Webhook handler failed' }, { status: 500 });
   }
 }
 
@@ -212,23 +203,25 @@ async function handleSubscriptionActivated(event: Record<string, unknown>, event
       : undefined;
     const currency = data.currency_code as string | undefined;
 
-    emailService.sendSubscriptionConfirmation(
-      { email: userEmail.toLowerCase(), name: user?.name || '' },
-      {
-        plan: plan as PlanType,
-        billing: billing || 'monthly',
-        amount,
-        currency,
-        gateway: 'paddle',
-      }
-    ).catch((err) => {
-      webhookLog('error', 'Failed to send subscription confirmation email', {
-        gateway: 'paddle',
-        eventId,
-        eventType: event.event_type as string,
-        error: err instanceof Error ? err.message : 'Unknown error',
+    emailService
+      .sendSubscriptionConfirmation(
+        { email: userEmail.toLowerCase(), name: user?.name || '' },
+        {
+          plan: plan as PlanType,
+          billing: billing || 'monthly',
+          amount,
+          currency,
+          gateway: 'paddle',
+        }
+      )
+      .catch((err) => {
+        webhookLog('error', 'Failed to send subscription confirmation email', {
+          gateway: 'paddle',
+          eventId,
+          eventType: event.event_type as string,
+          error: err instanceof Error ? err.message : 'Unknown error',
+        });
       });
-    });
   }
 }
 
@@ -299,20 +292,22 @@ async function handleSubscriptionCanceled(event: Record<string, unknown>, eventI
 
   // Send subscription canceled email
   if (emailService.isConfigured()) {
-    emailService.sendSubscriptionCanceled(
-      { email: userEmail.toLowerCase(), name: user?.name || '' },
-      {
-        plan: previousPlan as PlanType,
-        immediate: true,
-      }
-    ).catch((err) => {
-      webhookLog('error', 'Failed to send subscription canceled email', {
-        gateway: 'paddle',
-        eventId,
-        eventType: 'subscription.canceled',
-        error: err instanceof Error ? err.message : 'Unknown error',
+    emailService
+      .sendSubscriptionCanceled(
+        { email: userEmail.toLowerCase(), name: user?.name || '' },
+        {
+          plan: previousPlan as PlanType,
+          immediate: true,
+        }
+      )
+      .catch((err) => {
+        webhookLog('error', 'Failed to send subscription canceled email', {
+          gateway: 'paddle',
+          eventId,
+          eventType: 'subscription.canceled',
+          error: err instanceof Error ? err.message : 'Unknown error',
+        });
       });
-    });
   }
 }
 

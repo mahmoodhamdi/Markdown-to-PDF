@@ -18,9 +18,7 @@ export function calculateEditorStats(text: string): EditorStats {
     };
   }
 
-  const words = trimmedText
-    .split(/\s+/)
-    .filter((word) => word.length > 0).length;
+  const words = trimmedText.split(/\s+/).filter((word) => word.length > 0).length;
 
   const characters = trimmedText.length;
   const lines = text.split('\n').length;

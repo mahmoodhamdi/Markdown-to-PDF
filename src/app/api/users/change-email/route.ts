@@ -37,10 +37,7 @@ export async function POST(request: NextRequest) {
     // Get session
     const session = await getServerSession(authOptions);
     if (!session?.user?.email) {
-      return NextResponse.json(
-        { error: 'Unauthorized', code: 'unauthorized' },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: 'Unauthorized', code: 'unauthorized' }, { status: 401 });
     }
 
     // Rate limit by IP
@@ -85,10 +82,7 @@ export async function POST(request: NextRequest) {
     // Fetch user
     const user = await User.findById(currentEmail);
     if (!user) {
-      return NextResponse.json(
-        { error: 'User not found', code: 'not_found' },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: 'User not found', code: 'not_found' }, { status: 404 });
     }
 
     // Check if user has a password (required for email change)
@@ -160,7 +154,9 @@ export async function POST(request: NextRequest) {
     } else if (process.env.NODE_ENV === 'development') {
       // In development only, log the token when email is not configured
       // eslint-disable-next-line no-console
-      console.log(`[DEV] Email change token for ${currentEmail} -> ${normalizedNewEmail}: ${token}`);
+      console.log(
+        `[DEV] Email change token for ${currentEmail} -> ${normalizedNewEmail}: ${token}`
+      );
     }
 
     return NextResponse.json({

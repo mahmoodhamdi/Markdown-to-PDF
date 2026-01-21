@@ -46,11 +46,7 @@ interface CreateApiKeyDialogProps {
   onKeyCreated: (plainKey: string) => void;
 }
 
-export function CreateApiKeyDialog({
-  open,
-  onOpenChange,
-  onKeyCreated,
-}: CreateApiKeyDialogProps) {
+export function CreateApiKeyDialog({ open, onOpenChange, onKeyCreated }: CreateApiKeyDialogProps) {
   const t = useTranslations('dashboard.apiKeys');
 
   const [name, setName] = useState('');
@@ -204,9 +200,7 @@ export function CreateApiKeyDialog({
             </div>
 
             {/* Error Message */}
-            {error && (
-              <p className="text-sm text-destructive">{error}</p>
-            )}
+            {error && <p className="text-sm text-destructive">{error}</p>}
           </div>
 
           <DialogFooter>

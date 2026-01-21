@@ -1,0 +1,699 @@
+
+> markdown-to-pdf@1.0.0 build
+> next build
+
+  ▲ Next.js 14.2.35
+  - Environments: .env.local
+
+   Creating an optimized production build ...
+ ✓ Compiled successfully
+   Linting and checking validity of types ...
+
+./src/app/api/sso/domains/[domain]/verify/route.ts
+76:63  Warning: Forbidden non-null assertion.  @typescript-eslint/no-non-null-assertion
+
+./src/lib/auth/api-key-auth.ts
+212:69  Warning: Forbidden non-null assertion.  @typescript-eslint/no-non-null-assertion
+
+./src/lib/db/mongodb.ts
+132:9  Warning: Unexpected console statement.  no-console
+156:5  Warning: Unexpected console statement.  no-console
+
+./src/lib/payments/paddle/gateway.ts
+180:15  Warning: Unexpected console statement.  no-console
+234:13  Warning: Unexpected console statement.  no-console
+
+./src/lib/payments/paytabs/gateway.ts
+126:11  Warning: Unexpected console statement.  no-console
+
+./src/lib/payments/stripe/gateway.ts
+153:12  Warning: Forbidden non-null assertion.  @typescript-eslint/no-non-null-assertion
+
+./src/lib/pdf/browser-pool.ts
+122:7  Warning: Unexpected console statement.  no-console
+137:9  Warning: Unexpected console statement.  no-console
+
+./src/lib/pdf/generator.ts
+63:5  Warning: Unexpected console statement.  no-console
+502:5  Warning: Unexpected console statement.  no-console
+
+./src/lib/rate-limit/redis.ts
+61:12  Warning: Forbidden non-null assertion.  @typescript-eslint/no-non-null-assertion
+62:14  Warning: Forbidden non-null assertion.  @typescript-eslint/no-non-null-assertion
+
+./src/lib/webhooks/service.ts
+216:7  Warning: Unexpected console statement.  no-console
+
+info  - Need to disable some ESLint rules? Learn more here: https://nextjs.org/docs/basic-features/eslint#disabling-rules
+   Collecting page data ...
+STRIPE_SECRET_KEY is not set. Stripe functionality will be disabled.
+   Generating static pages (0/91) ...
+Analytics history API error: n [Error]: Dynamic server usage: Route /api/analytics/history couldn't be rendered statically because it used `headers`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error
+    at l (/media/alash/New Volume/Markdown-to-PDF/.next/server/chunks/8948.js:1:56329)
+    at c (/media/alash/New Volume/Markdown-to-PDF/.next/server/chunks/1615.js:1:1441)
+    at s (/media/alash/New Volume/Markdown-to-PDF/.next/server/chunks/4746.js:25:20859)
+    at u (/media/alash/New Volume/Markdown-to-PDF/.next/server/app/api/analytics/history/route.js:1:1311)
+    at /media/alash/New Volume/Markdown-to-PDF/node_modules/next/dist/compiled/next-server/app-route.runtime.prod.js:6:38417
+    at /media/alash/New Volume/Markdown-to-PDF/node_modules/next/dist/server/lib/trace/tracer.js:140:36
+    at NoopContextManager.with (/media/alash/New Volume/Markdown-to-PDF/node_modules/@opentelemetry/api/build/src/context/NoopContextManager.js:25:19)
+    at ContextAPI.with (/media/alash/New Volume/Markdown-to-PDF/node_modules/@opentelemetry/api/build/src/api/context.js:60:46)
+    at NoopTracer.startActiveSpan (/media/alash/New Volume/Markdown-to-PDF/node_modules/@opentelemetry/api/build/src/trace/NoopTracer.js:65:31)
+    at ProxyTracer.startActiveSpan (/media/alash/New Volume/Markdown-to-PDF/node_modules/@opentelemetry/api/build/src/trace/ProxyTracer.js:36:24) {
+  description: "Route /api/analytics/history couldn't be rendered statically because it used `headers`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error",
+  digest: 'DYNAMIC_SERVER_USAGE'
+}
+SSO audit GET error: n [Error]: Dynamic server usage: Route /api/sso/audit couldn't be rendered statically because it used `headers`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error
+    at l (/media/alash/New Volume/Markdown-to-PDF/.next/server/chunks/8948.js:1:56329)
+    at c (/media/alash/New Volume/Markdown-to-PDF/.next/server/chunks/1615.js:1:1441)
+    at s (/media/alash/New Volume/Markdown-to-PDF/.next/server/chunks/4746.js:25:20859)
+    at d (/media/alash/New Volume/Markdown-to-PDF/.next/server/app/api/sso/audit/route.js:1:1311)
+    at /media/alash/New Volume/Markdown-to-PDF/node_modules/next/dist/compiled/next-server/app-route.runtime.prod.js:6:38417
+    at /media/alash/New Volume/Markdown-to-PDF/node_modules/next/dist/server/lib/trace/tracer.js:140:36
+    at NoopContextManager.with (/media/alash/New Volume/Markdown-to-PDF/node_modules/@opentelemetry/api/build/src/context/NoopContextManager.js:25:19)
+    at ContextAPI.with (/media/alash/New Volume/Markdown-to-PDF/node_modules/@opentelemetry/api/build/src/api/context.js:60:46)
+    at NoopTracer.startActiveSpan (/media/alash/New Volume/Markdown-to-PDF/node_modules/@opentelemetry/api/build/src/trace/NoopTracer.js:65:31)
+    at ProxyTracer.startActiveSpan (/media/alash/New Volume/Markdown-to-PDF/node_modules/@opentelemetry/api/build/src/trace/ProxyTracer.js:36:24) {
+  description: "Route /api/sso/audit couldn't be rendered statically because it used `headers`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error",
+  digest: 'DYNAMIC_SERVER_USAGE'
+}
+Get subscription error: n [Error]: Dynamic server usage: Route /api/subscriptions couldn't be rendered statically because it used `headers`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error
+    at l (/media/alash/New Volume/Markdown-to-PDF/.next/server/chunks/8948.js:1:56329)
+    at c (/media/alash/New Volume/Markdown-to-PDF/.next/server/chunks/1615.js:1:1441)
+    at s (/media/alash/New Volume/Markdown-to-PDF/.next/server/chunks/4746.js:25:20859)
+    at m (/media/alash/New Volume/Markdown-to-PDF/.next/server/app/api/subscriptions/route.js:1:1322)
+    at /media/alash/New Volume/Markdown-to-PDF/node_modules/next/dist/compiled/next-server/app-route.runtime.prod.js:6:38417
+    at /media/alash/New Volume/Markdown-to-PDF/node_modules/next/dist/server/lib/trace/tracer.js:140:36
+    at NoopContextManager.with (/media/alash/New Volume/Markdown-to-PDF/node_modules/@opentelemetry/api/build/src/context/NoopContextManager.js:25:19)
+    at ContextAPI.with (/media/alash/New Volume/Markdown-to-PDF/node_modules/@opentelemetry/api/build/src/api/context.js:60:46)
+    at NoopTracer.startActiveSpan (/media/alash/New Volume/Markdown-to-PDF/node_modules/@opentelemetry/api/build/src/trace/NoopTracer.js:65:31)
+    at ProxyTracer.startActiveSpan (/media/alash/New Volume/Markdown-to-PDF/node_modules/@opentelemetry/api/build/src/trace/ProxyTracer.js:36:24) {
+  description: "Route /api/subscriptions couldn't be rendered statically because it used `headers`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error",
+  digest: 'DYNAMIC_SERVER_USAGE'
+}
+List files API error: n [Error]: Dynamic server usage: Route /api/storage/files couldn't be rendered statically because it used `headers`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error
+    at l (/media/alash/New Volume/Markdown-to-PDF/.next/server/chunks/8948.js:1:56329)
+    at c (/media/alash/New Volume/Markdown-to-PDF/.next/server/chunks/1615.js:1:1441)
+    at s (/media/alash/New Volume/Markdown-to-PDF/.next/server/chunks/4746.js:25:20859)
+    at m (/media/alash/New Volume/Markdown-to-PDF/.next/server/app/api/storage/files/route.js:1:1432)
+    at /media/alash/New Volume/Markdown-to-PDF/node_modules/next/dist/compiled/next-server/app-route.runtime.prod.js:6:38417
+    at /media/alash/New Volume/Markdown-to-PDF/node_modules/next/dist/server/lib/trace/tracer.js:140:36
+    at NoopContextManager.with (/media/alash/New Volume/Markdown-to-PDF/node_modules/@opentelemetry/api/build/src/context/NoopContextManager.js:25:19)
+    at ContextAPI.with (/media/alash/New Volume/Markdown-to-PDF/node_modules/@opentelemetry/api/build/src/api/context.js:60:46)
+    at NoopTracer.startActiveSpan (/media/alash/New Volume/Markdown-to-PDF/node_modules/@opentelemetry/api/build/src/trace/NoopTracer.js:65:31)
+    at ProxyTracer.startActiveSpan (/media/alash/New Volume/Markdown-to-PDF/node_modules/@opentelemetry/api/build/src/trace/ProxyTracer.js:36:24) {
+  description: "Route /api/storage/files couldn't be rendered statically because it used `headers`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error",
+  digest: 'DYNAMIC_SERVER_USAGE'
+}
+SSO metadata GET error: n [Error]: Dynamic server usage: Route /api/sso/metadata couldn't be rendered statically because it used `headers`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error
+    at l (/media/alash/New Volume/Markdown-to-PDF/.next/server/chunks/8948.js:1:56329)
+    at c (/media/alash/New Volume/Markdown-to-PDF/.next/server/chunks/1615.js:1:1441)
+    at s (/media/alash/New Volume/Markdown-to-PDF/.next/server/chunks/4746.js:25:20859)
+    at m (/media/alash/New Volume/Markdown-to-PDF/.next/server/app/api/sso/metadata/route.js:1:1311)
+    at /media/alash/New Volume/Markdown-to-PDF/node_modules/next/dist/compiled/next-server/app-route.runtime.prod.js:6:38417
+    at /media/alash/New Volume/Markdown-to-PDF/node_modules/next/dist/server/lib/trace/tracer.js:140:36
+    at NoopContextManager.with (/media/alash/New Volume/Markdown-to-PDF/node_modules/@opentelemetry/api/build/src/context/NoopContextManager.js:25:19)
+    at ContextAPI.with (/media/alash/New Volume/Markdown-to-PDF/node_modules/@opentelemetry/api/build/src/api/context.js:60:46)
+    at NoopTracer.startActiveSpan (/media/alash/New Volume/Markdown-to-PDF/node_modules/@opentelemetry/api/build/src/trace/NoopTracer.js:65:31)
+    at ProxyTracer.startActiveSpan (/media/alash/New Volume/Markdown-to-PDF/node_modules/@opentelemetry/api/build/src/trace/ProxyTracer.js:36:24) {
+  description: "Route /api/sso/metadata couldn't be rendered statically because it used `headers`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error",
+  digest: 'DYNAMIC_SERVER_USAGE'
+}
+Get invoices error: n [Error]: Dynamic server usage: Route /api/subscriptions/invoices couldn't be rendered statically because it used `headers`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error
+    at l (/media/alash/New Volume/Markdown-to-PDF/.next/server/chunks/8948.js:1:56329)
+    at c (/media/alash/New Volume/Markdown-to-PDF/.next/server/chunks/1615.js:1:1441)
+    at s (/media/alash/New Volume/Markdown-to-PDF/.next/server/chunks/4746.js:25:20859)
+    at m (/media/alash/New Volume/Markdown-to-PDF/.next/server/app/api/subscriptions/invoices/route.js:1:1320)
+    at /media/alash/New Volume/Markdown-to-PDF/node_modules/next/dist/compiled/next-server/app-route.runtime.prod.js:6:38417
+    at /media/alash/New Volume/Markdown-to-PDF/node_modules/next/dist/server/lib/trace/tracer.js:140:36
+    at NoopContextManager.with (/media/alash/New Volume/Markdown-to-PDF/node_modules/@opentelemetry/api/build/src/context/NoopContextManager.js:25:19)
+    at ContextAPI.with (/media/alash/New Volume/Markdown-to-PDF/node_modules/@opentelemetry/api/build/src/api/context.js:60:46)
+    at NoopTracer.startActiveSpan (/media/alash/New Volume/Markdown-to-PDF/node_modules/@opentelemetry/api/build/src/trace/NoopTracer.js:65:31)
+    at ProxyTracer.startActiveSpan (/media/alash/New Volume/Markdown-to-PDF/node_modules/@opentelemetry/api/build/src/trace/ProxyTracer.js:36:24) {
+  description: "Route /api/subscriptions/invoices couldn't be rendered statically because it used `headers`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error",
+  digest: 'DYNAMIC_SERVER_USAGE'
+}
+   Generating static pages (22/91) 
+Get portal URL error: n [Error]: Dynamic server usage: Route /api/subscriptions/portal-url couldn't be rendered statically because it used `headers`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error
+    at l (/media/alash/New Volume/Markdown-to-PDF/.next/server/chunks/8948.js:1:56329)
+    at c (/media/alash/New Volume/Markdown-to-PDF/.next/server/chunks/1615.js:1:1441)
+    at s (/media/alash/New Volume/Markdown-to-PDF/.next/server/chunks/4746.js:25:20859)
+    at m (/media/alash/New Volume/Markdown-to-PDF/.next/server/app/api/subscriptions/portal-url/route.js:1:1373)
+    at /media/alash/New Volume/Markdown-to-PDF/node_modules/next/dist/compiled/next-server/app-route.runtime.prod.js:6:38417
+    at /media/alash/New Volume/Markdown-to-PDF/node_modules/next/dist/server/lib/trace/tracer.js:140:36
+    at NoopContextManager.with (/media/alash/New Volume/Markdown-to-PDF/node_modules/@opentelemetry/api/build/src/context/NoopContextManager.js:25:19)
+    at ContextAPI.with (/media/alash/New Volume/Markdown-to-PDF/node_modules/@opentelemetry/api/build/src/api/context.js:60:46)
+    at NoopTracer.startActiveSpan (/media/alash/New Volume/Markdown-to-PDF/node_modules/@opentelemetry/api/build/src/trace/NoopTracer.js:65:31)
+    at ProxyTracer.startActiveSpan (/media/alash/New Volume/Markdown-to-PDF/node_modules/@opentelemetry/api/build/src/trace/ProxyTracer.js:36:24) {
+  description: "Route /api/subscriptions/portal-url couldn't be rendered statically because it used `headers`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error",
+  digest: 'DYNAMIC_SERVER_USAGE'
+}
+Get user invitations API error: n [Error]: Dynamic server usage: Route /api/invitations couldn't be rendered statically because it used `headers`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error
+    at l (/media/alash/New Volume/Markdown-to-PDF/.next/server/chunks/8948.js:1:56329)
+    at c (/media/alash/New Volume/Markdown-to-PDF/.next/server/chunks/1615.js:1:1441)
+    at s (/media/alash/New Volume/Markdown-to-PDF/.next/server/chunks/4746.js:25:20859)
+    at u (/media/alash/New Volume/Markdown-to-PDF/.next/server/app/api/invitations/route.js:1:1598)
+    at /media/alash/New Volume/Markdown-to-PDF/node_modules/next/dist/compiled/next-server/app-route.runtime.prod.js:6:38417
+    at /media/alash/New Volume/Markdown-to-PDF/node_modules/next/dist/server/lib/trace/tracer.js:140:36
+    at NoopContextManager.with (/media/alash/New Volume/Markdown-to-PDF/node_modules/@opentelemetry/api/build/src/context/NoopContextManager.js:25:19)
+    at ContextAPI.with (/media/alash/New Volume/Markdown-to-PDF/node_modules/@opentelemetry/api/build/src/api/context.js:60:46)
+    at NoopTracer.startActiveSpan (/media/alash/New Volume/Markdown-to-PDF/node_modules/@opentelemetry/api/build/src/trace/NoopTracer.js:65:31)
+    at ProxyTracer.startActiveSpan (/media/alash/New Volume/Markdown-to-PDF/node_modules/@opentelemetry/api/build/src/trace/ProxyTracer.js:36:24) {
+  description: "Route /api/invitations couldn't be rendered statically because it used `headers`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error",
+  digest: 'DYNAMIC_SERVER_USAGE'
+}
+Analytics summary API error: n [Error]: Dynamic server usage: Route /api/analytics/summary couldn't be rendered statically because it used `headers`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error
+    at l (/media/alash/New Volume/Markdown-to-PDF/.next/server/chunks/8948.js:1:56329)
+    at c (/media/alash/New Volume/Markdown-to-PDF/.next/server/chunks/1615.js:1:1441)
+    at s (/media/alash/New Volume/Markdown-to-PDF/.next/server/chunks/4746.js:25:20859)
+    at u (/media/alash/New Volume/Markdown-to-PDF/.next/server/app/api/analytics/summary/route.js:1:1309)
+    at /media/alash/New Volume/Markdown-to-PDF/node_modules/next/dist/compiled/next-server/app-route.runtime.prod.js:6:38417
+    at /media/alash/New Volume/Markdown-to-PDF/node_modules/next/dist/server/lib/trace/tracer.js:140:36
+    at NoopContextManager.with (/media/alash/New Volume/Markdown-to-PDF/node_modules/@opentelemetry/api/build/src/context/NoopContextManager.js:25:19)
+    at ContextAPI.with (/media/alash/New Volume/Markdown-to-PDF/node_modules/@opentelemetry/api/build/src/api/context.js:60:46)
+    at NoopTracer.startActiveSpan (/media/alash/New Volume/Markdown-to-PDF/node_modules/@opentelemetry/api/build/src/trace/NoopTracer.js:65:31)
+    at ProxyTracer.startActiveSpan (/media/alash/New Volume/Markdown-to-PDF/node_modules/@opentelemetry/api/build/src/trace/ProxyTracer.js:36:24) {
+  description: "Route /api/analytics/summary couldn't be rendered statically because it used `headers`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error",
+  digest: 'DYNAMIC_SERVER_USAGE'
+}
+Storage quota API error: n [Error]: Dynamic server usage: Route /api/storage/quota couldn't be rendered statically because it used `headers`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error
+    at l (/media/alash/New Volume/Markdown-to-PDF/.next/server/chunks/8948.js:1:56329)
+    at c (/media/alash/New Volume/Markdown-to-PDF/.next/server/chunks/1615.js:1:1441)
+    at s (/media/alash/New Volume/Markdown-to-PDF/.next/server/chunks/4746.js:25:20859)
+    at c (/media/alash/New Volume/Markdown-to-PDF/.next/server/app/api/storage/quota/route.js:1:1432)
+    at /media/alash/New Volume/Markdown-to-PDF/node_modules/next/dist/compiled/next-server/app-route.runtime.prod.js:6:38417
+    at /media/alash/New Volume/Markdown-to-PDF/node_modules/next/dist/server/lib/trace/tracer.js:140:36
+    at NoopContextManager.with (/media/alash/New Volume/Markdown-to-PDF/node_modules/@opentelemetry/api/build/src/context/NoopContextManager.js:25:19)
+    at ContextAPI.with (/media/alash/New Volume/Markdown-to-PDF/node_modules/@opentelemetry/api/build/src/api/context.js:60:46)
+    at NoopTracer.startActiveSpan (/media/alash/New Volume/Markdown-to-PDF/node_modules/@opentelemetry/api/build/src/trace/NoopTracer.js:65:31)
+    at ProxyTracer.startActiveSpan (/media/alash/New Volume/Markdown-to-PDF/node_modules/@opentelemetry/api/build/src/trace/ProxyTracer.js:36:24) {
+  description: "Route /api/storage/quota couldn't be rendered statically because it used `headers`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error",
+  digest: 'DYNAMIC_SERVER_USAGE'
+}
+Get accounts error: n [Error]: Dynamic server usage: Route /api/users/accounts couldn't be rendered statically because it used `headers`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error
+    at l (/media/alash/New Volume/Markdown-to-PDF/.next/server/chunks/8948.js:1:56329)
+    at c (/media/alash/New Volume/Markdown-to-PDF/.next/server/chunks/1615.js:1:1441)
+    at s (/media/alash/New Volume/Markdown-to-PDF/.next/server/chunks/4746.js:25:20859)
+    at d (/media/alash/New Volume/Markdown-to-PDF/.next/server/app/api/users/accounts/route.js:1:1298)
+    at /media/alash/New Volume/Markdown-to-PDF/node_modules/next/dist/compiled/next-server/app-route.runtime.prod.js:6:38417
+    at /media/alash/New Volume/Markdown-to-PDF/node_modules/next/dist/server/lib/trace/tracer.js:140:36
+    at NoopContextManager.with (/media/alash/New Volume/Markdown-to-PDF/node_modules/@opentelemetry/api/build/src/context/NoopContextManager.js:25:19)
+    at ContextAPI.with (/media/alash/New Volume/Markdown-to-PDF/node_modules/@opentelemetry/api/build/src/api/context.js:60:46)
+    at NoopTracer.startActiveSpan (/media/alash/New Volume/Markdown-to-PDF/node_modules/@opentelemetry/api/build/src/trace/NoopTracer.js:65:31)
+    at ProxyTracer.startActiveSpan (/media/alash/New Volume/Markdown-to-PDF/node_modules/@opentelemetry/api/build/src/trace/ProxyTracer.js:36:24) {
+  description: "Route /api/users/accounts couldn't be rendered statically because it used `headers`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error",
+  digest: 'DYNAMIC_SERVER_USAGE'
+}
+   Generating static pages (45/91) 
+STRIPE_SECRET_KEY is not set. Stripe functionality will be disabled.
+Export error: n [Error]: Dynamic server usage: Route /api/users/export couldn't be rendered statically because it used `headers`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error
+    at l (/media/alash/New Volume/Markdown-to-PDF/.next/server/chunks/8948.js:1:56329)
+    at c (/media/alash/New Volume/Markdown-to-PDF/.next/server/chunks/1615.js:1:1441)
+    at s (/media/alash/New Volume/Markdown-to-PDF/.next/server/chunks/4746.js:25:20859)
+    at m (/media/alash/New Volume/Markdown-to-PDF/.next/server/app/api/users/export/route.js:1:1602)
+    at /media/alash/New Volume/Markdown-to-PDF/node_modules/next/dist/compiled/next-server/app-route.runtime.prod.js:6:38417
+    at /media/alash/New Volume/Markdown-to-PDF/node_modules/next/dist/server/lib/trace/tracer.js:140:36
+    at NoopContextManager.with (/media/alash/New Volume/Markdown-to-PDF/node_modules/@opentelemetry/api/build/src/context/NoopContextManager.js:25:19)
+    at ContextAPI.with (/media/alash/New Volume/Markdown-to-PDF/node_modules/@opentelemetry/api/build/src/api/context.js:60:46)
+    at NoopTracer.startActiveSpan (/media/alash/New Volume/Markdown-to-PDF/node_modules/@opentelemetry/api/build/src/trace/NoopTracer.js:65:31)
+    at ProxyTracer.startActiveSpan (/media/alash/New Volume/Markdown-to-PDF/node_modules/@opentelemetry/api/build/src/trace/ProxyTracer.js:36:24) {
+  description: "Route /api/users/export couldn't be rendered statically because it used `headers`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error",
+  digest: 'DYNAMIC_SERVER_USAGE'
+}
+
+The `locale` parameter in `getRequestConfig` is deprecated, please switch to `await requestLocale`. See https://next-intl.dev/blog/next-intl-3-22#await-request-locale
+
+
+A `locale` is expected to be returned from `getRequestConfig`, but none was returned. This will be an error in the next major version of next-intl.
+
+See: https://next-intl.dev/blog/next-intl-3-22#await-request-locale
+
+
+The `locale` parameter in `getRequestConfig` is deprecated, please switch to `await requestLocale`. See https://next-intl.dev/blog/next-intl-3-22#await-request-locale
+
+
+A `locale` is expected to be returned from `getRequestConfig`, but none was returned. This will be an error in the next major version of next-intl.
+
+See: https://next-intl.dev/blog/next-intl-3-22#await-request-locale
+
+
+The `locale` parameter in `getRequestConfig` is deprecated, please switch to `await requestLocale`. See https://next-intl.dev/blog/next-intl-3-22#await-request-locale
+
+
+A `locale` is expected to be returned from `getRequestConfig`, but none was returned. This will be an error in the next major version of next-intl.
+
+See: https://next-intl.dev/blog/next-intl-3-22#await-request-locale
+
+
+The `locale` parameter in `getRequestConfig` is deprecated, please switch to `await requestLocale`. See https://next-intl.dev/blog/next-intl-3-22#await-request-locale
+
+
+A `locale` is expected to be returned from `getRequestConfig`, but none was returned. This will be an error in the next major version of next-intl.
+
+See: https://next-intl.dev/blog/next-intl-3-22#await-request-locale
+
+
+The `locale` parameter in `getRequestConfig` is deprecated, please switch to `await requestLocale`. See https://next-intl.dev/blog/next-intl-3-22#await-request-locale
+
+
+A `locale` is expected to be returned from `getRequestConfig`, but none was returned. This will be an error in the next major version of next-intl.
+
+See: https://next-intl.dev/blog/next-intl-3-22#await-request-locale
+
+
+The `locale` parameter in `getRequestConfig` is deprecated, please switch to `await requestLocale`. See https://next-intl.dev/blog/next-intl-3-22#await-request-locale
+
+
+A `locale` is expected to be returned from `getRequestConfig`, but none was returned. This will be an error in the next major version of next-intl.
+
+See: https://next-intl.dev/blog/next-intl-3-22#await-request-locale
+
+
+The `locale` parameter in `getRequestConfig` is deprecated, please switch to `await requestLocale`. See https://next-intl.dev/blog/next-intl-3-22#await-request-locale
+
+
+A `locale` is expected to be returned from `getRequestConfig`, but none was returned. This will be an error in the next major version of next-intl.
+
+See: https://next-intl.dev/blog/next-intl-3-22#await-request-locale
+
+
+The `locale` parameter in `getRequestConfig` is deprecated, please switch to `await requestLocale`. See https://next-intl.dev/blog/next-intl-3-22#await-request-locale
+
+
+A `locale` is expected to be returned from `getRequestConfig`, but none was returned. This will be an error in the next major version of next-intl.
+
+See: https://next-intl.dev/blog/next-intl-3-22#await-request-locale
+
+u [Error]: MISSING_MESSAGE: themes.codeThemes.githublight (en)
+    at b (/media/alash/New Volume/Markdown-to-PDF/.next/server/chunks/7597.js:1:138268)
+    at E (/media/alash/New Volume/Markdown-to-PDF/.next/server/chunks/7597.js:1:138424)
+    at w (/media/alash/New Volume/Markdown-to-PDF/.next/server/chunks/7597.js:1:139757)
+    at /media/alash/New Volume/Markdown-to-PDF/.next/server/app/[locale]/settings/page.js:1:4469
+    at Array.map (<anonymous>)
+    at g (/media/alash/New Volume/Markdown-to-PDF/.next/server/app/[locale]/settings/page.js:1:4401)
+    at nj (/media/alash/New Volume/Markdown-to-PDF/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:46252)
+    at nM (/media/alash/New Volume/Markdown-to-PDF/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:47572)
+    at nL (/media/alash/New Volume/Markdown-to-PDF/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64547)
+    at nB (/media/alash/New Volume/Markdown-to-PDF/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539) {
+  code: 'MISSING_MESSAGE',
+  originalMessage: 'themes.codeThemes.githublight (en)'
+}
+u [Error]: MISSING_MESSAGE: themes.codeThemes.githubdark (en)
+    at b (/media/alash/New Volume/Markdown-to-PDF/.next/server/chunks/7597.js:1:138268)
+    at E (/media/alash/New Volume/Markdown-to-PDF/.next/server/chunks/7597.js:1:138424)
+    at w (/media/alash/New Volume/Markdown-to-PDF/.next/server/chunks/7597.js:1:139757)
+    at /media/alash/New Volume/Markdown-to-PDF/.next/server/app/[locale]/settings/page.js:1:4469
+    at Array.map (<anonymous>)
+    at g (/media/alash/New Volume/Markdown-to-PDF/.next/server/app/[locale]/settings/page.js:1:4401)
+    at nj (/media/alash/New Volume/Markdown-to-PDF/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:46252)
+    at nM (/media/alash/New Volume/Markdown-to-PDF/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:47572)
+    at nL (/media/alash/New Volume/Markdown-to-PDF/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64547)
+    at nB (/media/alash/New Volume/Markdown-to-PDF/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539) {
+  code: 'MISSING_MESSAGE',
+  originalMessage: 'themes.codeThemes.githubdark (en)'
+}
+u [Error]: MISSING_MESSAGE: themes.codeThemes.onedark (en)
+    at b (/media/alash/New Volume/Markdown-to-PDF/.next/server/chunks/7597.js:1:138268)
+    at E (/media/alash/New Volume/Markdown-to-PDF/.next/server/chunks/7597.js:1:138424)
+    at w (/media/alash/New Volume/Markdown-to-PDF/.next/server/chunks/7597.js:1:139757)
+    at /media/alash/New Volume/Markdown-to-PDF/.next/server/app/[locale]/settings/page.js:1:4469
+    at Array.map (<anonymous>)
+    at g (/media/alash/New Volume/Markdown-to-PDF/.next/server/app/[locale]/settings/page.js:1:4401)
+    at nj (/media/alash/New Volume/Markdown-to-PDF/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:46252)
+    at nM (/media/alash/New Volume/Markdown-to-PDF/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:47572)
+    at nL (/media/alash/New Volume/Markdown-to-PDF/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64547)
+    at nB (/media/alash/New Volume/Markdown-to-PDF/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539) {
+  code: 'MISSING_MESSAGE',
+  originalMessage: 'themes.codeThemes.onedark (en)'
+}
+u [Error]: MISSING_MESSAGE: themes.codeThemes.vscode (en)
+    at b (/media/alash/New Volume/Markdown-to-PDF/.next/server/chunks/7597.js:1:138268)
+    at E (/media/alash/New Volume/Markdown-to-PDF/.next/server/chunks/7597.js:1:138424)
+    at w (/media/alash/New Volume/Markdown-to-PDF/.next/server/chunks/7597.js:1:139757)
+    at /media/alash/New Volume/Markdown-to-PDF/.next/server/app/[locale]/settings/page.js:1:4469
+    at Array.map (<anonymous>)
+    at g (/media/alash/New Volume/Markdown-to-PDF/.next/server/app/[locale]/settings/page.js:1:4401)
+    at nj (/media/alash/New Volume/Markdown-to-PDF/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:46252)
+    at nM (/media/alash/New Volume/Markdown-to-PDF/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:47572)
+    at nL (/media/alash/New Volume/Markdown-to-PDF/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64547)
+    at nB (/media/alash/New Volume/Markdown-to-PDF/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539) {
+  code: 'MISSING_MESSAGE',
+  originalMessage: 'themes.codeThemes.vscode (en)'
+}
+
+The `locale` parameter in `getRequestConfig` is deprecated, please switch to `await requestLocale`. See https://next-intl.dev/blog/next-intl-3-22#await-request-locale
+
+
+A `locale` is expected to be returned from `getRequestConfig`, but none was returned. This will be an error in the next major version of next-intl.
+
+See: https://next-intl.dev/blog/next-intl-3-22#await-request-locale
+
+
+The `locale` parameter in `getRequestConfig` is deprecated, please switch to `await requestLocale`. See https://next-intl.dev/blog/next-intl-3-22#await-request-locale
+
+
+A `locale` is expected to be returned from `getRequestConfig`, but none was returned. This will be an error in the next major version of next-intl.
+
+See: https://next-intl.dev/blog/next-intl-3-22#await-request-locale
+
+
+The `locale` parameter in `getRequestConfig` is deprecated, please switch to `await requestLocale`. See https://next-intl.dev/blog/next-intl-3-22#await-request-locale
+
+
+A `locale` is expected to be returned from `getRequestConfig`, but none was returned. This will be an error in the next major version of next-intl.
+
+See: https://next-intl.dev/blog/next-intl-3-22#await-request-locale
+
+
+The `locale` parameter in `getRequestConfig` is deprecated, please switch to `await requestLocale`. See https://next-intl.dev/blog/next-intl-3-22#await-request-locale
+
+
+A `locale` is expected to be returned from `getRequestConfig`, but none was returned. This will be an error in the next major version of next-intl.
+
+See: https://next-intl.dev/blog/next-intl-3-22#await-request-locale
+
+
+The `locale` parameter in `getRequestConfig` is deprecated, please switch to `await requestLocale`. See https://next-intl.dev/blog/next-intl-3-22#await-request-locale
+
+
+A `locale` is expected to be returned from `getRequestConfig`, but none was returned. This will be an error in the next major version of next-intl.
+
+See: https://next-intl.dev/blog/next-intl-3-22#await-request-locale
+
+
+The `locale` parameter in `getRequestConfig` is deprecated, please switch to `await requestLocale`. See https://next-intl.dev/blog/next-intl-3-22#await-request-locale
+
+
+A `locale` is expected to be returned from `getRequestConfig`, but none was returned. This will be an error in the next major version of next-intl.
+
+See: https://next-intl.dev/blog/next-intl-3-22#await-request-locale
+
+
+The `locale` parameter in `getRequestConfig` is deprecated, please switch to `await requestLocale`. See https://next-intl.dev/blog/next-intl-3-22#await-request-locale
+
+
+A `locale` is expected to be returned from `getRequestConfig`, but none was returned. This will be an error in the next major version of next-intl.
+
+See: https://next-intl.dev/blog/next-intl-3-22#await-request-locale
+
+u [Error]: MISSING_MESSAGE: themes.codeThemes.githublight (ar)
+    at b (/media/alash/New Volume/Markdown-to-PDF/.next/server/chunks/7597.js:1:138268)
+    at E (/media/alash/New Volume/Markdown-to-PDF/.next/server/chunks/7597.js:1:138424)
+    at w (/media/alash/New Volume/Markdown-to-PDF/.next/server/chunks/7597.js:1:139757)
+    at /media/alash/New Volume/Markdown-to-PDF/.next/server/app/[locale]/settings/page.js:1:4469
+    at Array.map (<anonymous>)
+    at g (/media/alash/New Volume/Markdown-to-PDF/.next/server/app/[locale]/settings/page.js:1:4401)
+    at nj (/media/alash/New Volume/Markdown-to-PDF/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:46252)
+    at nM (/media/alash/New Volume/Markdown-to-PDF/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:47572)
+    at nL (/media/alash/New Volume/Markdown-to-PDF/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64547)
+    at nB (/media/alash/New Volume/Markdown-to-PDF/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539) {
+  code: 'MISSING_MESSAGE',
+  originalMessage: 'themes.codeThemes.githublight (ar)'
+}
+u [Error]: MISSING_MESSAGE: themes.codeThemes.githubdark (ar)
+    at b (/media/alash/New Volume/Markdown-to-PDF/.next/server/chunks/7597.js:1:138268)
+    at E (/media/alash/New Volume/Markdown-to-PDF/.next/server/chunks/7597.js:1:138424)
+    at w (/media/alash/New Volume/Markdown-to-PDF/.next/server/chunks/7597.js:1:139757)
+    at /media/alash/New Volume/Markdown-to-PDF/.next/server/app/[locale]/settings/page.js:1:4469
+    at Array.map (<anonymous>)
+    at g (/media/alash/New Volume/Markdown-to-PDF/.next/server/app/[locale]/settings/page.js:1:4401)
+    at nj (/media/alash/New Volume/Markdown-to-PDF/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:46252)
+    at nM (/media/alash/New Volume/Markdown-to-PDF/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:47572)
+    at nL (/media/alash/New Volume/Markdown-to-PDF/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64547)
+    at nB (/media/alash/New Volume/Markdown-to-PDF/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539) {
+  code: 'MISSING_MESSAGE',
+  originalMessage: 'themes.codeThemes.githubdark (ar)'
+}
+u [Error]: MISSING_MESSAGE: themes.codeThemes.onedark (ar)
+    at b (/media/alash/New Volume/Markdown-to-PDF/.next/server/chunks/7597.js:1:138268)
+    at E (/media/alash/New Volume/Markdown-to-PDF/.next/server/chunks/7597.js:1:138424)
+    at w (/media/alash/New Volume/Markdown-to-PDF/.next/server/chunks/7597.js:1:139757)
+    at /media/alash/New Volume/Markdown-to-PDF/.next/server/app/[locale]/settings/page.js:1:4469
+    at Array.map (<anonymous>)
+    at g (/media/alash/New Volume/Markdown-to-PDF/.next/server/app/[locale]/settings/page.js:1:4401)
+    at nj (/media/alash/New Volume/Markdown-to-PDF/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:46252)
+    at nM (/media/alash/New Volume/Markdown-to-PDF/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:47572)
+    at nL (/media/alash/New Volume/Markdown-to-PDF/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64547)
+    at nB (/media/alash/New Volume/Markdown-to-PDF/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539) {
+  code: 'MISSING_MESSAGE',
+  originalMessage: 'themes.codeThemes.onedark (ar)'
+}
+u [Error]: MISSING_MESSAGE: themes.codeThemes.vscode (ar)
+    at b (/media/alash/New Volume/Markdown-to-PDF/.next/server/chunks/7597.js:1:138268)
+    at E (/media/alash/New Volume/Markdown-to-PDF/.next/server/chunks/7597.js:1:138424)
+    at w (/media/alash/New Volume/Markdown-to-PDF/.next/server/chunks/7597.js:1:139757)
+    at /media/alash/New Volume/Markdown-to-PDF/.next/server/app/[locale]/settings/page.js:1:4469
+    at Array.map (<anonymous>)
+    at g (/media/alash/New Volume/Markdown-to-PDF/.next/server/app/[locale]/settings/page.js:1:4401)
+    at nj (/media/alash/New Volume/Markdown-to-PDF/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:46252)
+    at nM (/media/alash/New Volume/Markdown-to-PDF/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:47572)
+    at nL (/media/alash/New Volume/Markdown-to-PDF/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64547)
+    at nB (/media/alash/New Volume/Markdown-to-PDF/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539) {
+  code: 'MISSING_MESSAGE',
+  originalMessage: 'themes.codeThemes.vscode (ar)'
+}
+
+The `locale` parameter in `getRequestConfig` is deprecated, please switch to `await requestLocale`. See https://next-intl.dev/blog/next-intl-3-22#await-request-locale
+
+
+A `locale` is expected to be returned from `getRequestConfig`, but none was returned. This will be an error in the next major version of next-intl.
+
+See: https://next-intl.dev/blog/next-intl-3-22#await-request-locale
+
+
+The `locale` parameter in `getRequestConfig` is deprecated, please switch to `await requestLocale`. See https://next-intl.dev/blog/next-intl-3-22#await-request-locale
+
+
+A `locale` is expected to be returned from `getRequestConfig`, but none was returned. This will be an error in the next major version of next-intl.
+
+See: https://next-intl.dev/blog/next-intl-3-22#await-request-locale
+
+
+The `locale` parameter in `getRequestConfig` is deprecated, please switch to `await requestLocale`. See https://next-intl.dev/blog/next-intl-3-22#await-request-locale
+
+
+A `locale` is expected to be returned from `getRequestConfig`, but none was returned. This will be an error in the next major version of next-intl.
+
+See: https://next-intl.dev/blog/next-intl-3-22#await-request-locale
+
+
+The `locale` parameter in `getRequestConfig` is deprecated, please switch to `await requestLocale`. See https://next-intl.dev/blog/next-intl-3-22#await-request-locale
+
+
+A `locale` is expected to be returned from `getRequestConfig`, but none was returned. This will be an error in the next major version of next-intl.
+
+See: https://next-intl.dev/blog/next-intl-3-22#await-request-locale
+
+
+The `locale` parameter in `getRequestConfig` is deprecated, please switch to `await requestLocale`. See https://next-intl.dev/blog/next-intl-3-22#await-request-locale
+
+
+A `locale` is expected to be returned from `getRequestConfig`, but none was returned. This will be an error in the next major version of next-intl.
+
+See: https://next-intl.dev/blog/next-intl-3-22#await-request-locale
+
+
+The `locale` parameter in `getRequestConfig` is deprecated, please switch to `await requestLocale`. See https://next-intl.dev/blog/next-intl-3-22#await-request-locale
+
+
+A `locale` is expected to be returned from `getRequestConfig`, but none was returned. This will be an error in the next major version of next-intl.
+
+See: https://next-intl.dev/blog/next-intl-3-22#await-request-locale
+
+
+The `locale` parameter in `getRequestConfig` is deprecated, please switch to `await requestLocale`. See https://next-intl.dev/blog/next-intl-3-22#await-request-locale
+
+
+A `locale` is expected to be returned from `getRequestConfig`, but none was returned. This will be an error in the next major version of next-intl.
+
+See: https://next-intl.dev/blog/next-intl-3-22#await-request-locale
+
+
+The `locale` parameter in `getRequestConfig` is deprecated, please switch to `await requestLocale`. See https://next-intl.dev/blog/next-intl-3-22#await-request-locale
+
+
+A `locale` is expected to be returned from `getRequestConfig`, but none was returned. This will be an error in the next major version of next-intl.
+
+See: https://next-intl.dev/blog/next-intl-3-22#await-request-locale
+
+
+The `locale` parameter in `getRequestConfig` is deprecated, please switch to `await requestLocale`. See https://next-intl.dev/blog/next-intl-3-22#await-request-locale
+
+
+A `locale` is expected to be returned from `getRequestConfig`, but none was returned. This will be an error in the next major version of next-intl.
+
+See: https://next-intl.dev/blog/next-intl-3-22#await-request-locale
+
+
+The `locale` parameter in `getRequestConfig` is deprecated, please switch to `await requestLocale`. See https://next-intl.dev/blog/next-intl-3-22#await-request-locale
+
+
+A `locale` is expected to be returned from `getRequestConfig`, but none was returned. This will be an error in the next major version of next-intl.
+
+See: https://next-intl.dev/blog/next-intl-3-22#await-request-locale
+
+
+The `locale` parameter in `getRequestConfig` is deprecated, please switch to `await requestLocale`. See https://next-intl.dev/blog/next-intl-3-22#await-request-locale
+
+
+A `locale` is expected to be returned from `getRequestConfig`, but none was returned. This will be an error in the next major version of next-intl.
+
+See: https://next-intl.dev/blog/next-intl-3-22#await-request-locale
+
+
+The `locale` parameter in `getRequestConfig` is deprecated, please switch to `await requestLocale`. See https://next-intl.dev/blog/next-intl-3-22#await-request-locale
+
+
+A `locale` is expected to be returned from `getRequestConfig`, but none was returned. This will be an error in the next major version of next-intl.
+
+See: https://next-intl.dev/blog/next-intl-3-22#await-request-locale
+
+   Generating static pages (68/91) 
+ ✓ Generating static pages (91/91)
+   Finalizing page optimization ...
+   Collecting build traces ...
+
+Route (app)                                                Size     First Load JS
+┌ ○ /_not-found                                            880 B          89.2 kB
+├ ● /[locale]                                              341 kB          499 kB
+├   ├ /en
+├   └ /ar
+├ ● /[locale]/api-docs                                     13.5 kB         135 kB
+├   ├ /en/api-docs
+├   └ /ar/api-docs
+├ ● /[locale]/api-docs/swagger                             4.68 kB         109 kB
+├   ├ /en/api-docs/swagger
+├   └ /ar/api-docs/swagger
+├ ● /[locale]/auth/login                                   9.01 kB         139 kB
+├   ├ /en/auth/login
+├   └ /ar/auth/login
+├ ● /[locale]/auth/register                                8.21 kB         139 kB
+├   ├ /en/auth/register
+├   └ /ar/auth/register
+├ ● /[locale]/batch                                        40.3 kB         152 kB
+├   ├ /en/batch
+├   └ /ar/batch
+├ ● /[locale]/dashboard                                    964 B           211 kB
+├   ├ /en/dashboard
+├   └ /ar/dashboard
+├ ● /[locale]/dashboard/account                            8.23 kB         141 kB
+├   ├ /en/dashboard/account
+├   └ /ar/dashboard/account
+├ ● /[locale]/dashboard/analytics                          8.47 kB         182 kB
+├   ├ /en/dashboard/analytics
+├   └ /ar/dashboard/analytics
+├ ● /[locale]/dashboard/api-keys                           10.8 kB         162 kB
+├   ├ /en/dashboard/api-keys
+├   └ /ar/dashboard/api-keys
+├ ● /[locale]/dashboard/files                              5.1 kB          182 kB
+├   ├ /en/dashboard/files
+├   └ /ar/dashboard/files
+├ ● /[locale]/dashboard/profile                            9.93 kB         152 kB
+├   ├ /en/dashboard/profile
+├   └ /ar/dashboard/profile
+├ ● /[locale]/dashboard/security                           11.6 kB         154 kB
+├   ├ /en/dashboard/security
+├   └ /ar/dashboard/security
+├ ● /[locale]/dashboard/subscription                       1.76 kB         211 kB
+├   ├ /en/dashboard/subscription
+├   └ /ar/dashboard/subscription
+├ ● /[locale]/dashboard/teams                              9.26 kB         165 kB
+├   ├ /en/dashboard/teams
+├   └ /ar/dashboard/teams
+├ ƒ /[locale]/dashboard/teams/[teamId]                     14.7 kB         195 kB
+├ ● /[locale]/dashboard/usage                              1.75 kB         216 kB
+├   ├ /en/dashboard/usage
+├   └ /ar/dashboard/usage
+├ ƒ /[locale]/invitation/[token]                           3.65 kB         134 kB
+├ ● /[locale]/pricing                                      12.8 kB         153 kB
+├   ├ /en/pricing
+├   └ /ar/pricing
+├ ● /[locale]/settings                                     5.09 kB         148 kB
+├   ├ /en/settings
+├   └ /ar/settings
+├ ● /[locale]/templates                                    18 kB           144 kB
+├   ├ /en/templates
+├   └ /ar/templates
+├ ● /[locale]/themes                                       6.25 kB         145 kB
+├   ├ /en/themes
+├   └ /ar/themes
+├ ƒ /[locale]/verify-email/[token]                         2.56 kB         123 kB
+├ ƒ /api/analytics/history                                 0 B                0 B
+├ ƒ /api/analytics/summary                                 0 B                0 B
+├ ƒ /api/analytics/track                                   0 B                0 B
+├ ƒ /api/api-keys                                          0 B                0 B
+├ ƒ /api/api-keys/[keyId]                                  0 B                0 B
+├ ƒ /api/auth/[...nextauth]                                0 B                0 B
+├ ƒ /api/auth/forgot-password                              0 B                0 B
+├ ƒ /api/auth/register                                     0 B                0 B
+├ ƒ /api/auth/resend-verification                          0 B                0 B
+├ ƒ /api/auth/reset-password                               0 B                0 B
+├ ƒ /api/auth/verify-email                                 0 B                0 B
+├ ƒ /api/checkout                                          0 B                0 B
+├ ƒ /api/convert                                           0 B                0 B
+├ ƒ /api/convert/batch                                     0 B                0 B
+├ ○ /api/health                                            0 B                0 B
+├ ƒ /api/invitations                                       0 B                0 B
+├ ƒ /api/invitations/[token]                               0 B                0 B
+├ ƒ /api/invitations/[token]/accept                        0 B                0 B
+├ ƒ /api/invitations/[token]/decline                       0 B                0 B
+├ ○ /api/openapi                                           0 B                0 B
+├ ƒ /api/preview                                           0 B                0 B
+├ ƒ /api/sso/audit                                         0 B                0 B
+├ ƒ /api/sso/check                                         0 B                0 B
+├ ƒ /api/sso/config                                        0 B                0 B
+├ ƒ /api/sso/config/[configId]                             0 B                0 B
+├ ƒ /api/sso/config/[configId]/test                        0 B                0 B
+├ ƒ /api/sso/domains                                       0 B                0 B
+├ ƒ /api/sso/domains/[domain]                              0 B                0 B
+├ ƒ /api/sso/domains/[domain]/verify                       0 B                0 B
+├ ƒ /api/sso/metadata                                      0 B                0 B
+├ ƒ /api/storage/avatar                                    0 B                0 B
+├ ƒ /api/storage/files                                     0 B                0 B
+├ ƒ /api/storage/files/[fileId]                            0 B                0 B
+├ ƒ /api/storage/files/[fileId]/download                   0 B                0 B
+├ ƒ /api/storage/quota                                     0 B                0 B
+├ ƒ /api/storage/upload                                    0 B                0 B
+├ ƒ /api/subscriptions                                     0 B                0 B
+├ ƒ /api/subscriptions/cancel                              0 B                0 B
+├ ƒ /api/subscriptions/invoices                            0 B                0 B
+├ ƒ /api/subscriptions/pause                               0 B                0 B
+├ ƒ /api/subscriptions/payment-methods                     0 B                0 B
+├ ƒ /api/subscriptions/portal-url                          0 B                0 B
+├ ƒ /api/subscriptions/promo-code                          0 B                0 B
+├ ƒ /api/subscriptions/resume                              0 B                0 B
+├ ƒ /api/teams                                             0 B                0 B
+├ ƒ /api/teams/[teamId]                                    0 B                0 B
+├ ƒ /api/teams/[teamId]/activity                           0 B                0 B
+├ ƒ /api/teams/[teamId]/invitations                        0 B                0 B
+├ ƒ /api/teams/[teamId]/invitations/[invitationId]         0 B                0 B
+├ ƒ /api/teams/[teamId]/invitations/[invitationId]/resend  0 B                0 B
+├ ƒ /api/teams/[teamId]/members                            0 B                0 B
+├ ƒ /api/teams/[teamId]/members/[memberId]                 0 B                0 B
+├ ƒ /api/templates                                         0 B                0 B
+├ ○ /api/themes                                            0 B                0 B
+├ ƒ /api/users/accounts                                    0 B                0 B
+├ ƒ /api/users/accounts/[provider]                         0 B                0 B
+├ ƒ /api/users/change-email                                0 B                0 B
+├ ƒ /api/users/change-password                             0 B                0 B
+├ ƒ /api/users/export                                      0 B                0 B
+├ ƒ /api/users/profile                                     0 B                0 B
+├ ƒ /api/users/sessions                                    0 B                0 B
+├ ƒ /api/users/sessions/[sessionId]                        0 B                0 B
+├ ƒ /api/users/verify-email-change                         0 B                0 B
+├ ƒ /api/webhooks/paddle                                   0 B                0 B
+├ ƒ /api/webhooks/paymob                                   0 B                0 B
+├ ƒ /api/webhooks/paytabs                                  0 B                0 B
+├ ƒ /api/webhooks/stripe                                   0 B                0 B
+└ ○ /icon.svg                                              0 B                0 B
++ First Load JS shared by all                              88.4 kB
+  ├ chunks/2117-9f5df4ec8832ff92.js                        31.9 kB
+  ├ chunks/fd9d1056-e89c14d87d38f587.js                    53.6 kB
+  └ other shared chunks (total)                            2.82 kB
+
+
+ƒ Middleware                                               48.4 kB
+
+○  (Static)   prerendered as static content
+●  (SSG)      prerendered as static HTML (uses getStaticProps)
+ƒ  (Dynamic)  server-rendered on demand
+

@@ -113,28 +113,20 @@ export async function updateSessionActivity(token: string): Promise<void> {
   await connectDB();
 
   const hashedToken = hashSessionToken(token);
-  await Session.updateOne(
-    { token: hashedToken },
-    { lastActive: new Date() }
-  );
+  await Session.updateOne({ token: hashedToken }, { lastActive: new Date() });
 }
 
 // Get all sessions for a user
 export async function getUserSessions(userId: string): Promise<ISession[]> {
   await connectDB();
 
-  const sessions = await Session.find({ userId })
-    .sort({ lastActive: -1 })
-    .lean();
+  const sessions = await Session.find({ userId }).sort({ lastActive: -1 }).lean();
 
   return sessions;
 }
 
 // Revoke a specific session
-export async function revokeSession(
-  sessionId: string,
-  userId: string
-): Promise<boolean> {
+export async function revokeSession(sessionId: string, userId: string): Promise<boolean> {
   await connectDB();
 
   const result = await Session.deleteOne({
@@ -146,10 +138,7 @@ export async function revokeSession(
 }
 
 // Revoke all sessions except current
-export async function revokeOtherSessions(
-  userId: string,
-  currentToken: string
-): Promise<number> {
+export async function revokeOtherSessions(userId: string, currentToken: string): Promise<number> {
   await connectDB();
 
   const hashedToken = hashSessionToken(currentToken);
@@ -163,10 +152,7 @@ export async function revokeOtherSessions(
 }
 
 // Check if current token matches a session
-export async function isCurrentSession(
-  sessionId: string,
-  currentToken: string
-): Promise<boolean> {
+export async function isCurrentSession(sessionId: string, currentToken: string): Promise<boolean> {
   await connectDB();
 
   const hashedToken = hashSessionToken(currentToken);

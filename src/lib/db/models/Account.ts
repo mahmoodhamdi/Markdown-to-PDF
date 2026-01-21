@@ -29,7 +29,7 @@ const AccountSchema = new Schema<IAccount>(
     provider: {
       type: String,
       enum: ['github', 'google'],
-      required: true
+      required: true,
     },
     providerAccountId: { type: String, required: true },
     providerEmail: { type: String },

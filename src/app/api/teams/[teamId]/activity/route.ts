@@ -17,10 +17,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user?.id) {
-      return NextResponse.json(
-        { error: 'Authentication required' },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
     }
 
     const { teamId } = await params;
@@ -73,9 +70,6 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     });
   } catch (error) {
     console.error('Team activity API error:', error);
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
