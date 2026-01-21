@@ -129,7 +129,7 @@ export async function connectDB(): Promise<typeof mongoose> {
   if (!cached.promise) {
     cached.promise = mongoose.connect(MONGODB_URI, connectionOptions).then((mongoose) => {
       if (process.env.NODE_ENV !== 'production') {
-        console.log('MongoDB connected successfully');
+        console.info('MongoDB connected successfully');
       }
       return mongoose;
     });
@@ -153,7 +153,7 @@ export async function disconnectDB(): Promise<void> {
     await mongoose.disconnect();
     cached.conn = null;
     cached.promise = null;
-    console.log('MongoDB disconnected');
+    console.info('MongoDB disconnected');
   }
 }
 

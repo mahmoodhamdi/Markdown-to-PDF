@@ -36,7 +36,7 @@ describe('Webhook Service', () => {
 
   describe('webhookLog', () => {
     it('should log info messages with correct prefix', () => {
-      const consoleSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
+      const consoleSpy = vi.spyOn(console, 'info').mockImplementation(() => {});
 
       webhookLog('info', 'Test info message', {
         gateway: 'stripe',
@@ -105,7 +105,7 @@ describe('Webhook Service', () => {
     });
 
     it('should include timestamp in log data', () => {
-      const consoleSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
+      const consoleSpy = vi.spyOn(console, 'info').mockImplementation(() => {});
 
       webhookLog('info', 'Test message', {
         gateway: 'stripe',

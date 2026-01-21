@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useSession } from 'next-auth/react';
 import { redirect } from 'next/navigation';
+import Link from 'next/link';
 import { useTranslations } from 'next-intl';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -101,7 +102,7 @@ export default function TeamsPage() {
             <p className="font-medium">{t('upgradeRequired')}</p>
             <p className="text-sm text-muted-foreground">{t('upgradeDescription')}</p>
             <Button variant="outline" size="sm" className="mt-2" asChild>
-              <a href="/dashboard/subscription">{t('viewPlans')}</a>
+              <Link href="/dashboard/subscription">{t('viewPlans')}</Link>
             </Button>
           </div>
         </div>

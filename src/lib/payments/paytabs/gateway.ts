@@ -123,7 +123,7 @@ export const paytabsGateway: PaymentGateway = {
             });
           }
 
-          console.log(`User ${parsed.customerEmail} upgraded to ${parsed.plan} via PayTabs`);
+          console.info(`User ${parsed.customerEmail} upgraded to ${parsed.plan} via PayTabs`);
         } catch (error) {
           console.error('Error updating user from PayTabs webhook:', error);
         }

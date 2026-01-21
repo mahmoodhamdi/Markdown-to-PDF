@@ -150,7 +150,7 @@ export const stripeGateway: PaymentGateway = {
     });
 
     return {
-      url: session.url!,
+      url: session.url || '',
       sessionId: session.id,
       gateway: 'stripe',
       clientSecret: session.client_secret || undefined,

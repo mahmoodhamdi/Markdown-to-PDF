@@ -1,9 +1,20 @@
 import { describe, it, expect } from 'vitest';
+import { NextRequest } from 'next/server';
 import { GET } from '@/app/api/themes/route';
+
+// Helper to create mock request
+function createMockRequest(): NextRequest {
+  return new NextRequest('http://localhost:3000/api/themes', {
+    method: 'GET',
+    headers: {
+      'x-forwarded-for': '127.0.0.1',
+    },
+  });
+}
 
 describe('GET /api/themes', () => {
   it('should return document themes', async () => {
-    const response = await GET();
+    const response = await GET(createMockRequest());
     const data = await response.json();
 
     expect(response.status).toBe(200);
@@ -12,7 +23,7 @@ describe('GET /api/themes', () => {
   });
 
   it('should return code themes', async () => {
-    const response = await GET();
+    const response = await GET(createMockRequest());
     const data = await response.json();
 
     expect(data.codeThemes).toBeDefined();
@@ -20,7 +31,7 @@ describe('GET /api/themes', () => {
   });
 
   it('should include expected document themes', async () => {
-    const response = await GET();
+    const response = await GET(createMockRequest());
     const data = await response.json();
 
     const themeIds = data.documentThemes.map((t: { id: string }) => t.id);
@@ -32,7 +43,7 @@ describe('GET /api/themes', () => {
   });
 
   it('should include expected code themes', async () => {
-    const response = await GET();
+    const response = await GET(createMockRequest());
     const data = await response.json();
 
     const themeIds = data.codeThemes.map((t: { id: string }) => t.id);
@@ -42,7 +53,7 @@ describe('GET /api/themes', () => {
   });
 
   it('should have id, name, and description for each document theme', async () => {
-    const response = await GET();
+    const response = await GET(createMockRequest());
     const data = await response.json();
 
     data.documentThemes.forEach((theme: { id: string; name: string; description: string }) => {
@@ -53,7 +64,7 @@ describe('GET /api/themes', () => {
   });
 
   it('should have id and name for each code theme', async () => {
-    const response = await GET();
+    const response = await GET(createMockRequest());
     const data = await response.json();
 
     data.codeThemes.forEach((theme: { id: string; name: string }) => {

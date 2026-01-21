@@ -209,7 +209,7 @@ export async function requireApiKeyAuth(
   const rateLimitResult = await checkApiKeyRateLimit(authResult.user);
   if (!rateLimitResult.success) {
     return {
-      response: createApiKeyRateLimitError(rateLimitResult.headers, rateLimitResult.error!),
+      response: createApiKeyRateLimitError(rateLimitResult.headers, rateLimitResult.error || 'Rate limit exceeded'),
     };
   }
 

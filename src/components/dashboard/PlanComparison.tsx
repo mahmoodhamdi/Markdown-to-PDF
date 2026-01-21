@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
 import { useTranslations } from 'next-intl';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -279,7 +280,7 @@ export function PlanComparison({
           {/* Feature comparison link */}
           <div className="mt-6 text-center">
             <Button variant="link" asChild>
-              <a href="/pricing#features">{t('seeAllFeatures')}</a>
+              <Link href="/pricing#features">{t('seeAllFeatures')}</Link>
             </Button>
           </div>
         </CardContent>
