@@ -119,10 +119,7 @@ export function AppearanceSettings() {
         {/* Code Theme */}
         <div className="space-y-2">
           <Label>{tThemes('codeThemes.title')}</Label>
-          <Select
-            value={codeTheme}
-            onValueChange={(value) => setCodeTheme(value as CodeTheme)}
-          >
+          <Select value={codeTheme} onValueChange={(value) => setCodeTheme(value as CodeTheme)}>
             <SelectTrigger>
               <SelectValue />
             </SelectTrigger>

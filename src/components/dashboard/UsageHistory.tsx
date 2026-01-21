@@ -78,9 +78,7 @@ export function UsageHistory({ data, maxConversions, loading = false }: UsageHis
           <CardTitle>{t('thisWeek')}</CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="text-sm text-muted-foreground text-center py-8">
-            {t('noHistoryData')}
-          </p>
+          <p className="text-sm text-muted-foreground text-center py-8">{t('noHistoryData')}</p>
         </CardContent>
       </Card>
     );
@@ -135,9 +133,7 @@ export function UsageHistory({ data, maxConversions, loading = false }: UsageHis
               <p className="text-sm text-muted-foreground">{t('totalConversions')}</p>
             </div>
             <div>
-              <p className="text-2xl font-bold">
-                {data.reduce((sum, d) => sum + d.apiCalls, 0)}
-              </p>
+              <p className="text-2xl font-bold">{data.reduce((sum, d) => sum + d.apiCalls, 0)}</p>
               <p className="text-sm text-muted-foreground">{t('totalApiCalls')}</p>
             </div>
           </div>

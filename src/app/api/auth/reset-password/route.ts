@@ -6,10 +6,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { connectDB } from '@/lib/db/mongodb';
 import { User } from '@/lib/db/models/User';
-import {
-  verifyPasswordResetToken,
-  markTokenAsUsed,
-} from '@/lib/db/models/PasswordResetToken';
+import { verifyPasswordResetToken, markTokenAsUsed } from '@/lib/db/models/PasswordResetToken';
 import { checkRateLimit, getRateLimitHeaders } from '@/lib/rate-limit';
 import { invalidateAllUserSessions } from '@/lib/auth/session-service';
 import { passwordSchema, BCRYPT_ROUNDS } from '@/lib/auth/password-validation';
@@ -83,10 +80,7 @@ export async function POST(request: NextRequest) {
     const hashedPassword = await bcrypt.hash(password, BCRYPT_ROUNDS);
 
     // Update user password
-    await User.updateOne(
-      { _id: tokenDoc.userId },
-      { $set: { password: hashedPassword } }
-    );
+    await User.updateOne({ _id: tokenDoc.userId }, { $set: { password: hashedPassword } });
 
     // Mark token as used
     await markTokenAsUsed(token);

@@ -69,12 +69,16 @@ function TrendIndicator({ trend, className }: { trend: number | null; className?
 
   const isPositive = trend > 0;
   const Icon = isPositive ? TrendingUp : TrendingDown;
-  const colorClass = isPositive ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400';
+  const colorClass = isPositive
+    ? 'text-green-600 dark:text-green-400'
+    : 'text-red-600 dark:text-red-400';
 
   return (
     <span
       className={cn('inline-flex items-center text-xs font-medium', colorClass, className)}
-      aria-label={isPositive ? t('trendUp', { percent: trend }) : t('trendDown', { percent: Math.abs(trend) })}
+      aria-label={
+        isPositive ? t('trendUp', { percent: trend }) : t('trendDown', { percent: Math.abs(trend) })
+      }
     >
       <Icon className="h-3 w-3 me-0.5" aria-hidden="true" />
       <span>{Math.abs(trend)}%</span>
@@ -183,7 +187,9 @@ export function ConversionStats({ summary, loading }: ConversionStatsProps) {
                 <div className="flex-1 min-w-0">
                   <p className="text-sm text-muted-foreground truncate">{stat.label}</p>
                   <div className="flex items-baseline gap-2 mt-1">
-                    <span className="text-2xl font-bold tabular-nums">{stat.value.toLocaleString()}</span>
+                    <span className="text-2xl font-bold tabular-nums">
+                      {stat.value.toLocaleString()}
+                    </span>
                     <span className="text-xs text-muted-foreground">{stat.sublabel}</span>
                   </div>
                   {stat.trend !== null && (

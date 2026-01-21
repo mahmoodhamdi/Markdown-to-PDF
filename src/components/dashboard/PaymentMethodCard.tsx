@@ -48,9 +48,18 @@ const cardBrandIcons: Record<string, React.ReactNode> = {
     <svg className="h-6 w-10" viewBox="0 0 48 32" fill="none">
       <rect width="48" height="32" rx="4" fill="#1A1F71" />
       <path d="M19.5 21L21.5 11H24.5L22.5 21H19.5Z" fill="white" />
-      <path d="M31.5 11.3C30.7 11 29.6 10.7 28.3 10.7C25.3 10.7 23.2 12.3 23.2 14.5C23.2 16.2 24.7 17.1 25.9 17.7C27.1 18.3 27.5 18.7 27.5 19.2C27.5 20 26.5 20.4 25.6 20.4C24.4 20.4 23.3 20.1 22.5 19.7L22 19.5L21.5 22.5C22.5 22.9 24.1 23.3 25.7 23.3C28.9 23.3 31 21.7 31 19.4C31 18.1 30.2 17.1 28.4 16.2C27.3 15.6 26.6 15.2 26.6 14.6C26.6 14.1 27.2 13.6 28.4 13.6C29.4 13.6 30.2 13.8 30.8 14.1L31.1 14.2L31.5 11.3Z" fill="white" />
-      <path d="M36 11H33.8C33 11 32.4 11.2 32.1 12L27.5 21H30.7L31.3 19.3H35.2L35.5 21H38.5L36 11ZM32.3 17C32.6 16.2 33.5 13.7 33.5 13.7C33.5 13.7 33.7 13.1 33.9 12.7L34.1 13.6C34.1 13.6 34.6 16.3 34.7 17H32.3Z" fill="white" />
-      <path d="M17.5 11L14.5 18L14.2 16.5C13.6 14.8 12 13 10.2 12.1L13 21H16.2L20.7 11H17.5Z" fill="white" />
+      <path
+        d="M31.5 11.3C30.7 11 29.6 10.7 28.3 10.7C25.3 10.7 23.2 12.3 23.2 14.5C23.2 16.2 24.7 17.1 25.9 17.7C27.1 18.3 27.5 18.7 27.5 19.2C27.5 20 26.5 20.4 25.6 20.4C24.4 20.4 23.3 20.1 22.5 19.7L22 19.5L21.5 22.5C22.5 22.9 24.1 23.3 25.7 23.3C28.9 23.3 31 21.7 31 19.4C31 18.1 30.2 17.1 28.4 16.2C27.3 15.6 26.6 15.2 26.6 14.6C26.6 14.1 27.2 13.6 28.4 13.6C29.4 13.6 30.2 13.8 30.8 14.1L31.1 14.2L31.5 11.3Z"
+        fill="white"
+      />
+      <path
+        d="M36 11H33.8C33 11 32.4 11.2 32.1 12L27.5 21H30.7L31.3 19.3H35.2L35.5 21H38.5L36 11ZM32.3 17C32.6 16.2 33.5 13.7 33.5 13.7C33.5 13.7 33.7 13.1 33.9 12.7L34.1 13.6C34.1 13.6 34.6 16.3 34.7 17H32.3Z"
+        fill="white"
+      />
+      <path
+        d="M17.5 11L14.5 18L14.2 16.5C13.6 14.8 12 13 10.2 12.1L13 21H16.2L20.7 11H17.5Z"
+        fill="white"
+      />
     </svg>
   ),
   mastercard: (
@@ -58,7 +67,10 @@ const cardBrandIcons: Record<string, React.ReactNode> = {
       <rect width="48" height="32" rx="4" fill="#F7F7F7" />
       <circle cx="18" cy="16" r="8" fill="#EB001B" />
       <circle cx="30" cy="16" r="8" fill="#F79E1B" />
-      <path d="M24 10.3C25.8 11.7 27 13.7 27 16C27 18.3 25.8 20.3 24 21.7C22.2 20.3 21 18.3 21 16C21 13.7 22.2 11.7 24 10.3Z" fill="#FF5F00" />
+      <path
+        d="M24 10.3C25.8 11.7 27 13.7 27 16C27 18.3 25.8 20.3 24 21.7C22.2 20.3 21 18.3 21 16C21 13.7 22.2 11.7 24 10.3Z"
+        fill="#FF5F00"
+      />
     </svg>
   ),
   amex: (
@@ -103,9 +115,10 @@ export function PaymentMethodCard({
       return {
         icon: getCardBrandIcon(method.brand),
         title: `${brand} •••• ${method.last4}`,
-        subtitle: method.expiryMonth && method.expiryYear
-          ? `${t('expires')} ${method.expiryMonth.toString().padStart(2, '0')}/${method.expiryYear.toString().slice(-2)}`
-          : undefined,
+        subtitle:
+          method.expiryMonth && method.expiryYear
+            ? `${t('expires')} ${method.expiryMonth.toString().padStart(2, '0')}/${method.expiryYear.toString().slice(-2)}`
+            : undefined,
       };
     }
     if (method.type === 'wallet') {
@@ -176,21 +189,22 @@ export function PaymentMethodCard({
               <CreditCard className="h-5 w-5" />
               {t('paymentMethods')}
             </CardTitle>
-            {canManagePayments && (
-              portalUrl ? (
+            {canManagePayments &&
+              (portalUrl ? (
                 <Button variant="outline" size="sm" asChild>
                   <a href={portalUrl} target="_blank" rel="noopener noreferrer">
                     {t('manageInPortal')}
                     <ExternalLink className="h-4 w-4 ms-2" />
                   </a>
                 </Button>
-              ) : onAddNew && (
-                <Button variant="outline" size="sm" onClick={onAddNew}>
-                  <Plus className="h-4 w-4 me-2" />
-                  {t('addPaymentMethod')}
-                </Button>
-              )
-            )}
+              ) : (
+                onAddNew && (
+                  <Button variant="outline" size="sm" onClick={onAddNew}>
+                    <Plus className="h-4 w-4 me-2" />
+                    {t('addPaymentMethod')}
+                  </Button>
+                )
+              ))}
           </div>
         </CardHeader>
         <CardContent>
@@ -270,9 +284,7 @@ export function PaymentMethodCard({
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>{t('removePaymentTitle')}</AlertDialogTitle>
-            <AlertDialogDescription>
-              {t('removePaymentDescription')}
-            </AlertDialogDescription>
+            <AlertDialogDescription>{t('removePaymentDescription')}</AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel disabled={!!removingId}>{t('cancel')}</AlertDialogCancel>

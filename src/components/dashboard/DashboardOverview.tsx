@@ -49,12 +49,8 @@ export function DashboardOverview({
 
       {/* Welcome Section */}
       <div>
-        <h1 className="text-3xl font-bold">
-          {t('welcome', { name: userName || t('user') })}
-        </h1>
-        <p className="text-muted-foreground mt-1">
-          {t('welcomeSubtitle')}
-        </p>
+        <h1 className="text-3xl font-bold">{t('welcome', { name: userName || t('user') })}</h1>
+        <p className="text-muted-foreground mt-1">{t('welcomeSubtitle')}</p>
       </div>
 
       {/* Quick Stats */}
@@ -76,11 +72,7 @@ export function DashboardOverview({
             {quickActions.map((action) => {
               const Icon = action.icon;
               return (
-                <Button
-                  key={action.href}
-                  variant={action.variant}
-                  asChild
-                >
+                <Button key={action.href} variant={action.variant} asChild>
                   <Link href={action.href}>
                     <Icon className="h-4 w-4 me-2" />
                     {t(`actions.${action.labelKey}`)}
@@ -99,9 +91,7 @@ export function DashboardOverview({
             <div className="flex items-center justify-between">
               <div>
                 <h3 className="font-semibold">{t('upgrade.title')}</h3>
-                <p className="text-sm text-muted-foreground mt-1">
-                  {t('upgrade.description')}
-                </p>
+                <p className="text-sm text-muted-foreground mt-1">{t('upgrade.description')}</p>
               </div>
               <Button asChild>
                 <Link href="/pricing">

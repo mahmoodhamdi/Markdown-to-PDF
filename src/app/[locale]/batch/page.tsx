@@ -19,46 +19,55 @@ export default function BatchPage() {
   const [progress, setProgress] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
 
-  const handleFiles = useCallback(async (fileList: FileList) => {
-    const validTypes = ['.md', '.markdown', '.txt'];
-    const newFiles: BatchFile[] = [];
+  const handleFiles = useCallback(
+    async (fileList: FileList) => {
+      const validTypes = ['.md', '.markdown', '.txt'];
+      const newFiles: BatchFile[] = [];
 
-    for (let i = 0; i < Math.min(fileList.length, 20 - files.length); i++) {
-      const file = fileList[i];
-      if (!file) continue;
-      const fileName = file.name.toLowerCase();
-      const isValid = validTypes.some((ext) => fileName.endsWith(ext));
+      for (let i = 0; i < Math.min(fileList.length, 20 - files.length); i++) {
+        const file = fileList[i];
+        if (!file) continue;
+        const fileName = file.name.toLowerCase();
+        const isValid = validTypes.some((ext) => fileName.endsWith(ext));
 
-      if (isValid) {
-        try {
-          const content = await file.text();
-          newFiles.push({
-            id: generateId(),
-            name: file.name,
-            content,
-            size: file.size,
-            status: 'pending',
-          });
-        } catch (error) {
-          console.error('Error reading file:', error);
+        if (isValid) {
+          try {
+            const content = await file.text();
+            newFiles.push({
+              id: generateId(),
+              name: file.name,
+              content,
+              size: file.size,
+              status: 'pending',
+            });
+          } catch (error) {
+            console.error('Error reading file:', error);
+          }
         }
       }
-    }
 
-    setFiles((prev) => [...prev, ...newFiles]);
-  }, [files.length]);
+      setFiles((prev) => [...prev, ...newFiles]);
+    },
+    [files.length]
+  );
 
-  const handleDrop = useCallback((e: React.DragEvent) => {
-    e.preventDefault();
-    setIsDragging(false);
-    handleFiles(e.dataTransfer.files);
-  }, [handleFiles]);
+  const handleDrop = useCallback(
+    (e: React.DragEvent) => {
+      e.preventDefault();
+      setIsDragging(false);
+      handleFiles(e.dataTransfer.files);
+    },
+    [handleFiles]
+  );
 
-  const handleInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files) {
-      handleFiles(e.target.files);
-    }
-  }, [handleFiles]);
+  const handleInputChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      if (e.target.files) {
+        handleFiles(e.target.files);
+      }
+    },
+    [handleFiles]
+  );
 
   const removeFile = (id: string) => {
     setFiles((prev) => prev.filter((f) => f.id !== id));
@@ -149,8 +158,14 @@ export default function BatchPage() {
             ? 'border-primary bg-primary/5'
             : 'border-muted-foreground/25 hover:border-primary/50'
         )}
-        onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
-        onDragLeave={(e) => { e.preventDefault(); setIsDragging(false); }}
+        onDragOver={(e) => {
+          e.preventDefault();
+          setIsDragging(true);
+        }}
+        onDragLeave={(e) => {
+          e.preventDefault();
+          setIsDragging(false);
+        }}
         onDrop={handleDrop}
       >
         <input
@@ -205,9 +220,7 @@ export default function BatchPage() {
                     {file.status === 'converting' && (
                       <Loader2 className="h-4 w-4 animate-spin text-primary" />
                     )}
-                    {file.status === 'success' && (
-                      <Check className="h-4 w-4 text-green-500" />
-                    )}
+                    {file.status === 'success' && <Check className="h-4 w-4 text-green-500" />}
                     {file.status === 'failed' && (
                       <AlertCircle className="h-4 w-4 text-destructive" />
                     )}

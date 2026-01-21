@@ -45,10 +45,7 @@ export function TableOfContents({ className }: TableOfContentsProps) {
           const indent = (item.level - 1) * 12;
 
           return (
-            <li
-              key={`${item.id}-${index}`}
-              style={{ paddingInlineStart: `${indent}px` }}
-            >
+            <li key={`${item.id}-${index}`} style={{ paddingInlineStart: `${indent}px` }}>
               <a
                 href={`#${item.id}`}
                 onClick={(e) => handleHeadingClick(e, item.id)}

@@ -905,7 +905,10 @@ export function getTemplatesForPlan(planType: 'free' | 'pro' | 'team' | 'enterpr
 /**
  * Check if a template is available for a specific plan
  */
-export function isTemplateAvailable(templateId: string, planType: 'free' | 'pro' | 'team' | 'enterprise'): boolean {
+export function isTemplateAvailable(
+  templateId: string,
+  planType: 'free' | 'pro' | 'team' | 'enterprise'
+): boolean {
   const template = getTemplateById(templateId);
   if (!template) return false;
 

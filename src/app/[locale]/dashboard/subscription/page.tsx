@@ -80,7 +80,10 @@ export default function SubscriptionPage() {
   }, [session, fetchSubscription]);
 
   // Handle plan change
-  const handleChangePlan = async (plan: Exclude<PlanType, 'free'>, billing: 'monthly' | 'yearly') => {
+  const handleChangePlan = async (
+    plan: Exclude<PlanType, 'free'>,
+    billing: 'monthly' | 'yearly'
+  ) => {
     try {
       // Redirect to checkout
       const params = new URLSearchParams({
@@ -175,11 +178,7 @@ export default function SubscriptionPage() {
             <Button variant="outline" onClick={() => setCancelDialogOpen(false)}>
               {t('keepSubscription')}
             </Button>
-            <Button
-              variant="destructive"
-              onClick={handleCancelSubscription}
-              disabled={canceling}
-            >
+            <Button variant="destructive" onClick={handleCancelSubscription} disabled={canceling}>
               {canceling ? t('canceling') : t('confirmCancel')}
             </Button>
           </DialogFooter>

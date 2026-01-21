@@ -117,10 +117,7 @@ export async function checkConversionLimit(
 /**
  * Check if an API call is allowed for the user
  */
-export async function checkApiCallLimit(
-  email: string,
-  plan: PlanType
-): Promise<UsageCheckResult> {
+export async function checkApiCallLimit(email: string, plan: PlanType): Promise<UsageCheckResult> {
   const usage = await getUserUsage(email);
   const limits = getPlanLimits(plan);
 
@@ -175,10 +172,7 @@ export function checkBatchLimit(
 /**
  * Increment conversion count for user
  */
-export async function incrementConversions(
-  email: string,
-  count: number = 1
-): Promise<void> {
+export async function incrementConversions(email: string, count: number = 1): Promise<void> {
   try {
     await connectDB();
 
@@ -196,10 +190,7 @@ export async function incrementConversions(
 /**
  * Increment API call count for user
  */
-export async function incrementApiCalls(
-  email: string,
-  count: number = 1
-): Promise<void> {
+export async function incrementApiCalls(email: string, count: number = 1): Promise<void> {
   try {
     await connectDB();
 
@@ -230,18 +221,21 @@ export async function getUsageReport(
   const usage = await getUserUsage(email);
   const limits = getPlanLimits(plan);
 
-  const conversionsRemaining = limits.conversionsPerDay === Infinity
-    ? Infinity
-    : Math.max(0, limits.conversionsPerDay - usage.conversions);
-  const apiCallsRemaining = limits.apiCallsPerDay === Infinity
-    ? Infinity
-    : Math.max(0, limits.apiCallsPerDay - usage.apiCalls);
+  const conversionsRemaining =
+    limits.conversionsPerDay === Infinity
+      ? Infinity
+      : Math.max(0, limits.conversionsPerDay - usage.conversions);
+  const apiCallsRemaining =
+    limits.apiCallsPerDay === Infinity
+      ? Infinity
+      : Math.max(0, limits.apiCallsPerDay - usage.apiCalls);
 
   return {
     usage,
     limits: {
       conversions: {
-        allowed: limits.conversionsPerDay === Infinity || usage.conversions < limits.conversionsPerDay,
+        allowed:
+          limits.conversionsPerDay === Infinity || usage.conversions < limits.conversionsPerDay,
         current: usage.conversions,
         limit: limits.conversionsPerDay,
         remaining: conversionsRemaining,

@@ -48,10 +48,7 @@ export function useServiceWorker(): ServiceWorkerState {
           const newWorker = registration.installing;
           if (newWorker) {
             newWorker.addEventListener('statechange', () => {
-              if (
-                newWorker.state === 'installed' &&
-                navigator.serviceWorker.controller
-              ) {
+              if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
                 setState((prev) => ({ ...prev, updateAvailable: true }));
               }
             });
@@ -59,9 +56,12 @@ export function useServiceWorker(): ServiceWorkerState {
         });
 
         // Check for updates periodically (every hour)
-        setInterval(() => {
-          registration.update();
-        }, 60 * 60 * 1000);
+        setInterval(
+          () => {
+            registration.update();
+          },
+          60 * 60 * 1000
+        );
       } catch (error) {
         console.error('Service worker registration failed:', error);
       }

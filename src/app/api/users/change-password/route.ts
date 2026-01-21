@@ -29,10 +29,7 @@ export async function POST(request: NextRequest) {
     // Get session
     const session = await getServerSession(authOptions);
     if (!session?.user?.email) {
-      return NextResponse.json(
-        { error: 'Unauthorized', code: 'unauthorized' },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: 'Unauthorized', code: 'unauthorized' }, { status: 401 });
     }
 
     // Rate limit (strict for security)
@@ -70,10 +67,7 @@ export async function POST(request: NextRequest) {
     // Fetch user with password
     const user = await User.findById(session.user.email);
     if (!user) {
-      return NextResponse.json(
-        { error: 'User not found', code: 'not_found' },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: 'User not found', code: 'not_found' }, { status: 404 });
     }
 
     // Check if user has a password (not OAuth-only)

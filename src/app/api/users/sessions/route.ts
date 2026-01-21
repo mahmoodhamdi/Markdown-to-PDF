@@ -7,11 +7,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth/config';
-import {
-  getUserSessions,
-  revokeOtherSessions,
-  isCurrentSession,
-} from '@/lib/auth/session-service';
+import { getUserSessions, revokeOtherSessions, isCurrentSession } from '@/lib/auth/session-service';
 import { getToken } from 'next-auth/jwt';
 
 export async function GET(request: NextRequest) {
@@ -19,10 +15,7 @@ export async function GET(request: NextRequest) {
     const session = await getServerSession(authOptions);
 
     if (!session?.user?.email) {
-      return NextResponse.json(
-        { success: false, error: 'Unauthorized' },
-        { status: 401 }
-      );
+      return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 });
     }
 
     const userId = session.user.email;
@@ -53,10 +46,7 @@ export async function GET(request: NextRequest) {
     });
   } catch (error) {
     console.error('Get sessions error:', error);
-    return NextResponse.json(
-      { success: false, error: 'Failed to get sessions' },
-      { status: 500 }
-    );
+    return NextResponse.json({ success: false, error: 'Failed to get sessions' }, { status: 500 });
   }
 }
 
@@ -65,10 +55,7 @@ export async function DELETE(request: NextRequest) {
     const session = await getServerSession(authOptions);
 
     if (!session?.user?.email) {
-      return NextResponse.json(
-        { success: false, error: 'Unauthorized' },
-        { status: 401 }
-      );
+      return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 });
     }
 
     const userId = session.user.email;

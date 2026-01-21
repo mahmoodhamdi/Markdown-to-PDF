@@ -30,15 +30,7 @@ import {
 } from '@/components/ui/alert-dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import {
-  MoreHorizontal,
-  Pause,
-  Play,
-  RefreshCw,
-  XCircle,
-  Tag,
-  ExternalLink,
-} from 'lucide-react';
+import { MoreHorizontal, Pause, Play, RefreshCw, XCircle, Tag, ExternalLink } from 'lucide-react';
 import { toast } from 'sonner';
 
 type SubscriptionStatus = 'active' | 'past_due' | 'canceled' | 'paused' | 'trialing';
@@ -145,10 +137,7 @@ export function SubscriptionActions({
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-48">
           {canResume && (
-            <DropdownMenuItem
-              onClick={handleResume}
-              disabled={isResuming}
-            >
+            <DropdownMenuItem onClick={handleResume} disabled={isResuming}>
               <Play className="h-4 w-4 me-2" />
               {isResuming ? t('resuming') : t('resumeSubscription')}
             </DropdownMenuItem>
@@ -244,7 +233,11 @@ export function SubscriptionActions({
             />
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setShowPromoDialog(false)} disabled={isApplyingPromo}>
+            <Button
+              variant="outline"
+              onClick={() => setShowPromoDialog(false)}
+              disabled={isApplyingPromo}
+            >
               {t('cancel')}
             </Button>
             <Button onClick={handleApplyPromo} disabled={!promoCode.trim() || isApplyingPromo}>

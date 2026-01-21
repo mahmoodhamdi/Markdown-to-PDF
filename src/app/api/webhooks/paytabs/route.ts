@@ -26,15 +26,13 @@ export async function POST(request: NextRequest) {
   try {
     // Check if PayTabs is configured
     if (!isPayTabsConfigured()) {
-      return NextResponse.json(
-        { error: 'PayTabs not configured' },
-        { status: 503 }
-      );
+      return NextResponse.json({ error: 'PayTabs not configured' }, { status: 503 });
     }
 
     // Parse the callback data
     const callback: PayTabsCallbackData = await request.json();
-    const eventType = callback.payment_result?.response_status === 'A' ? 'payment.success' : 'payment.failed';
+    const eventType =
+      callback.payment_result?.response_status === 'A' ? 'payment.success' : 'payment.failed';
     const eventId = generateEventId('paytabs', callback.tran_ref || 'unknown', eventType);
 
     // Log incoming webhook
@@ -56,24 +54,16 @@ export async function POST(request: NextRequest) {
           eventId,
           eventType,
         });
-        return NextResponse.json(
-          { error: 'Invalid signature' },
-          { status: 400 }
-        );
+        return NextResponse.json({ error: 'Invalid signature' }, { status: 400 });
       }
     }
 
     // Check idempotency - skip if already processed
-    const idempotencyResult = await checkAndMarkProcessing(
-      'paytabs',
-      eventId,
-      eventType,
-      {
-        tranRef: callback.tran_ref,
-        cartId: callback.cart_id,
-        responseStatus: callback.payment_result?.response_status,
-      }
-    );
+    const idempotencyResult = await checkAndMarkProcessing('paytabs', eventId, eventType, {
+      tranRef: callback.tran_ref,
+      cartId: callback.cart_id,
+      responseStatus: callback.payment_result?.response_status,
+    });
 
     if (!idempotencyResult.isNew) {
       return NextResponse.json({ received: true, status: 'duplicate' });
@@ -104,38 +94,44 @@ export async function POST(request: NextRequest) {
           const planMatch = cartId.match(/(pro|team|enterprise)/i);
           const plan = (planMatch ? planMatch[1].toLowerCase() : 'pro') as PlanType;
           const billingMatch = cartId.match(/(monthly|yearly)/i);
-          const billing = (billingMatch ? billingMatch[1].toLowerCase() : 'monthly') as 'monthly' | 'yearly';
+          const billing = (billingMatch ? billingMatch[1].toLowerCase() : 'monthly') as
+            | 'monthly'
+            | 'yearly';
 
-          emailService.sendSubscriptionConfirmation(
-            { email: result.userEmail, name: user?.name || '' },
-            {
-              plan,
-              billing,
-              amount: callback.cart_amount ? parseFloat(callback.cart_amount) : undefined,
-              currency: callback.cart_currency,
-              gateway: 'paytabs',
-            }
-          ).catch((err) => {
-            webhookLog('error', 'Failed to send subscription confirmation email', {
-              gateway: 'paytabs',
-              eventId,
-              eventType,
-              error: err instanceof Error ? err.message : 'Unknown error',
+          emailService
+            .sendSubscriptionConfirmation(
+              { email: result.userEmail, name: user?.name || '' },
+              {
+                plan,
+                billing,
+                amount: callback.cart_amount ? parseFloat(callback.cart_amount) : undefined,
+                currency: callback.cart_currency,
+                gateway: 'paytabs',
+              }
+            )
+            .catch((err) => {
+              webhookLog('error', 'Failed to send subscription confirmation email', {
+                gateway: 'paytabs',
+                eventId,
+                eventType,
+                error: err instanceof Error ? err.message : 'Unknown error',
+              });
             });
-          });
         } else if (result.status === 'canceled') {
           const plan = (user?.plan as PlanType) || 'pro';
-          emailService.sendSubscriptionCanceled(
-            { email: result.userEmail, name: user?.name || '' },
-            { plan, immediate: true }
-          ).catch((err) => {
-            webhookLog('error', 'Failed to send subscription canceled email', {
-              gateway: 'paytabs',
-              eventId,
-              eventType,
-              error: err instanceof Error ? err.message : 'Unknown error',
+          emailService
+            .sendSubscriptionCanceled(
+              { email: result.userEmail, name: user?.name || '' },
+              { plan, immediate: true }
+            )
+            .catch((err) => {
+              webhookLog('error', 'Failed to send subscription canceled email', {
+                gateway: 'paytabs',
+                eventId,
+                eventType,
+                error: err instanceof Error ? err.message : 'Unknown error',
+              });
             });
-          });
         }
       }
 
@@ -168,10 +164,7 @@ export async function POST(request: NextRequest) {
       eventType: 'unknown',
       error: error instanceof Error ? error.message : 'Unknown error',
     });
-    return NextResponse.json(
-      { error: 'Webhook handler failed' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Webhook handler failed' }, { status: 500 });
   }
 }
 
@@ -198,17 +191,11 @@ export async function GET(request: NextRequest) {
   // Redirect based on payment status
   if (isSuccess) {
     return NextResponse.redirect(
-      new URL(
-        `/pricing?success=true&gateway=paytabs&transaction=${tranRef}`,
-        request.url
-      )
+      new URL(`/pricing?success=true&gateway=paytabs&transaction=${tranRef}`, request.url)
     );
   } else {
     return NextResponse.redirect(
-      new URL(
-        `/pricing?error=payment_failed&gateway=paytabs&status=${respStatus}`,
-        request.url
-      )
+      new URL(`/pricing?error=payment_failed&gateway=paytabs&status=${respStatus}`, request.url)
     );
   }
 }

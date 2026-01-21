@@ -18,15 +18,11 @@ function StatCard({ icon, label, value, subtext, colorClass = 'text-primary' }: 
     <Card>
       <CardContent className="pt-6">
         <div className="flex items-center gap-4">
-          <div className={cn('p-3 rounded-lg bg-primary/10', colorClass)}>
-            {icon}
-          </div>
+          <div className={cn('p-3 rounded-lg bg-primary/10', colorClass)}>{icon}</div>
           <div className="flex-1 min-w-0">
             <p className="text-sm text-muted-foreground truncate">{label}</p>
             <p className="text-2xl font-bold">{value}</p>
-            {subtext && (
-              <p className="text-xs text-muted-foreground mt-0.5">{subtext}</p>
-            )}
+            {subtext && <p className="text-xs text-muted-foreground mt-0.5">{subtext}</p>}
           </div>
         </div>
       </CardContent>

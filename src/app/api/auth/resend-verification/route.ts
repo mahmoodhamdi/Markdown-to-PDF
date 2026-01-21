@@ -19,10 +19,7 @@ export async function POST(_request: NextRequest) {
     const session = await getServerSession(authOptions);
 
     if (!session?.user?.email) {
-      return NextResponse.json(
-        { success: false, error: 'Unauthorized' },
-        { status: 401 }
-      );
+      return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 });
     }
 
     const userEmail = session.user.email;
@@ -67,11 +64,7 @@ export async function POST(_request: NextRequest) {
     // Send verification email
     if (emailService.isConfigured()) {
       try {
-        await emailService.sendEmailVerification(
-          { email: userEmail, name: user.name },
-          token,
-          24
-        );
+        await emailService.sendEmailVerification({ email: userEmail, name: user.name }, token, 24);
       } catch (emailError) {
         console.error('Failed to send verification email:', emailError);
         return NextResponse.json(

@@ -116,9 +116,7 @@ export default function TeamDetailPage() {
       prev
         ? {
             ...prev,
-            members: prev.members.map((m) =>
-              m.userId === memberId ? { ...m, role: newRole } : m
-            ),
+            members: prev.members.map((m) => (m.userId === memberId ? { ...m, role: newRole } : m)),
           }
         : null
     );
@@ -147,10 +145,8 @@ export default function TeamDetailPage() {
     );
   };
 
-  const canManageMembers =
-    team?.currentUserRole === 'owner' || team?.currentUserRole === 'admin';
-  const canManageSettings =
-    team?.currentUserRole === 'owner' || team?.currentUserRole === 'admin';
+  const canManageMembers = team?.currentUserRole === 'owner' || team?.currentUserRole === 'admin';
+  const canManageSettings = team?.currentUserRole === 'owner' || team?.currentUserRole === 'admin';
   const canChangeRoles = team?.currentUserRole === 'owner';
 
   const getRoleIcon = (role: string) => {

@@ -19,10 +19,7 @@ export async function POST(request: NextRequest) {
   // For API key auth, check both 'convert' and 'batch' permissions
   if (context.authType === 'api-key' && context.apiKeyUser) {
     if (!context.apiKeyUser.permissions.includes('batch')) {
-      return NextResponse.json(
-        { error: "API key lacks 'batch' permission" },
-        { status: 403 }
-      );
+      return NextResponse.json({ error: "API key lacks 'batch' permission" }, { status: 403 });
     }
   }
 
@@ -63,7 +60,9 @@ export async function POST(request: NextRequest) {
     // Check if the requested theme is available for the user's plan
     if (body.theme && !planLimits.availableThemes.includes(body.theme)) {
       return NextResponse.json(
-        { error: `Theme "${body.theme}" is not available for your plan. Available themes: ${planLimits.availableThemes.join(', ')}` },
+        {
+          error: `Theme "${body.theme}" is not available for your plan. Available themes: ${planLimits.availableThemes.join(', ')}`,
+        },
         { status: 403, headers: rateLimitHeaders }
       );
     }
@@ -118,15 +117,18 @@ export async function POST(request: NextRequest) {
       // This is more user-friendly for batch operations
     }
 
-    return NextResponse.json({
-      success: failedCount === 0,
-      results,
-      summary: {
-        total: body.files.length,
-        success: successCount,
-        failed: failedCount,
+    return NextResponse.json(
+      {
+        success: failedCount === 0,
+        results,
+        summary: {
+          total: body.files.length,
+          success: successCount,
+          failed: failedCount,
+        },
       },
-    }, { headers: rateLimitHeaders });
+      { headers: rateLimitHeaders }
+    );
   } catch (error) {
     console.error('Batch convert API error:', error);
     return NextResponse.json(

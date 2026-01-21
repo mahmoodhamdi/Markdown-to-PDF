@@ -179,9 +179,7 @@ export function TeamSettings({
               <div className="flex items-center justify-between">
                 <div className="space-y-0.5">
                   <Label>{t('allowMemberInvites')}</Label>
-                  <p className="text-sm text-muted-foreground">
-                    {t('allowMemberInvitesHint')}
-                  </p>
+                  <p className="text-sm text-muted-foreground">{t('allowMemberInvitesHint')}</p>
                 </div>
                 <Switch
                   checked={localSettings.allowMemberInvites}
@@ -260,7 +258,9 @@ export function TeamSettings({
                     <div className="flex items-center justify-between p-4 border border-yellow-500/50 rounded-lg bg-yellow-50/50 dark:bg-yellow-900/10">
                       <div className="space-y-0.5">
                         <Label>{t('transferOwnership')}</Label>
-                        <p className="text-sm text-muted-foreground">{t('transferOwnershipHint')}</p>
+                        <p className="text-sm text-muted-foreground">
+                          {t('transferOwnershipHint')}
+                        </p>
                       </div>
                       <Button
                         variant="outline"

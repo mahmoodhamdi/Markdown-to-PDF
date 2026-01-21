@@ -5,7 +5,13 @@
  */
 
 import { connectDB } from '@/lib/db/mongodb';
-import { Team, TeamMemberLookup, type ITeam, type ITeamMember, type TeamRole } from '@/lib/db/models/Team';
+import {
+  Team,
+  TeamMemberLookup,
+  type ITeam,
+  type ITeamMember,
+  type TeamRole,
+} from '@/lib/db/models/Team';
 import { getPlanLimits, PlanType } from '@/lib/plans/config';
 import {
   logTeamCreated,
@@ -300,11 +306,7 @@ export async function updateTeam(
       };
     }
 
-    const updatedTeam = await Team.findByIdAndUpdate(
-      teamId,
-      { $set: updateData },
-      { new: true }
-    );
+    const updatedTeam = await Team.findByIdAndUpdate(teamId, { $set: updateData }, { new: true });
 
     if (!updatedTeam) {
       return {
@@ -315,14 +317,9 @@ export async function updateTeam(
 
     // Log activity
     if (updates.name) {
-      await logTeamUpdated(
-        teamId,
-        updatedTeam.name,
-        userId,
-        member.email,
-        member.name,
-        { name: updates.name }
-      );
+      await logTeamUpdated(teamId, updatedTeam.name, userId, member.email, member.name, {
+        name: updates.name,
+      });
     }
     if (updates.settings) {
       await logSettingsUpdated(
@@ -351,7 +348,10 @@ export async function updateTeam(
 /**
  * Delete a team (owner only)
  */
-export async function deleteTeam(teamId: string, userId: string): Promise<{ success: boolean; error?: string }> {
+export async function deleteTeam(
+  teamId: string,
+  userId: string
+): Promise<{ success: boolean; error?: string }> {
   try {
     await connectDB();
 
@@ -374,13 +374,7 @@ export async function deleteTeam(teamId: string, userId: string): Promise<{ succ
     const owner = team.members.find((m: ITeamMember) => m.userId === userId);
 
     // Log activity before deleting
-    await logTeamDeleted(
-      teamId,
-      team.name,
-      userId,
-      owner?.email || '',
-      owner?.name
-    );
+    await logTeamDeleted(teamId, team.name, userId, owner?.email || '', owner?.name);
 
     // Delete all member records
     await TeamMemberLookup.deleteMany({ teamId });
@@ -441,7 +435,10 @@ export async function addTeamMember(
 
     // Check member limit
     const limits = getPlanLimits(team.plan);
-    if (limits.teamMembersAllowed !== Infinity && team.members.length >= limits.teamMembersAllowed) {
+    if (
+      limits.teamMembersAllowed !== Infinity &&
+      team.members.length >= limits.teamMembersAllowed
+    ) {
       return {
         success: false,
         error: `Team member limit reached (${limits.teamMembersAllowed} members)`,
@@ -578,13 +575,7 @@ export async function removeTeamMember(
     // Log activity
     if (userId === memberIdToRemove) {
       // Member left the team
-      await logMemberLeft(
-        teamId,
-        team.name,
-        userId,
-        remover.email,
-        remover.name
-      );
+      await logMemberLeft(teamId, team.name, userId, remover.email, remover.name);
     } else {
       // Member was removed by someone else
       await logMemberRemoved(
@@ -672,7 +663,9 @@ export async function updateMemberRole(
       { $set: { role: newRole } }
     );
 
-    const updatedMember = updatedTeam.members.find((m: ITeamMember) => m.userId === memberIdToUpdate);
+    const updatedMember = updatedTeam.members.find(
+      (m: ITeamMember) => m.userId === memberIdToUpdate
+    );
     const owner = team.members.find((m: ITeamMember) => m.userId === userId);
     const oldRole = team.members[memberIndex].role;
 
@@ -693,14 +686,16 @@ export async function updateMemberRole(
 
     return {
       success: true,
-      member: updatedMember ? {
-        userId: updatedMember.userId,
-        email: updatedMember.email,
-        name: updatedMember.name,
-        role: updatedMember.role,
-        joinedAt: updatedMember.joinedAt,
-        invitedBy: updatedMember.invitedBy,
-      } : undefined,
+      member: updatedMember
+        ? {
+            userId: updatedMember.userId,
+            email: updatedMember.email,
+            name: updatedMember.name,
+            role: updatedMember.role,
+            joinedAt: updatedMember.joinedAt,
+            invitedBy: updatedMember.invitedBy,
+          }
+        : undefined,
     };
   } catch (error) {
     console.error('Update member role error:', error);

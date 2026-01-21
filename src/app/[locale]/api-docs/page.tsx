@@ -99,9 +99,7 @@ export default function ApiDocsPage() {
               <FileJson className="h-5 w-5 text-primary" />
               OpenAPI Specification
             </CardTitle>
-            <CardDescription>
-              Download the OpenAPI 3.0 specification file
-            </CardDescription>
+            <CardDescription>Download the OpenAPI 3.0 specification file</CardDescription>
           </CardHeader>
           <CardContent>
             <a href="/openapi.json" target="_blank" rel="noopener noreferrer">
@@ -123,9 +121,7 @@ export default function ApiDocsPage() {
 
           <div>
             <h4 className="font-medium mb-2">{t('baseUrl')}</h4>
-            <code className="block p-3 bg-muted rounded-lg">
-              https://your-domain.com/api
-            </code>
+            <code className="block p-3 bg-muted rounded-lg">https://your-domain.com/api</code>
           </div>
 
           <div>
@@ -150,7 +146,9 @@ export default function ApiDocsPage() {
               <span
                 className={cn(
                   'px-2 py-1 text-xs font-mono rounded',
-                  endpoint.method === 'GET' ? 'bg-green-100 text-green-700' : 'bg-blue-100 text-blue-700'
+                  endpoint.method === 'GET'
+                    ? 'bg-green-100 text-green-700'
+                    : 'bg-blue-100 text-blue-700'
                 )}
               >
                 {endpoint.method}

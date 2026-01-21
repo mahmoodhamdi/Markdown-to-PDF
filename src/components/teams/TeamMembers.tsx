@@ -31,7 +31,15 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Plus, MoreHorizontal, UserMinus, ShieldCheck, ShieldOff, Search, Filter } from 'lucide-react';
+import {
+  Plus,
+  MoreHorizontal,
+  UserMinus,
+  ShieldCheck,
+  ShieldOff,
+  Search,
+  Filter,
+} from 'lucide-react';
 import { toast } from 'sonner';
 
 interface TeamMember {
@@ -188,8 +196,7 @@ export function TeamMembers({
       const query = searchQuery.toLowerCase();
       result = result.filter(
         (m) =>
-          m.email.toLowerCase().includes(query) ||
-          (m.name && m.name.toLowerCase().includes(query))
+          m.email.toLowerCase().includes(query) || (m.name && m.name.toLowerCase().includes(query))
       );
     }
 
@@ -230,7 +237,10 @@ export function TeamMembers({
                   className="ps-9"
                 />
               </div>
-              <Select value={roleFilter} onValueChange={(v) => setRoleFilter(v as typeof roleFilter)}>
+              <Select
+                value={roleFilter}
+                onValueChange={(v) => setRoleFilter(v as typeof roleFilter)}
+              >
                 <SelectTrigger className="w-full sm:w-[140px]">
                   <Filter className="h-4 w-4 me-2" />
                   <SelectValue />
@@ -251,91 +261,98 @@ export function TeamMembers({
               {searchQuery || roleFilter !== 'all' ? t('noMatchingMembers') : t('noMembers')}
             </div>
           ) : (
-          <div className="divide-y">
-            {filteredAndSortedMembers.map((member) => (
-              <div
-                key={member.userId}
-                className="flex items-center justify-between py-4 first:pt-0 last:pb-0"
-              >
-                <div className="flex items-center gap-4">
-                  <Avatar className="h-10 w-10">
-                    <AvatarImage src={member.image} alt={member.name || member.email} />
-                    <AvatarFallback className="bg-primary/10 text-primary">
-                      {getInitials(member.name, member.email)}
-                    </AvatarFallback>
-                  </Avatar>
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <span className="font-medium">
-                        {member.name || member.email.split('@')[0]}
-                      </span>
-                      <Badge variant={getRoleBadgeVariant(member.role)} className="text-xs">
-                        {t(`role.${member.role}`)}
-                      </Badge>
-                      {isPending(member) && (
-                        <Badge variant="outline" className="text-xs text-muted-foreground">
-                          {t('pending')}
+            <div className="divide-y">
+              {filteredAndSortedMembers.map((member) => (
+                <div
+                  key={member.userId}
+                  className="flex items-center justify-between py-4 first:pt-0 last:pb-0"
+                >
+                  <div className="flex items-center gap-4">
+                    <Avatar className="h-10 w-10">
+                      <AvatarImage src={member.image} alt={member.name || member.email} />
+                      <AvatarFallback className="bg-primary/10 text-primary">
+                        {getInitials(member.name, member.email)}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <span className="font-medium">
+                          {member.name || member.email.split('@')[0]}
+                        </span>
+                        <Badge variant={getRoleBadgeVariant(member.role)} className="text-xs">
+                          {t(`role.${member.role}`)}
                         </Badge>
-                      )}
-                      {member.userId === currentUserId && (
-                        <Badge variant="outline" className="text-xs">
-                          {t('you')}
-                        </Badge>
-                      )}
+                        {isPending(member) && (
+                          <Badge variant="outline" className="text-xs text-muted-foreground">
+                            {t('pending')}
+                          </Badge>
+                        )}
+                        {member.userId === currentUserId && (
+                          <Badge variant="outline" className="text-xs">
+                            {t('you')}
+                          </Badge>
+                        )}
+                      </div>
+                      <span className="text-sm text-muted-foreground">{member.email}</span>
                     </div>
-                    <span className="text-sm text-muted-foreground">{member.email}</span>
                   </div>
-                </div>
 
-                <div className="flex items-center gap-4">
-                  <span className="text-sm text-muted-foreground hidden sm:block">
-                    {t('joined')} {formatDate(member.joinedAt)}
-                  </span>
+                  <div className="flex items-center gap-4">
+                    <span className="text-sm text-muted-foreground hidden sm:block">
+                      {t('joined')} {formatDate(member.joinedAt)}
+                    </span>
 
-                  {(canManageMembers || member.userId === currentUserId) && member.role !== 'owner' && (
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="icon" disabled={isChangingRole === member.userId}>
-                          <MoreHorizontal className="h-4 w-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        {canChangeRoles && (
-                          <>
-                            {member.role === 'member' ? (
+                    {(canManageMembers || member.userId === currentUserId) &&
+                      member.role !== 'owner' && (
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              disabled={isChangingRole === member.userId}
+                            >
+                              <MoreHorizontal className="h-4 w-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            {canChangeRoles && (
+                              <>
+                                {member.role === 'member' ? (
+                                  <DropdownMenuItem
+                                    onClick={() => handleChangeRole(member.userId, 'admin')}
+                                  >
+                                    <ShieldCheck className="h-4 w-4 me-2" />
+                                    {t('makeAdmin')}
+                                  </DropdownMenuItem>
+                                ) : (
+                                  <DropdownMenuItem
+                                    onClick={() => handleChangeRole(member.userId, 'member')}
+                                  >
+                                    <ShieldOff className="h-4 w-4 me-2" />
+                                    {t('removeAdmin')}
+                                  </DropdownMenuItem>
+                                )}
+                                <DropdownMenuSeparator />
+                              </>
+                            )}
+                            {canRemoveMember(member) && (
                               <DropdownMenuItem
-                                onClick={() => handleChangeRole(member.userId, 'admin')}
+                                className="text-destructive focus:text-destructive"
+                                onClick={() => setRemovingMember(member)}
                               >
-                                <ShieldCheck className="h-4 w-4 me-2" />
-                                {t('makeAdmin')}
-                              </DropdownMenuItem>
-                            ) : (
-                              <DropdownMenuItem
-                                onClick={() => handleChangeRole(member.userId, 'member')}
-                              >
-                                <ShieldOff className="h-4 w-4 me-2" />
-                                {t('removeAdmin')}
+                                <UserMinus className="h-4 w-4 me-2" />
+                                {member.userId === currentUserId
+                                  ? t('leaveTeam')
+                                  : t('removeMember')}
                               </DropdownMenuItem>
                             )}
-                            <DropdownMenuSeparator />
-                          </>
-                        )}
-                        {canRemoveMember(member) && (
-                          <DropdownMenuItem
-                            className="text-destructive focus:text-destructive"
-                            onClick={() => setRemovingMember(member)}
-                          >
-                            <UserMinus className="h-4 w-4 me-2" />
-                            {member.userId === currentUserId ? t('leaveTeam') : t('removeMember')}
-                          </DropdownMenuItem>
-                        )}
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  )}
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      )}
+                  </div>
                 </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
           )}
         </CardContent>
       </Card>
@@ -352,7 +369,9 @@ export function TeamMembers({
             <AlertDialogDescription>
               {removingMember?.userId === currentUserId
                 ? t('leaveTeamDescription')
-                : t('removeMemberDescription', { name: removingMember?.name || removingMember?.email })}
+                : t('removeMemberDescription', {
+                    name: removingMember?.name || removingMember?.email,
+                  })}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

@@ -80,24 +80,32 @@ export function getSubscriptionConfirmationEmail(params: SubscriptionConfirmatio
           <td style="color: #666;">Billing:</td>
           <td style="font-weight: 600;">${billingText.charAt(0).toUpperCase() + billingText.slice(1)}</td>
         </tr>
-        ${amountText ? `
+        ${
+          amountText
+            ? `
         <tr>
           <td style="color: #666;">Amount:</td>
           <td style="font-weight: 600;">${amountText}/${billingText === 'yearly' ? 'year' : 'month'}</td>
         </tr>
-        ` : ''}
-        ${gateway ? `
+        `
+            : ''
+        }
+        ${
+          gateway
+            ? `
         <tr>
           <td style="color: #666;">Payment method:</td>
           <td style="font-weight: 600;">${gateway.charAt(0).toUpperCase() + gateway.slice(1)}</td>
         </tr>
-        ` : ''}
+        `
+            : ''
+        }
       </table>
     </div>
 
     <h3 style="margin: 24px 0 12px 0; color: #1a1a1a;">Your ${planName} Features</h3>
     <ul style="margin: 0 0 20px 0; padding-left: 20px; color: #4a4a4a;">
-      ${features.map(feature => `<li style="margin-bottom: 8px;">${feature}</li>`).join('')}
+      ${features.map((feature) => `<li style="margin-bottom: 8px;">${feature}</li>`).join('')}
     </ul>
 
     <div style="text-align: center;">
@@ -134,7 +142,7 @@ ${amountText ? `- Amount: ${amountText}/${billingText === 'yearly' ? 'year' : 'm
 ${gateway ? `- Payment method: ${gateway.charAt(0).toUpperCase() + gateway.slice(1)}` : ''}
 
 Your ${planName} Features:
-${features.map(feature => `- ${feature}`).join('\n')}
+${features.map((feature) => `- ${feature}`).join('\n')}
 
 Start using your new features at: ${baseUrl}/editor
 

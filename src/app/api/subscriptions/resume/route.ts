@@ -57,9 +57,6 @@ export async function POST(_request: NextRequest) {
     }
   } catch (error) {
     console.error('Resume subscription error:', error);
-    return NextResponse.json(
-      { error: 'Failed to resume subscription' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Failed to resume subscription' }, { status: 500 });
   }
 }

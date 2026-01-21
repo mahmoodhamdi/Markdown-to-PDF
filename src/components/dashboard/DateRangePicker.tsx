@@ -54,10 +54,7 @@ export function DateRangePicker({ value, onChange, className }: DateRangePickerP
   return (
     <div className={cn('space-y-1', className)}>
       <Select value={value} onValueChange={(val) => onChange(val as DateRangePreset)}>
-        <SelectTrigger
-          className="min-w-[160px]"
-          aria-label={t('selectDateRange')}
-        >
+        <SelectTrigger className="min-w-[160px]" aria-label={t('selectDateRange')}>
           <div className="flex items-center gap-2">
             <Calendar className="h-4 w-4 text-muted-foreground" aria-hidden="true" />
             <SelectValue />

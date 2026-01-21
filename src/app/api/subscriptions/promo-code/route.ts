@@ -43,10 +43,7 @@ export async function GET(request: NextRequest) {
     }
 
     if (!stripe) {
-      return NextResponse.json(
-        { error: 'Stripe is not configured' },
-        { status: 500 }
-      );
+      return NextResponse.json({ error: 'Stripe is not configured' }, { status: 500 });
     }
 
     try {
@@ -119,10 +116,7 @@ export async function GET(request: NextRequest) {
     }
   } catch (error) {
     console.error('Promo code validation error:', error);
-    return NextResponse.json(
-      { error: 'Failed to validate promo code' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Failed to validate promo code' }, { status: 500 });
   }
 }
 
@@ -146,10 +140,7 @@ export async function POST(request: NextRequest) {
     }
 
     if (!stripe) {
-      return NextResponse.json(
-        { error: 'Stripe is not configured' },
-        { status: 500 }
-      );
+      return NextResponse.json({ error: 'Stripe is not configured' }, { status: 500 });
     }
 
     await connectDB();
@@ -225,9 +216,6 @@ export async function POST(request: NextRequest) {
     }
   } catch (error) {
     console.error('Apply promo code error:', error);
-    return NextResponse.json(
-      { error: 'Failed to apply promo code' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Failed to apply promo code' }, { status: 500 });
   }
 }

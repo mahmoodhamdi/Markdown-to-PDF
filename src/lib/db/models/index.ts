@@ -4,9 +4,23 @@
  */
 
 export { User, type IUser } from './User';
-export { Team, TeamMemberLookup, type ITeam, type ITeamMember, type ITeamMemberLookup, type ITeamSettings, type TeamRole } from './Team';
+export {
+  Team,
+  TeamMemberLookup,
+  type ITeam,
+  type ITeamMember,
+  type ITeamMemberLookup,
+  type ITeamSettings,
+  type TeamRole,
+} from './Team';
 export { UserFile, StorageQuota, type IUserFile, type IStorageQuota } from './UserFile';
-export { UsageEvent, DailyUsage, type IUsageEvent, type IDailyUsage, type EventType } from './Usage';
+export {
+  UsageEvent,
+  DailyUsage,
+  type IUsageEvent,
+  type IDailyUsage,
+  type EventType,
+} from './Usage';
 export {
   SSOConfiguration,
   SSODomainMapping,
@@ -39,10 +53,7 @@ export {
   countRecentResetRequests,
   type IPasswordResetToken,
 } from './PasswordResetToken';
-export {
-  EmailChangeToken,
-  type IEmailChangeToken,
-} from './EmailChangeToken';
+export { EmailChangeToken, type IEmailChangeToken } from './EmailChangeToken';
 export {
   EmailVerificationToken,
   generateVerificationToken,
@@ -54,25 +65,10 @@ export {
   countRecentVerificationRequests,
   type IEmailVerificationToken,
 } from './EmailVerificationToken';
-export {
-  TeamInvitation,
-  type ITeamInvitation,
-  type InvitationStatus,
-} from './TeamInvitation';
-export {
-  TeamActivity,
-  type ITeamActivity,
-  type TeamActivityAction,
-} from './TeamActivity';
-export {
-  Session,
-  type ISession,
-} from './Session';
-export {
-  Account,
-  type IAccount,
-  type OAuthProvider,
-} from './Account';
+export { TeamInvitation, type ITeamInvitation, type InvitationStatus } from './TeamInvitation';
+export { TeamActivity, type ITeamActivity, type TeamActivityAction } from './TeamActivity';
+export { Session, type ISession } from './Session';
+export { Account, type IAccount, type OAuthProvider } from './Account';
 export {
   LoginAttempt,
   recordFailedLogin,

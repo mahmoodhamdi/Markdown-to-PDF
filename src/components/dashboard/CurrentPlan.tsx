@@ -121,7 +121,8 @@ export function CurrentPlan({
     if (!paymentMethod) return null;
 
     if (paymentMethod.type === 'card') {
-      const brand = paymentMethod.brand?.charAt(0).toUpperCase() + (paymentMethod.brand?.slice(1) || '');
+      const brand =
+        paymentMethod.brand?.charAt(0).toUpperCase() + (paymentMethod.brand?.slice(1) || '');
       return `${brand} •••• ${paymentMethod.last4}`;
     }
     if (paymentMethod.type === 'wallet') {
@@ -156,16 +157,16 @@ export function CurrentPlan({
       <CardHeader>
         <div className="flex items-center justify-between">
           <CardTitle>{t('currentPlan')}</CardTitle>
-          <Badge className={cn('text-white', statusColors[status])}>
-            {statusLabels[status]}
-          </Badge>
+          <Badge className={cn('text-white', statusColors[status])}>{statusLabels[status]}</Badge>
         </div>
       </CardHeader>
       <CardContent className="space-y-6">
         {/* Plan Info */}
         <div className="flex items-start justify-between">
           <div>
-            <h3 className="text-2xl font-bold">{planLabels[plan]} {t('plan')}</h3>
+            <h3 className="text-2xl font-bold">
+              {planLabels[plan]} {t('plan')}
+            </h3>
             {plan !== 'free' && (
               <p className="text-muted-foreground">
                 ${price}/{billingLabel}
@@ -174,11 +175,13 @@ export function CurrentPlan({
           </div>
           {plan === 'free' ? (
             <Badge variant="secondary">{t('freeForever')}</Badge>
-          ) : plan === 'pro' && (
-            <Badge variant="outline" className="text-primary border-primary">
-              <Zap className="h-3 w-3 me-1" />
-              {tPricing('mostPopular')}
-            </Badge>
+          ) : (
+            plan === 'pro' && (
+              <Badge variant="outline" className="text-primary border-primary">
+                <Zap className="h-3 w-3 me-1" />
+                {tPricing('mostPopular')}
+              </Badge>
+            )
           )}
         </div>
 
@@ -229,9 +232,7 @@ export function CurrentPlan({
               {status === 'trialing' && trialEndsAt && (
                 <div className="flex items-center gap-2 text-blue-600 dark:text-blue-400">
                   <Clock className="h-4 w-4" />
-                  <span>
-                    {t('trialEnds', { days: getDaysUntil(trialEndsAt) })}
-                  </span>
+                  <span>{t('trialEnds', { days: getDaysUntil(trialEndsAt) })}</span>
                 </div>
               )}
 
@@ -257,7 +258,9 @@ export function CurrentPlan({
               {cancelAtPeriodEnd && currentPeriodEnd && (
                 <div className="flex items-center gap-2 p-3 rounded-lg bg-yellow-50 dark:bg-yellow-900/20 text-yellow-700 dark:text-yellow-400">
                   <AlertCircle className="h-4 w-4 shrink-0" />
-                  <span className="text-sm">{t('cancelsOn', { date: formatDate(currentPeriodEnd) })}</span>
+                  <span className="text-sm">
+                    {t('cancelsOn', { date: formatDate(currentPeriodEnd) })}
+                  </span>
                 </div>
               )}
 
@@ -271,7 +274,12 @@ export function CurrentPlan({
                   <div className="flex items-center gap-2">
                     <span className="font-medium">{getPaymentMethodDisplay()}</span>
                     {canManagePayment && onManagePayment && (
-                      <Button variant="link" size="sm" className="h-auto p-0" onClick={onManagePayment}>
+                      <Button
+                        variant="link"
+                        size="sm"
+                        className="h-auto p-0"
+                        onClick={onManagePayment}
+                      >
                         {t('update')}
                       </Button>
                     )}

@@ -33,50 +33,62 @@ export function FileUploadZone({
   const [uploadProgress, setUploadProgress] = useState(0);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
-  const handleFile = useCallback((file: File) => {
-    // Validate size
-    if (file.size > maxSizeBytes) {
-      toast.error(t('fileTooLarge'));
-      return;
-    }
+  const handleFile = useCallback(
+    (file: File) => {
+      // Validate size
+      if (file.size > maxSizeBytes) {
+        toast.error(t('fileTooLarge'));
+        return;
+      }
 
-    setSelectedFile(file);
-  }, [maxSizeBytes, t]);
+      setSelectedFile(file);
+    },
+    [maxSizeBytes, t]
+  );
 
-  const handleDragOver = useCallback((e: React.DragEvent) => {
-    e.preventDefault();
-    if (!disabled) {
-      setIsDragOver(true);
-    }
-  }, [disabled]);
+  const handleDragOver = useCallback(
+    (e: React.DragEvent) => {
+      e.preventDefault();
+      if (!disabled) {
+        setIsDragOver(true);
+      }
+    },
+    [disabled]
+  );
 
   const handleDragLeave = useCallback((e: React.DragEvent) => {
     e.preventDefault();
     setIsDragOver(false);
   }, []);
 
-  const handleDrop = useCallback((e: React.DragEvent) => {
-    e.preventDefault();
-    setIsDragOver(false);
+  const handleDrop = useCallback(
+    (e: React.DragEvent) => {
+      e.preventDefault();
+      setIsDragOver(false);
 
-    if (disabled) return;
+      if (disabled) return;
 
-    const files = e.dataTransfer.files;
-    const firstFile = files[0];
-    if (files.length > 0 && firstFile) {
-      handleFile(firstFile);
-    }
-  }, [disabled, handleFile]);
+      const files = e.dataTransfer.files;
+      const firstFile = files[0];
+      if (files.length > 0 && firstFile) {
+        handleFile(firstFile);
+      }
+    },
+    [disabled, handleFile]
+  );
 
-  const handleFileSelect = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = e.target.files;
-    const firstFile = files?.[0];
-    if (files && files.length > 0 && firstFile) {
-      handleFile(firstFile);
-    }
-    // Reset input
-    e.target.value = '';
-  }, [handleFile]);
+  const handleFileSelect = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      const files = e.target.files;
+      const firstFile = files?.[0];
+      if (files && files.length > 0 && firstFile) {
+        handleFile(firstFile);
+      }
+      // Reset input
+      e.target.value = '';
+    },
+    [handleFile]
+  );
 
   const uploadFile = async () => {
     if (!selectedFile) return;
@@ -166,17 +178,10 @@ export function FileUploadZone({
             <FileText className="h-8 w-8 text-primary" />
             <div className="text-start">
               <p className="font-medium truncate max-w-[200px]">{selectedFile.name}</p>
-              <p className="text-sm text-muted-foreground">
-                {formatFileSize(selectedFile.size)}
-              </p>
+              <p className="text-sm text-muted-foreground">{formatFileSize(selectedFile.size)}</p>
             </div>
             {!isUploading && (
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={cancelUpload}
-                className="ms-2"
-              >
+              <Button variant="ghost" size="icon" onClick={cancelUpload} className="ms-2">
                 <X className="h-4 w-4" />
               </Button>
             )}
@@ -185,17 +190,12 @@ export function FileUploadZone({
           {isUploading && (
             <div className="space-y-2">
               <Progress value={uploadProgress} className="h-2" />
-              <p className="text-sm text-muted-foreground">
-                {uploadProgress}%
-              </p>
+              <p className="text-sm text-muted-foreground">{uploadProgress}%</p>
             </div>
           )}
 
           <div className="flex justify-center gap-2">
-            <Button
-              onClick={uploadFile}
-              disabled={isUploading}
-            >
+            <Button onClick={uploadFile} disabled={isUploading}>
               {isUploading ? (
                 <>
                   <Loader2 className="h-4 w-4 me-2 animate-spin" />
@@ -218,9 +218,7 @@ export function FileUploadZone({
       ) : (
         <>
           <Upload className="h-10 w-10 mx-auto text-muted-foreground mb-4" />
-          <p className="text-sm text-muted-foreground mb-4">
-            {t('dragDrop')}
-          </p>
+          <p className="text-sm text-muted-foreground mb-4">{t('dragDrop')}</p>
           <label>
             <input
               type="file"
@@ -229,9 +227,7 @@ export function FileUploadZone({
               accept=".md,.markdown,.txt,.pdf,.doc,.docx,.png,.jpg,.jpeg,.gif,.webp"
             />
             <Button asChild variant="outline">
-              <span className="cursor-pointer">
-                {t('browse')}
-              </span>
+              <span className="cursor-pointer">{t('browse')}</span>
             </Button>
           </label>
           <p className="text-xs text-muted-foreground mt-4">

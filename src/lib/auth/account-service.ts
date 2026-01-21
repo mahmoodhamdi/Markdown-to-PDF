@@ -14,9 +14,7 @@ export type { OAuthProvider } from '@/lib/db/models';
 export async function getUserAccounts(userId: string): Promise<IAccount[]> {
   await connectDB();
 
-  const accounts = await Account.find({ userId })
-    .select('-accessToken -refreshToken')
-    .lean();
+  const accounts = await Account.find({ userId }).select('-accessToken -refreshToken').lean();
 
   return accounts;
 }

@@ -37,10 +37,7 @@ export async function GET(_request: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user?.id) {
-      return NextResponse.json(
-        { error: 'Authentication required' },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
     }
 
     const userId = session.user.id;
@@ -83,10 +80,7 @@ export async function GET(_request: NextRequest) {
     });
   } catch (error) {
     console.error('List API keys error:', error);
-    return NextResponse.json(
-      { error: 'Failed to list API keys' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Failed to list API keys' }, { status: 500 });
   }
 }
 
@@ -98,10 +92,7 @@ export async function POST(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user?.id) {
-      return NextResponse.json(
-        { error: 'Authentication required' },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
     }
 
     const userId = session.user.id;
@@ -172,13 +163,11 @@ export async function POST(request: NextRequest) {
       },
       // IMPORTANT: The plain key is only returned once and should be shown to the user
       plainKey,
-      message: 'API key created successfully. Make sure to copy the key now - it will not be shown again.',
+      message:
+        'API key created successfully. Make sure to copy the key now - it will not be shown again.',
     });
   } catch (error) {
     console.error('Create API key error:', error);
-    return NextResponse.json(
-      { error: 'Failed to create API key' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Failed to create API key' }, { status: 500 });
   }
 }

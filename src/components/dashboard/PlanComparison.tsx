@@ -7,12 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from '@/components/ui/tooltip';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { Check, HelpCircle, Zap, Building } from 'lucide-react';
 import { PLANS, PlanType } from '@/lib/plans/config';
 import { cn } from '@/lib/utils';
@@ -75,9 +70,7 @@ export function PlanComparison({
 
   const getMonthlyEquivalent = (plan: PlanType) => {
     if (plan === 'free') return 0;
-    return isYearly
-      ? Math.round(PLANS[plan].priceYearly / 12)
-      : PLANS[plan].priceMonthly;
+    return isYearly ? Math.round(PLANS[plan].priceYearly / 12) : PLANS[plan].priceMonthly;
   };
 
   const getSavings = (plan: PlanType) => {
@@ -138,7 +131,9 @@ export function PlanComparison({
     return (
       <Button
         className="w-full"
-        onClick={() => onSelectPlan(plan as Exclude<PlanType, 'free'>, isYearly ? 'yearly' : 'monthly')}
+        onClick={() =>
+          onSelectPlan(plan as Exclude<PlanType, 'free'>, isYearly ? 'yearly' : 'monthly')
+        }
         disabled={loading}
         variant={isDowngrade(plan) ? 'outline' : 'default'}
       >
@@ -163,11 +158,7 @@ export function PlanComparison({
               >
                 {t('monthly')}
               </Label>
-              <Switch
-                id="billing-toggle"
-                checked={isYearly}
-                onCheckedChange={setIsYearly}
-              />
+              <Switch id="billing-toggle" checked={isYearly} onCheckedChange={setIsYearly} />
               <Label
                 htmlFor="billing-toggle"
                 className={cn(
@@ -176,7 +167,10 @@ export function PlanComparison({
                 )}
               >
                 {t('yearly')}
-                <Badge variant="secondary" className="text-xs bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400">
+                <Badge
+                  variant="secondary"
+                  className="text-xs bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400"
+                >
                   {tPricing('save', { percent: '20' })}
                 </Badge>
               </Label>
@@ -223,24 +217,24 @@ export function PlanComparison({
                   {/* Plan Header */}
                   <div className="text-center mb-4 pt-2">
                     <h3 className="font-semibold text-lg">{planLabels[plan]}</h3>
-                    <p className="text-sm text-muted-foreground mt-1">
-                      {planDescriptions[plan]}
-                    </p>
+                    <p className="text-sm text-muted-foreground mt-1">{planDescriptions[plan]}</p>
                     <div className="mt-4">
                       <span className="text-4xl font-bold">${getMonthlyEquivalent(plan)}</span>
                       <span className="text-muted-foreground">/{t('mo')}</span>
                     </div>
                     {isYearly && plan !== 'free' && (
                       <p className="text-sm text-muted-foreground mt-1">
-                        <span className="line-through">${PLANS[plan].priceMonthly * 12}</span>
-                        {' '}
+                        <span className="line-through">${PLANS[plan].priceMonthly * 12}</span>{' '}
                         <span className="text-green-600 dark:text-green-400 font-medium">
                           ${getPrice(plan)}/{t('year')}
                         </span>
                       </p>
                     )}
                     {isYearly && getSavings(plan) > 0 && (
-                      <Badge variant="secondary" className="mt-2 bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400">
+                      <Badge
+                        variant="secondary"
+                        className="mt-2 bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400"
+                      >
                         {t('save', { percent: getSavings(plan) })}
                       </Badge>
                     )}
@@ -248,35 +242,35 @@ export function PlanComparison({
 
                   {/* Features */}
                   <ul className="space-y-2.5 text-sm mb-6 flex-1">
-                    {getPlanFeatures(plan).slice(0, 6).map((feature, index) => {
-                      const featureKey = Object.keys(featureTooltips)[index];
-                      const tooltip = featureKey ? featureTooltips[featureKey] : null;
+                    {getPlanFeatures(plan)
+                      .slice(0, 6)
+                      .map((feature, index) => {
+                        const featureKey = Object.keys(featureTooltips)[index];
+                        const tooltip = featureKey ? featureTooltips[featureKey] : null;
 
-                      return (
-                        <li key={index} className="flex items-start gap-2">
-                          <Check className="h-4 w-4 text-green-500 mt-0.5 shrink-0" />
-                          <span className="flex-1">{feature}</span>
-                          {tooltip && (
-                            <Tooltip>
-                              <TooltipTrigger asChild>
-                                <button className="text-muted-foreground hover:text-foreground">
-                                  <HelpCircle className="h-3.5 w-3.5" />
-                                </button>
-                              </TooltipTrigger>
-                              <TooltipContent side="top" className="max-w-xs">
-                                <p className="text-sm">{tooltip}</p>
-                              </TooltipContent>
-                            </Tooltip>
-                          )}
-                        </li>
-                      );
-                    })}
+                        return (
+                          <li key={index} className="flex items-start gap-2">
+                            <Check className="h-4 w-4 text-green-500 mt-0.5 shrink-0" />
+                            <span className="flex-1">{feature}</span>
+                            {tooltip && (
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <button className="text-muted-foreground hover:text-foreground">
+                                    <HelpCircle className="h-3.5 w-3.5" />
+                                  </button>
+                                </TooltipTrigger>
+                                <TooltipContent side="top" className="max-w-xs">
+                                  <p className="text-sm">{tooltip}</p>
+                                </TooltipContent>
+                              </Tooltip>
+                            )}
+                          </li>
+                        );
+                      })}
                   </ul>
 
                   {/* Action Button */}
-                  <div className="mt-auto">
-                    {getActionButton(plan)}
-                  </div>
+                  <div className="mt-auto">{getActionButton(plan)}</div>
                 </div>
               );
             })}

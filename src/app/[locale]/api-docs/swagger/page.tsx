@@ -43,7 +43,9 @@ export default function SwaggerPage() {
     const initSwagger = async () => {
       try {
         await loadScript('https://cdn.jsdelivr.net/npm/swagger-ui-dist@5/swagger-ui-bundle.js');
-        await loadScript('https://cdn.jsdelivr.net/npm/swagger-ui-dist@5/swagger-ui-standalone-preset.js');
+        await loadScript(
+          'https://cdn.jsdelivr.net/npm/swagger-ui-dist@5/swagger-ui-standalone-preset.js'
+        );
 
         if (windowWithAMD.SwaggerUIBundle && windowWithAMD.SwaggerUIStandalonePreset) {
           windowWithAMD.SwaggerUIBundle({
@@ -51,11 +53,13 @@ export default function SwaggerPage() {
             dom_id: '#swagger-ui',
             deepLinking: true,
             presets: [
-              (windowWithAMD.SwaggerUIBundle as unknown as { presets: { apis: unknown } }).presets.apis,
+              (windowWithAMD.SwaggerUIBundle as unknown as { presets: { apis: unknown } }).presets
+                .apis,
               windowWithAMD.SwaggerUIStandalonePreset,
             ],
             plugins: [
-              (windowWithAMD.SwaggerUIBundle as unknown as { plugins: { DownloadUrl: unknown } }).plugins.DownloadUrl,
+              (windowWithAMD.SwaggerUIBundle as unknown as { plugins: { DownloadUrl: unknown } })
+                .plugins.DownloadUrl,
             ],
             layout: 'StandaloneLayout',
             defaultModelsExpandDepth: 1,
@@ -105,12 +109,24 @@ export default function SwaggerPage() {
         `}</style>
       </Head>
       <style jsx global>{`
-        .swagger-ui .topbar { display: none; }
-        .swagger-ui .info { margin: 20px 0; }
-        .swagger-ui .scheme-container { padding: 15px 0; }
-        .dark .swagger-ui { filter: invert(88%) hue-rotate(180deg); }
-        .dark .swagger-ui .model-box { background-color: #1a1a1a; }
-        .dark .swagger-ui img { filter: invert(100%) hue-rotate(180deg); }
+        .swagger-ui .topbar {
+          display: none;
+        }
+        .swagger-ui .info {
+          margin: 20px 0;
+        }
+        .swagger-ui .scheme-container {
+          padding: 15px 0;
+        }
+        .dark .swagger-ui {
+          filter: invert(88%) hue-rotate(180deg);
+        }
+        .dark .swagger-ui .model-box {
+          background-color: #1a1a1a;
+        }
+        .dark .swagger-ui img {
+          filter: invert(100%) hue-rotate(180deg);
+        }
       `}</style>
       <div className="container py-8">
         <div className="mb-6">

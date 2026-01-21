@@ -35,10 +35,7 @@ export async function GET(_request: NextRequest, { params }: RouteParams) {
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user?.id) {
-      return NextResponse.json(
-        { error: 'Authentication required' },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
     }
 
     const userId = session.user.id;
@@ -46,10 +43,7 @@ export async function GET(_request: NextRequest, { params }: RouteParams) {
 
     // Validate keyId format
     if (!mongoose.Types.ObjectId.isValid(keyId)) {
-      return NextResponse.json(
-        { error: 'Invalid key ID' },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'Invalid key ID' }, { status: 400 });
     }
 
     // Rate limit
@@ -71,10 +65,7 @@ export async function GET(_request: NextRequest, { params }: RouteParams) {
     });
 
     if (!apiKey) {
-      return NextResponse.json(
-        { error: 'API key not found' },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: 'API key not found' }, { status: 404 });
     }
 
     return NextResponse.json({
@@ -93,10 +84,7 @@ export async function GET(_request: NextRequest, { params }: RouteParams) {
     });
   } catch (error) {
     console.error('Get API key error:', error);
-    return NextResponse.json(
-      { error: 'Failed to get API key' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Failed to get API key' }, { status: 500 });
   }
 }
 
@@ -108,10 +96,7 @@ export async function DELETE(_request: NextRequest, { params }: RouteParams) {
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user?.id) {
-      return NextResponse.json(
-        { error: 'Authentication required' },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
     }
 
     const userId = session.user.id;
@@ -119,10 +104,7 @@ export async function DELETE(_request: NextRequest, { params }: RouteParams) {
 
     // Validate keyId format
     if (!mongoose.Types.ObjectId.isValid(keyId)) {
-      return NextResponse.json(
-        { error: 'Invalid key ID' },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'Invalid key ID' }, { status: 400 });
     }
 
     // Rate limit
@@ -140,10 +122,7 @@ export async function DELETE(_request: NextRequest, { params }: RouteParams) {
     const revoked = await ApiKey.revokeKey(keyId, userId);
 
     if (!revoked) {
-      return NextResponse.json(
-        { error: 'API key not found or already revoked' },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: 'API key not found or already revoked' }, { status: 404 });
     }
 
     return NextResponse.json({
@@ -152,10 +131,7 @@ export async function DELETE(_request: NextRequest, { params }: RouteParams) {
     });
   } catch (error) {
     console.error('Revoke API key error:', error);
-    return NextResponse.json(
-      { error: 'Failed to revoke API key' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Failed to revoke API key' }, { status: 500 });
   }
 }
 
@@ -167,10 +143,7 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user?.id) {
-      return NextResponse.json(
-        { error: 'Authentication required' },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
     }
 
     const userId = session.user.id;
@@ -178,10 +151,7 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
 
     // Validate keyId format
     if (!mongoose.Types.ObjectId.isValid(keyId)) {
-      return NextResponse.json(
-        { error: 'Invalid key ID' },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'Invalid key ID' }, { status: 400 });
     }
 
     // Rate limit
@@ -208,10 +178,7 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
 
     // Check if there's anything to update
     if (!updates.name && !updates.permissions) {
-      return NextResponse.json(
-        { error: 'No updates provided' },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'No updates provided' }, { status: 400 });
     }
 
     await connectDB();
@@ -237,10 +204,7 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
     );
 
     if (!apiKey) {
-      return NextResponse.json(
-        { error: 'API key not found' },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: 'API key not found' }, { status: 404 });
     }
 
     return NextResponse.json({
@@ -260,9 +224,6 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
     });
   } catch (error) {
     console.error('Update API key error:', error);
-    return NextResponse.json(
-      { error: 'Failed to update API key' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Failed to update API key' }, { status: 500 });
   }
 }

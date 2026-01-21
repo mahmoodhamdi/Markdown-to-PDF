@@ -32,9 +32,23 @@ vi.mock('@/lib/auth/session-service', () => ({
 
 import { getServerSession } from 'next-auth';
 import { getToken } from 'next-auth/jwt';
+import type { JWT } from 'next-auth/jwt';
 
 const mockGetServerSession = vi.mocked(getServerSession);
 const mockGetToken = vi.mocked(getToken);
+
+// Helper to create a mock JWT with required fields
+const createMockJWT = (jti: string): JWT => ({
+  jti,
+  id: 'user-123',
+  plan: 'free',
+  emailVerified: true,
+  usage: {
+    conversions: 0,
+    apiCalls: 0,
+    lastReset: new Date().toISOString().split('T')[0],
+  },
+});
 
 describe('/api/users/sessions', () => {
   let GET: typeof import('@/app/api/users/sessions/route').GET;
@@ -46,11 +60,11 @@ describe('/api/users/sessions', () => {
 
     // Re-mock after reset
     vi.doMock('next-auth', () => ({
-      getServerSession: (...args: unknown[]) => mockGetServerSession(...args),
+      getServerSession: vi.fn().mockImplementation((...args: unknown[]) => mockGetServerSession(...(args as Parameters<typeof mockGetServerSession>))),
     }));
 
     vi.doMock('next-auth/jwt', () => ({
-      getToken: (...args: unknown[]) => mockGetToken(...args),
+      getToken: vi.fn().mockImplementation((...args: unknown[]) => mockGetToken(...(args as Parameters<typeof mockGetToken>))),
     }));
 
     vi.doMock('@/lib/auth/config', () => ({
@@ -92,7 +106,7 @@ describe('/api/users/sessions', () => {
       mockGetServerSession.mockResolvedValue({
         user: { email: 'test@example.com' },
       });
-      mockGetToken.mockResolvedValue({ jti: 'current-session-id' });
+      mockGetToken.mockResolvedValue(createMockJWT('current-session-id'));
       mockGetUserSessions.mockResolvedValue([
         {
           _id: 'session-1',
@@ -138,7 +152,7 @@ describe('/api/users/sessions', () => {
       mockGetServerSession.mockResolvedValue({
         user: { email: 'test@example.com' },
       });
-      mockGetToken.mockResolvedValue({ jti: 'current-session-id' });
+      mockGetToken.mockResolvedValue(createMockJWT('current-session-id'));
       mockGetUserSessions.mockResolvedValue([]);
 
       const request = new NextRequest('http://localhost:3000/api/users/sessions', {
@@ -174,7 +188,7 @@ describe('/api/users/sessions', () => {
       mockGetServerSession.mockResolvedValue({
         user: { email: 'test@example.com' },
       });
-      mockGetToken.mockResolvedValue({ jti: 'current-session-id' });
+      mockGetToken.mockResolvedValue(createMockJWT('current-session-id'));
       mockRevokeOtherSessions.mockResolvedValue(3);
 
       const request = new NextRequest('http://localhost:3000/api/users/sessions', {
@@ -197,7 +211,7 @@ describe('/api/users/sessions', () => {
       mockGetServerSession.mockResolvedValue({
         user: { email: 'test@example.com' },
       });
-      mockGetToken.mockResolvedValue({ jti: 'current-session-id' });
+      mockGetToken.mockResolvedValue(createMockJWT('current-session-id'));
       mockRevokeOtherSessions.mockResolvedValue(0);
 
       const request = new NextRequest('http://localhost:3000/api/users/sessions', {

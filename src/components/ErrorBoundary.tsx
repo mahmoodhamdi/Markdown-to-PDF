@@ -51,7 +51,8 @@ export class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoun
           <AlertTriangle className="h-16 w-16 text-destructive mb-4" />
           <h2 className="text-2xl font-bold mb-2">Something went wrong</h2>
           <p className="text-muted-foreground mb-6 max-w-md">
-            An unexpected error occurred. You can try refreshing the page or resetting the component.
+            An unexpected error occurred. You can try refreshing the page or resetting the
+            component.
           </p>
           {this.state.error && (
             <details className="mb-6 text-left w-full max-w-md">

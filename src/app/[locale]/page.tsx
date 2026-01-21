@@ -18,7 +18,15 @@ import { cn } from '@/lib/utils';
 export default function HomePage() {
   const t = useTranslations('editor');
   const tPreview = useTranslations('preview');
-  const { viewMode, content, setContent, showToc, isFullscreen, setIsFullscreen, toggleFullscreen } = useEditorStore();
+  const {
+    viewMode,
+    content,
+    setContent,
+    showToc,
+    isFullscreen,
+    setIsFullscreen,
+    toggleFullscreen,
+  } = useEditorStore();
   const [isMobile, setIsMobile] = useState(false);
   const hasInitialized = useRef(false);
 
@@ -53,17 +61,20 @@ export default function HomePage() {
   }, [isFullscreen]);
 
   // Handle keyboard shortcuts (ESC to exit, F11 to toggle)
-  const handleKeyDown = useCallback((e: KeyboardEvent) => {
-    // F11 to toggle fullscreen
-    if (e.key === 'F11') {
-      e.preventDefault();
-      toggleFullscreen();
-    }
-    // Escape to exit fullscreen
-    if (e.key === 'Escape' && isFullscreen) {
-      setIsFullscreen(false);
-    }
-  }, [isFullscreen, setIsFullscreen, toggleFullscreen]);
+  const handleKeyDown = useCallback(
+    (e: KeyboardEvent) => {
+      // F11 to toggle fullscreen
+      if (e.key === 'F11') {
+        e.preventDefault();
+        toggleFullscreen();
+      }
+      // Escape to exit fullscreen
+      if (e.key === 'Escape' && isFullscreen) {
+        setIsFullscreen(false);
+      }
+    },
+    [isFullscreen, setIsFullscreen, toggleFullscreen]
+  );
 
   useEffect(() => {
     window.addEventListener('keydown', handleKeyDown);
@@ -96,7 +107,10 @@ export default function HomePage() {
             </div>
           </TabsContent>
 
-          <TabsContent value="preview" className="flex-1 m-0 data-[state=inactive]:hidden overflow-auto flex flex-col">
+          <TabsContent
+            value="preview"
+            className="flex-1 m-0 data-[state=inactive]:hidden overflow-auto flex flex-col"
+          >
             {showToc && (
               <div className="border-b">
                 <TableOfContents className="max-h-48 overflow-y-auto" />
@@ -116,9 +130,7 @@ export default function HomePage() {
     <div
       className={cn(
         'flex flex-col',
-        isFullscreen
-          ? 'fixed inset-0 z-50 bg-background'
-          : 'h-[calc(100vh-3.5rem-4rem)]'
+        isFullscreen ? 'fixed inset-0 z-50 bg-background' : 'h-[calc(100vh-3.5rem-4rem)]'
       )}
     >
       {/* Exit fullscreen overlay button */}

@@ -59,5 +59,4 @@ UserSchema.index({ plan: 1, createdAt: -1 }); // For admin queries by plan
 UserSchema.index({ stripeCustomerId: 1 }, { sparse: true }); // For webhook lookups
 
 // Prevent model recompilation in development
-export const User: Model<IUser> =
-  mongoose.models.User || mongoose.model<IUser>('User', UserSchema);
+export const User: Model<IUser> = mongoose.models.User || mongoose.model<IUser>('User', UserSchema);

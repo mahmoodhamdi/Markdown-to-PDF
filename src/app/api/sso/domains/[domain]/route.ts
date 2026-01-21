@@ -20,10 +20,7 @@ export async function GET(
     // Check authentication
     const session = await getServerSession(authOptions);
     if (!session?.user?.id) {
-      return NextResponse.json(
-        { error: 'Authentication required' },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
     }
 
     // Only enterprise users can access SSO
@@ -49,10 +46,7 @@ export async function GET(
     const mapping = await getDomainMapping(domain);
 
     if (!mapping) {
-      return NextResponse.json(
-        { error: 'Domain mapping not found' },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: 'Domain mapping not found' }, { status: 404 });
     }
 
     return NextResponse.json({
@@ -61,10 +55,7 @@ export async function GET(
     });
   } catch (error) {
     console.error('SSO domain GET error:', error);
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
 
@@ -78,10 +69,7 @@ export async function DELETE(
     // Check authentication
     const session = await getServerSession(authOptions);
     if (!session?.user?.id) {
-      return NextResponse.json(
-        { error: 'Authentication required' },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
     }
 
     // Only enterprise users can configure SSO
@@ -107,10 +95,7 @@ export async function DELETE(
     const deleted = await deleteDomainMapping(domain);
 
     if (!deleted) {
-      return NextResponse.json(
-        { error: 'Domain mapping not found' },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: 'Domain mapping not found' }, { status: 404 });
     }
 
     return NextResponse.json({
@@ -119,9 +104,6 @@ export async function DELETE(
     });
   } catch (error) {
     console.error('SSO domain DELETE error:', error);
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

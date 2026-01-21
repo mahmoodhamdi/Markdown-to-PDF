@@ -146,9 +146,7 @@ export const authOptions: NextAuthOptions = {
         const email = credentials.email.toLowerCase();
         // Get IP from request headers (works with most proxies)
         const forwardedFor = req?.headers?.['x-forwarded-for'];
-        const ip = typeof forwardedFor === 'string'
-          ? forwardedFor.split(',')[0].trim()
-          : 'unknown';
+        const ip = typeof forwardedFor === 'string' ? forwardedFor.split(',')[0].trim() : 'unknown';
 
         try {
           await connectDB();
@@ -156,7 +154,9 @@ export const authOptions: NextAuthOptions = {
           // Check if login is blocked due to too many attempts
           const blockStatus = await checkLoginBlocked(email, ip);
           if (blockStatus.blocked) {
-            throw new Error(blockStatus.reason || 'Too many login attempts. Please try again later.');
+            throw new Error(
+              blockStatus.reason || 'Too many login attempts. Please try again later.'
+            );
           }
 
           // Find user by email
@@ -173,10 +173,7 @@ export const authOptions: NextAuthOptions = {
             throw new Error('This account uses social login. Please sign in with your provider.');
           }
 
-          const isValid = await bcrypt.compare(
-            credentials.password,
-            user.password
-          );
+          const isValid = await bcrypt.compare(credentials.password, user.password);
 
           if (!isValid) {
             // Record failed attempt

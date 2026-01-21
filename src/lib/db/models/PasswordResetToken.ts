@@ -86,9 +86,7 @@ export async function createPasswordResetToken(
  * @param token The plain text token from the email link
  * @returns The token document if valid, null otherwise
  */
-export async function verifyPasswordResetToken(
-  token: string
-): Promise<IPasswordResetToken | null> {
+export async function verifyPasswordResetToken(token: string): Promise<IPasswordResetToken | null> {
   const hashedToken = hashToken(token);
 
   const doc = await PasswordResetToken.findOne({

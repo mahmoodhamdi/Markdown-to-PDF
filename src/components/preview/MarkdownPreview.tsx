@@ -66,11 +66,14 @@ export function MarkdownPreview({ className, content: propContent }: MarkdownPre
         });
         mermaidElements.forEach((el, index) => {
           el.setAttribute('data-processed', 'true');
-          mermaid.default.render(`mermaid-${index}`, el.textContent || '').then((result) => {
-            el.innerHTML = result.svg;
-          }).catch((e) => {
-            console.error('Mermaid error:', e);
-          });
+          mermaid.default
+            .render(`mermaid-${index}`, el.textContent || '')
+            .then((result) => {
+              el.innerHTML = result.svg;
+            })
+            .catch((e) => {
+              console.error('Mermaid error:', e);
+            });
         });
       });
     }
@@ -79,10 +82,7 @@ export function MarkdownPreview({ className, content: propContent }: MarkdownPre
   if (!content.trim()) {
     return (
       <div
-        className={cn(
-          'flex items-center justify-center h-full text-muted-foreground',
-          className
-        )}
+        className={cn('flex items-center justify-center h-full text-muted-foreground', className)}
       >
         {t('emptyState')}
       </div>

@@ -1,0 +1,76 @@
+
+> markdown-to-pdf@1.0.0 test:integration
+> vitest run --config vitest.integration.config.ts
+
+[33mThe CJS build of Vite's Node API is deprecated. See https://vite.dev/guide/troubleshooting.html#vite-cjs-node-api-deprecated for more details.[39m
+
+ RUN  v2.1.9 /media/alash/New Volume/Markdown-to-PDF
+
+ ✓ __tests__/integration/api/users-verify-email-change.test.ts (6 tests) 131ms
+ ✓ __tests__/integration/api/webhook-paymob.test.ts (6 tests) 21ms
+ ✓ __tests__/integration/api/webhook-paddle.test.ts (16 tests) 48ms
+ ✓ __tests__/integration/api/themes.test.ts (6 tests) 10ms
+stderr | __tests__/integration/api/checkout.test.ts > /api/checkout > POST /api/checkout > should return 503 when price not configured error occurs
+Checkout session error: Error: Price not configured for plan
+    at /media/alash/New Volume/Markdown-to-PDF/__tests__/integration/api/checkout.test.ts:376:58
+    at file:///media/alash/New%20Volume/Markdown-to-PDF/node_modules/@vitest/runner/dist/index.js:146:14
+    at file:///media/alash/New%20Volume/Markdown-to-PDF/node_modules/@vitest/runner/dist/index.js:533:11
+    at runWithTimeout (file:///media/alash/New%20Volume/Markdown-to-PDF/node_modules/@vitest/runner/dist/index.js:39:7)
+    at runTest (file:///media/alash/New%20Volume/Markdown-to-PDF/node_modules/@vitest/runner/dist/index.js:1056:17)
+    at processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at runSuite (file:///media/alash/New%20Volume/Markdown-to-PDF/node_modules/@vitest/runner/dist/index.js:1205:15)
+    at runSuite (file:///media/alash/New%20Volume/Markdown-to-PDF/node_modules/@vitest/runner/dist/index.js:1205:15)
+    at runSuite (file:///media/alash/New%20Volume/Markdown-to-PDF/node_modules/@vitest/runner/dist/index.js:1205:15)
+    at runFiles (file:///media/alash/New%20Volume/Markdown-to-PDF/node_modules/@vitest/runner/dist/index.js:1262:5)
+
+stderr | __tests__/integration/api/checkout.test.ts > /api/checkout > POST /api/checkout > should return 503 when gateway not configured error occurs
+Checkout session error: Error: Paddle is not configured
+    at /media/alash/New Volume/Markdown-to-PDF/__tests__/integration/api/checkout.test.ts:400:58
+    at file:///media/alash/New%20Volume/Markdown-to-PDF/node_modules/@vitest/runner/dist/index.js:146:14
+    at file:///media/alash/New%20Volume/Markdown-to-PDF/node_modules/@vitest/runner/dist/index.js:533:11
+    at runWithTimeout (file:///media/alash/New%20Volume/Markdown-to-PDF/node_modules/@vitest/runner/dist/index.js:39:7)
+    at runTest (file:///media/alash/New%20Volume/Markdown-to-PDF/node_modules/@vitest/runner/dist/index.js:1056:17)
+    at processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at runSuite (file:///media/alash/New%20Volume/Markdown-to-PDF/node_modules/@vitest/runner/dist/index.js:1205:15)
+    at runSuite (file:///media/alash/New%20Volume/Markdown-to-PDF/node_modules/@vitest/runner/dist/index.js:1205:15)
+    at runSuite (file:///media/alash/New%20Volume/Markdown-to-PDF/node_modules/@vitest/runner/dist/index.js:1205:15)
+    at runFiles (file:///media/alash/New%20Volume/Markdown-to-PDF/node_modules/@vitest/runner/dist/index.js:1262:5)
+
+stderr | __tests__/integration/api/checkout.test.ts > /api/checkout > POST /api/checkout > should return 500 for unexpected errors
+Checkout session error: Error: Unexpected error
+    at /media/alash/New Volume/Markdown-to-PDF/__tests__/integration/api/checkout.test.ts:424:58
+    at file:///media/alash/New%20Volume/Markdown-to-PDF/node_modules/@vitest/runner/dist/index.js:146:14
+    at file:///media/alash/New%20Volume/Markdown-to-PDF/node_modules/@vitest/runner/dist/index.js:533:11
+    at runWithTimeout (file:///media/alash/New%20Volume/Markdown-to-PDF/node_modules/@vitest/runner/dist/index.js:39:7)
+    at runTest (file:///media/alash/New%20Volume/Markdown-to-PDF/node_modules/@vitest/runner/dist/index.js:1056:17)
+    at processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at runSuite (file:///media/alash/New%20Volume/Markdown-to-PDF/node_modules/@vitest/runner/dist/index.js:1205:15)
+    at runSuite (file:///media/alash/New%20Volume/Markdown-to-PDF/node_modules/@vitest/runner/dist/index.js:1205:15)
+    at runSuite (file:///media/alash/New%20Volume/Markdown-to-PDF/node_modules/@vitest/runner/dist/index.js:1205:15)
+    at runFiles (file:///media/alash/New%20Volume/Markdown-to-PDF/node_modules/@vitest/runner/dist/index.js:1262:5)
+
+ ✓ __tests__/integration/api/checkout.test.ts (25 tests) 72ms
+ ✓ __tests__/integration/api/users-change-email.test.ts (9 tests) 87ms
+ ✓ __tests__/integration/api/health.test.ts (3 tests) 9ms
+ ✓ __tests__/integration/api/templates.test.ts (20 tests) 50ms
+ ✓ __tests__/integration/api/users-profile.test.ts (14 tests) 135ms
+ ✓ __tests__/integration/api/auth-verify-email.test.ts (5 tests) 257ms
+ ✓ __tests__/integration/api/users-sessions.test.ts (6 tests) 220ms
+ ✓ __tests__/integration/api/auth-register.test.ts (5 tests) 24ms
+ ✓ __tests__/integration/api/users-change-password.test.ts (7 tests) 194ms
+ ✓ __tests__/integration/api/auth-password-reset.test.ts (10 tests) 195ms
+ ✓ __tests__/integration/api/teams.test.ts (18 tests) 301ms
+ ✓ __tests__/integration/api/storage.test.ts (21 tests) 365ms
+ ✓ __tests__/integration/api/analytics.test.ts (12 tests) 322ms
+ ✓ __tests__/integration/api/webhook-stripe.test.ts (10 tests) 327ms
+ ✓ __tests__/integration/api/subscriptions.test.ts (10 tests) 329ms
+ ✓ __tests__/integration/api/sso.test.ts (31 tests | 18 skipped) 364ms
+ ✓ __tests__/integration/api/convert.test.ts (11 tests) 45ms
+ ✓ __tests__/integration/api/webhook-paytabs.test.ts (9 tests) 22ms
+ ✓ __tests__/integration/api/preview.test.ts (7 tests) 62ms
+
+ Test Files  23 passed (23)
+      Tests  249 passed | 18 skipped (267)
+   Start at  00:34:09
+   Duration  3.18s (transform 3.45s, setup 2.87s, collect 5.58s, tests 3.59s, environment 16.49s, prepare 3.02s)
+

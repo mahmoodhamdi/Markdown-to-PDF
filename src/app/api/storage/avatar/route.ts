@@ -24,10 +24,7 @@ export async function POST(request: NextRequest) {
     // Check authentication
     const session = await getServerSession(authOptions);
     if (!session?.user?.id) {
-      return NextResponse.json(
-        { error: 'Authentication required' },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
     }
 
     const userId = session.user.id;
@@ -46,10 +43,7 @@ export async function POST(request: NextRequest) {
     const file = formData.get('file') as File | null;
 
     if (!file) {
-      return NextResponse.json(
-        { error: 'No file provided' },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'No file provided' }, { status: 400 });
     }
 
     // Validate MIME type
@@ -62,10 +56,7 @@ export async function POST(request: NextRequest) {
 
     // Validate file size
     if (file.size > MAX_FILE_SIZE) {
-      return NextResponse.json(
-        { error: 'File too large. Maximum size is 2MB.' },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'File too large. Maximum size is 2MB.' }, { status: 400 });
     }
 
     // Convert file to buffer
@@ -73,27 +64,29 @@ export async function POST(request: NextRequest) {
     const buffer = Buffer.from(arrayBuffer);
 
     // Upload to Cloudinary with transformations (resize to 256x256)
-    const uploadResult = await new Promise<{ secure_url: string; public_id: string }>((resolve, reject) => {
-      const uploadStream = cloudinary.uploader.upload_stream(
-        {
-          folder: `md2pdf/avatars`,
-          public_id: `user_${userId}_${Date.now()}`,
-          resource_type: 'image',
-          transformation: [
-            { width: 256, height: 256, crop: 'fill', gravity: 'face' },
-            { quality: 'auto:good' },
-            { format: 'webp' },
-          ],
-          overwrite: true,
-        },
-        (error, result) => {
-          if (error) reject(error);
-          else if (result) resolve(result);
-          else reject(new Error('Upload failed'));
-        }
-      );
-      uploadStream.end(buffer);
-    });
+    const uploadResult = await new Promise<{ secure_url: string; public_id: string }>(
+      (resolve, reject) => {
+        const uploadStream = cloudinary.uploader.upload_stream(
+          {
+            folder: `md2pdf/avatars`,
+            public_id: `user_${userId}_${Date.now()}`,
+            resource_type: 'image',
+            transformation: [
+              { width: 256, height: 256, crop: 'fill', gravity: 'face' },
+              { quality: 'auto:good' },
+              { format: 'webp' },
+            ],
+            overwrite: true,
+          },
+          (error, result) => {
+            if (error) reject(error);
+            else if (result) resolve(result);
+            else reject(new Error('Upload failed'));
+          }
+        );
+        uploadStream.end(buffer);
+      }
+    );
 
     return NextResponse.json({
       success: true,
@@ -102,9 +95,6 @@ export async function POST(request: NextRequest) {
     });
   } catch (error) {
     console.error('Avatar upload error:', error);
-    return NextResponse.json(
-      { error: 'Failed to upload avatar' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Failed to upload avatar' }, { status: 500 });
   }
 }

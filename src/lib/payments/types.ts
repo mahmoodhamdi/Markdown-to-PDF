@@ -201,14 +201,22 @@ export interface PaymentGateway {
 
   // Customer management
   getCustomer(customerId: string): Promise<Customer | null>;
-  createCustomer(email: string, name?: string, metadata?: Record<string, string>): Promise<Customer>;
+  createCustomer(
+    email: string,
+    name?: string,
+    metadata?: Record<string, string>
+  ): Promise<Customer>;
 
   // Optional: Resume/pause subscription (not all gateways support this)
   pauseSubscription?(subscriptionId: string): Promise<void>;
   resumeSubscription?(subscriptionId: string): Promise<void>;
 
   // Optional: Update subscription plan
-  updateSubscription?(subscriptionId: string, plan: Exclude<PlanType, 'free'>, billing: BillingPeriod): Promise<Subscription>;
+  updateSubscription?(
+    subscriptionId: string,
+    plan: Exclude<PlanType, 'free'>,
+    billing: BillingPeriod
+  ): Promise<Subscription>;
 
   // Optional: Get portal/management URL
   getCustomerPortalUrl?(customerId: string, returnUrl: string): Promise<string>;

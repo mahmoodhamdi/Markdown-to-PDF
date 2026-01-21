@@ -108,7 +108,12 @@ export function CreateTeamDialog({ open, onOpenChange, onTeamCreated }: CreateTe
           </div>
 
           <DialogFooter>
-            <Button type="button" variant="outline" onClick={() => handleOpenChange(false)} disabled={loading}>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => handleOpenChange(false)}
+              disabled={loading}
+            >
               {t('cancel')}
             </Button>
             <Button type="submit" disabled={loading || !teamName.trim()}>

@@ -159,19 +159,15 @@ export async function POST(request: NextRequest) {
         eventId,
         eventType: type,
       });
-      return NextResponse.json(
-        { error: 'Invalid signature' },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'Invalid signature' }, { status: 400 });
     }
 
     // Check idempotency - skip if already processed
-    const idempotencyResult = await checkAndMarkProcessing(
-      'paymob',
-      eventId,
-      type,
-      { transactionId: obj.id, success: obj.success, amount: obj.amount_cents }
-    );
+    const idempotencyResult = await checkAndMarkProcessing('paymob', eventId, type, {
+      transactionId: obj.id,
+      success: obj.success,
+      amount: obj.amount_cents,
+    });
 
     if (!idempotencyResult.isNew) {
       return NextResponse.json({ received: true, status: 'duplicate' });
@@ -201,36 +197,40 @@ export async function POST(request: NextRequest) {
           const plan = (orderData.plan as PlanType) || 'pro';
           const billing = (orderData.billing as 'monthly' | 'yearly') || 'monthly';
 
-          emailService.sendSubscriptionConfirmation(
-            { email: result.userEmail, name: user?.name || '' },
-            {
-              plan,
-              billing,
-              amount: payload.obj.amount_cents / 100,
-              currency: payload.obj.currency,
-              gateway: 'paymob',
-            }
-          ).catch((err) => {
-            webhookLog('error', 'Failed to send subscription confirmation email', {
-              gateway: 'paymob',
-              eventId,
-              eventType: type,
-              error: err instanceof Error ? err.message : 'Unknown error',
+          emailService
+            .sendSubscriptionConfirmation(
+              { email: result.userEmail, name: user?.name || '' },
+              {
+                plan,
+                billing,
+                amount: payload.obj.amount_cents / 100,
+                currency: payload.obj.currency,
+                gateway: 'paymob',
+              }
+            )
+            .catch((err) => {
+              webhookLog('error', 'Failed to send subscription confirmation email', {
+                gateway: 'paymob',
+                eventId,
+                eventType: type,
+                error: err instanceof Error ? err.message : 'Unknown error',
+              });
             });
-          });
         } else if (result.event === 'subscription.canceled' || result.status === 'canceled') {
           const plan = (user?.plan as PlanType) || 'pro';
-          emailService.sendSubscriptionCanceled(
-            { email: result.userEmail, name: user?.name || '' },
-            { plan, immediate: true }
-          ).catch((err) => {
-            webhookLog('error', 'Failed to send subscription canceled email', {
-              gateway: 'paymob',
-              eventId,
-              eventType: type,
-              error: err instanceof Error ? err.message : 'Unknown error',
+          emailService
+            .sendSubscriptionCanceled(
+              { email: result.userEmail, name: user?.name || '' },
+              { plan, immediate: true }
+            )
+            .catch((err) => {
+              webhookLog('error', 'Failed to send subscription canceled email', {
+                gateway: 'paymob',
+                eventId,
+                eventType: type,
+                error: err instanceof Error ? err.message : 'Unknown error',
+              });
             });
-          });
         }
       }
 
@@ -250,9 +250,6 @@ export async function POST(request: NextRequest) {
       eventType: 'unknown',
       error: error instanceof Error ? error.message : 'Unknown error',
     });
-    return NextResponse.json(
-      { error: 'Webhook handler failed' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Webhook handler failed' }, { status: 500 });
   }
 }

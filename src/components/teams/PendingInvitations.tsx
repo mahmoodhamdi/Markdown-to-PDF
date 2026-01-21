@@ -73,7 +73,11 @@ export function PendingInvitations({
       return { expired: true, text: t('expired') };
     }
     if (diffHours < 24) {
-      return { expired: false, text: t('expiresIn', { time: t('time.hours', { count: diffHours }) }), urgent: true };
+      return {
+        expired: false,
+        text: t('expiresIn', { time: t('time.hours', { count: diffHours }) }),
+        urgent: true,
+      };
     }
     return { expired: false, text: t('expiresIn', { time: t('time.days', { count: diffDays }) }) };
   };
@@ -165,7 +169,9 @@ export function PendingInvitations({
                       </Badge>
                     </div>
                     <div className="flex items-center gap-3 text-xs text-muted-foreground mt-1">
-                      <span>{t('invitedBy', { name: invitation.invitedByName || invitation.invitedBy })}</span>
+                      <span>
+                        {t('invitedBy', { name: invitation.invitedByName || invitation.invitedBy })}
+                      </span>
                       <span className="flex items-center gap-1">
                         <Clock className="h-3 w-3" />
                         {expStatus.text}
@@ -209,7 +215,9 @@ export function PendingInvitations({
               <>
                 <div className="flex items-center gap-2 pt-2">
                   <AlertTriangle className="h-4 w-4 text-yellow-500" />
-                  <span className="text-sm font-medium text-muted-foreground">{t('expiredInvitations')}</span>
+                  <span className="text-sm font-medium text-muted-foreground">
+                    {t('expiredInvitations')}
+                  </span>
                 </div>
                 {expiredInvitations.map((invitation) => (
                   <div

@@ -51,9 +51,7 @@ export function StorageQuotaCard({
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
-          <p className="text-sm text-muted-foreground">
-            {t('upgradeRequired')}
-          </p>
+          <p className="text-sm text-muted-foreground">{t('upgradeRequired')}</p>
           <Button asChild size="sm" className="w-full">
             <Link href="/pricing">
               <TrendingUp className="h-4 w-4 me-2" />
@@ -65,15 +63,14 @@ export function StorageQuotaCard({
     );
   }
 
-  const percentage = limit === Infinity || limit === 0
-    ? 0
-    : Math.min(Math.round((used / limit) * 100), 100);
+  const percentage =
+    limit === Infinity || limit === 0 ? 0 : Math.min(Math.round((used / limit) * 100), 100);
 
   const isNearLimit = percentage >= 80;
   const isAtLimit = percentage >= 95;
 
   const displayUsed = usedFormatted || formatBytes(used);
-  const displayLimit = limit === Infinity ? t('unlimited') : (limitFormatted || formatBytes(limit));
+  const displayLimit = limit === Infinity ? t('unlimited') : limitFormatted || formatBytes(limit);
 
   return (
     <Card className={isAtLimit ? 'border-destructive' : isNearLimit ? 'border-yellow-500' : ''}>
@@ -92,7 +89,9 @@ export function StorageQuotaCard({
           <span className="text-muted-foreground">
             {displayUsed} {t('of')} {displayLimit}
           </span>
-          <span className={`font-medium ${isAtLimit ? 'text-destructive' : isNearLimit ? 'text-yellow-600' : ''}`}>
+          <span
+            className={`font-medium ${isAtLimit ? 'text-destructive' : isNearLimit ? 'text-yellow-600' : ''}`}
+          >
             {percentage}%
           </span>
         </div>

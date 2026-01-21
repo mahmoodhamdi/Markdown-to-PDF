@@ -13,14 +13,8 @@ interface ShortcutHandler {
 }
 
 export function useKeyboardShortcuts() {
-  const {
-    wrapSelection,
-    insertAtCursor,
-    toggleFullscreen,
-    setViewMode,
-    viewMode,
-    toggleToc,
-  } = useEditorStore();
+  const { wrapSelection, insertAtCursor, toggleFullscreen, setViewMode, viewMode, toggleToc } =
+    useEditorStore();
 
   const handleKeyDown = useCallback(
     (event: KeyboardEvent) => {
@@ -141,7 +135,9 @@ export function useKeyboardShortcuts() {
       ];
 
       for (const shortcut of shortcuts) {
-        const ctrlMatch = shortcut.ctrl ? event.ctrlKey || event.metaKey : !event.ctrlKey && !event.metaKey;
+        const ctrlMatch = shortcut.ctrl
+          ? event.ctrlKey || event.metaKey
+          : !event.ctrlKey && !event.metaKey;
         const shiftMatch = shortcut.shift ? event.shiftKey : !event.shiftKey;
         const altMatch = shortcut.alt ? event.altKey : !event.altKey;
         const keyMatch = event.key.toLowerCase() === shortcut.key.toLowerCase();

@@ -68,7 +68,9 @@ export async function POST(request: NextRequest) {
 
         return NextResponse.json({
           success: true,
-          message: immediate ? 'Subscription canceled immediately' : 'Subscription will cancel at period end',
+          message: immediate
+            ? 'Subscription canceled immediately'
+            : 'Subscription will cancel at period end',
           cancelAtPeriodEnd: !immediate,
           currentPeriodEnd: regionalSub.currentPeriodEnd.toISOString(),
         });
@@ -104,7 +106,9 @@ export async function POST(request: NextRequest) {
 
         return NextResponse.json({
           success: true,
-          message: immediate ? 'Subscription canceled immediately' : 'Subscription will cancel at period end',
+          message: immediate
+            ? 'Subscription canceled immediately'
+            : 'Subscription will cancel at period end',
         });
       } catch (error) {
         console.error('Stripe subscription cancellation error:', error);
@@ -116,15 +120,9 @@ export async function POST(request: NextRequest) {
     }
 
     // No active subscription found
-    return NextResponse.json(
-      { error: 'No active subscription found' },
-      { status: 400 }
-    );
+    return NextResponse.json({ error: 'No active subscription found' }, { status: 400 });
   } catch (error) {
     console.error('Cancel subscription error:', error);
-    return NextResponse.json(
-      { error: 'Failed to cancel subscription' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Failed to cancel subscription' }, { status: 500 });
   }
 }

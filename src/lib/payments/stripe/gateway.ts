@@ -170,11 +170,7 @@ export const stripeGateway: PaymentGateway = {
 
     let event: Stripe.Event;
     try {
-      event = stripe.webhooks.constructEvent(
-        payload as string | Buffer,
-        signature,
-        webhookSecret
-      );
+      event = stripe.webhooks.constructEvent(payload as string | Buffer, signature, webhookSecret);
     } catch (err) {
       return {
         event: 'error',
@@ -225,7 +221,8 @@ export const stripeGateway: PaymentGateway = {
         result.customerId = invoice.customer as string;
         result.userEmail = invoice.customer_email || undefined;
         // payment_intent may be null or a string/PaymentIntent object
-        const paymentIntent = (invoice as unknown as { payment_intent?: string | { id: string } }).payment_intent;
+        const paymentIntent = (invoice as unknown as { payment_intent?: string | { id: string } })
+          .payment_intent;
         result.paymentId = typeof paymentIntent === 'string' ? paymentIntent : paymentIntent?.id;
         result.amount = invoice.amount_paid;
         result.currency = invoice.currency.toUpperCase() as WebhookResult['currency'];
@@ -237,7 +234,8 @@ export const stripeGateway: PaymentGateway = {
         const invoice = event.data.object as Stripe.Invoice;
         result.customerId = invoice.customer as string;
         result.userEmail = invoice.customer_email || undefined;
-        const paymentIntent = (invoice as unknown as { payment_intent?: string | { id: string } }).payment_intent;
+        const paymentIntent = (invoice as unknown as { payment_intent?: string | { id: string } })
+          .payment_intent;
         result.paymentId = typeof paymentIntent === 'string' ? paymentIntent : paymentIntent?.id;
         result.status = 'failed';
         break;
@@ -257,7 +255,9 @@ export const stripeGateway: PaymentGateway = {
     }
 
     try {
-      const subscription = await stripe.subscriptions.retrieve(subscriptionId) as unknown as StripeSubscriptionWithPeriods;
+      const subscription = (await stripe.subscriptions.retrieve(
+        subscriptionId
+      )) as unknown as StripeSubscriptionWithPeriods;
 
       return {
         id: subscription.id,
@@ -266,11 +266,14 @@ export const stripeGateway: PaymentGateway = {
         userEmail: subscription.metadata?.userEmail || '',
         plan: (subscription.metadata?.plan as AppSubscription['plan']) || 'free',
         status: mapSubscriptionStatus(subscription.status),
-        billing: subscription.items.data[0]?.price?.recurring?.interval === 'year' ? 'yearly' : 'monthly',
+        billing:
+          subscription.items.data[0]?.price?.recurring?.interval === 'year' ? 'yearly' : 'monthly',
         currentPeriodStart: new Date(subscription.current_period_start * 1000),
         currentPeriodEnd: new Date(subscription.current_period_end * 1000),
         cancelAtPeriodEnd: subscription.cancel_at_period_end,
-        canceledAt: subscription.canceled_at ? new Date(subscription.canceled_at * 1000) : undefined,
+        canceledAt: subscription.canceled_at
+          ? new Date(subscription.canceled_at * 1000)
+          : undefined,
         createdAt: new Date(subscription.created * 1000),
         metadata: subscription.metadata as Record<string, string>,
       };
@@ -319,7 +322,11 @@ export const stripeGateway: PaymentGateway = {
     }
   },
 
-  async createCustomer(email: string, name?: string, metadata?: Record<string, string>): Promise<Customer> {
+  async createCustomer(
+    email: string,
+    name?: string,
+    metadata?: Record<string, string>
+  ): Promise<Customer> {
     if (!stripe) {
       throw new Error('Stripe is not configured');
     }
@@ -362,7 +369,11 @@ export const stripeGateway: PaymentGateway = {
     });
   },
 
-  async updateSubscription(subscriptionId: string, plan: 'pro' | 'team' | 'enterprise', billing: 'monthly' | 'yearly'): Promise<AppSubscription> {
+  async updateSubscription(
+    subscriptionId: string,
+    plan: 'pro' | 'team' | 'enterprise',
+    billing: 'monthly' | 'yearly'
+  ): Promise<AppSubscription> {
     if (!stripe) {
       throw new Error('Stripe is not configured');
     }
@@ -372,8 +383,10 @@ export const stripeGateway: PaymentGateway = {
       throw new Error(`Price not configured for ${plan} ${billing}`);
     }
 
-    const subscription = await stripe.subscriptions.retrieve(subscriptionId) as unknown as StripeSubscriptionWithPeriods;
-    const updatedSubscription = await stripe.subscriptions.update(subscriptionId, {
+    const subscription = (await stripe.subscriptions.retrieve(
+      subscriptionId
+    )) as unknown as StripeSubscriptionWithPeriods;
+    const updatedSubscription = (await stripe.subscriptions.update(subscriptionId, {
       items: [
         {
           id: subscription.items.data[0].id,
@@ -385,7 +398,7 @@ export const stripeGateway: PaymentGateway = {
         plan,
       },
       proration_behavior: 'create_prorations',
-    }) as unknown as StripeSubscriptionWithPeriods;
+    })) as unknown as StripeSubscriptionWithPeriods;
 
     return {
       id: updatedSubscription.id,
@@ -398,7 +411,9 @@ export const stripeGateway: PaymentGateway = {
       currentPeriodStart: new Date(updatedSubscription.current_period_start * 1000),
       currentPeriodEnd: new Date(updatedSubscription.current_period_end * 1000),
       cancelAtPeriodEnd: updatedSubscription.cancel_at_period_end,
-      canceledAt: updatedSubscription.canceled_at ? new Date(updatedSubscription.canceled_at * 1000) : undefined,
+      canceledAt: updatedSubscription.canceled_at
+        ? new Date(updatedSubscription.canceled_at * 1000)
+        : undefined,
       createdAt: new Date(updatedSubscription.created * 1000),
       metadata: updatedSubscription.metadata as Record<string, string>,
     };

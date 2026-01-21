@@ -12,15 +12,8 @@ import {
   Customer,
   SubscriptionStatus,
 } from '../types';
-import {
-  isPaddleConfigured,
-  getPaddlePriceId,
-  PADDLE_CONFIG,
-} from './config';
-import {
-  paddleClient,
-  PaddleSubscription,
-} from './client';
+import { isPaddleConfigured, getPaddlePriceId, PADDLE_CONFIG } from './config';
+import { paddleClient, PaddleSubscription } from './client';
 import { connectDB } from '@/lib/db/mongodb';
 import { User } from '@/lib/db/models/User';
 
@@ -37,10 +30,7 @@ function mapSubscriptionStatus(status: string): SubscriptionStatus {
 }
 
 // Convert Paddle subscription to our Subscription type
-function convertSubscription(
-  paddleSub: PaddleSubscription,
-  userEmail?: string
-): Subscription {
+function convertSubscription(paddleSub: PaddleSubscription, userEmail?: string): Subscription {
   return {
     id: paddleSub.id,
     gateway: 'paddle',
@@ -368,7 +358,11 @@ export const paddleGateway: PaymentGateway = {
     };
   },
 
-  async createCustomer(email: string, name?: string, metadata?: Record<string, string>): Promise<Customer> {
+  async createCustomer(
+    email: string,
+    name?: string,
+    metadata?: Record<string, string>
+  ): Promise<Customer> {
     if (!isPaddleConfigured()) {
       throw new Error('Paddle is not configured');
     }
@@ -405,7 +399,11 @@ export const paddleGateway: PaymentGateway = {
     await paddleClient.resumeSubscription(subscriptionId);
   },
 
-  async updateSubscription(subscriptionId: string, plan: 'pro' | 'team' | 'enterprise', billing: 'monthly' | 'yearly'): Promise<Subscription> {
+  async updateSubscription(
+    subscriptionId: string,
+    plan: 'pro' | 'team' | 'enterprise',
+    billing: 'monthly' | 'yearly'
+  ): Promise<Subscription> {
     if (!isPaddleConfigured()) {
       throw new Error('Paddle is not configured');
     }

@@ -5,12 +5,7 @@ import { cn } from '@/lib/utils';
  * Displays an animated placeholder while content is loading.
  */
 function Skeleton({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) {
-  return (
-    <div
-      className={cn('animate-pulse rounded-md bg-muted', className)}
-      {...props}
-    />
-  );
+  return <div className={cn('animate-pulse rounded-md bg-muted', className)} {...props} />;
 }
 
 /**
@@ -33,10 +28,7 @@ function TextSkeleton({ lines = 3, className }: { lines?: number; className?: st
   return (
     <div className={cn('space-y-2', className)}>
       {Array.from({ length: lines }).map((_, i) => (
-        <Skeleton
-          key={i}
-          className={cn('h-4', i === lines - 1 ? 'w-2/3' : 'w-full')}
-        />
+        <Skeleton key={i} className={cn('h-4', i === lines - 1 ? 'w-2/3' : 'w-full')} />
       ))}
     </div>
   );
@@ -65,11 +57,7 @@ function EditorSkeleton({ className }: { className?: string }) {
   return (
     <div className={cn('h-full p-4 space-y-2', className)}>
       {Array.from({ length: 15 }).map((_, i) => (
-        <Skeleton
-          key={i}
-          className="h-5"
-          style={{ width: `${Math.random() * 40 + 60}%` }}
-        />
+        <Skeleton key={i} className="h-5" style={{ width: `${Math.random() * 40 + 60}%` }} />
       ))}
     </div>
   );

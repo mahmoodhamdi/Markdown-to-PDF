@@ -18,14 +18,8 @@ import { cn } from '@/lib/utils';
 
 export default function ThemesPage() {
   const t = useTranslations('themes');
-  const {
-    documentTheme,
-    setDocumentTheme,
-    codeTheme,
-    setCodeTheme,
-    customCss,
-    setCustomCss,
-  } = useThemeStore();
+  const { documentTheme, setDocumentTheme, codeTheme, setCodeTheme, customCss, setCustomCss } =
+    useThemeStore();
 
   const themes = getAllThemes();
   const codeThemeIds = Object.keys(codeThemes) as CodeTheme[];
@@ -56,13 +50,9 @@ export default function ThemesPage() {
                     <Palette className="h-5 w-5" />
                     {t(`builtIn.${theme.id}`)}
                   </span>
-                  {documentTheme === theme.id && (
-                    <Check className="h-5 w-5 text-primary" />
-                  )}
+                  {documentTheme === theme.id && <Check className="h-5 w-5 text-primary" />}
                 </CardTitle>
-                <CardDescription>
-                  {t(`builtIn.${theme.id}Desc`)}
-                </CardDescription>
+                <CardDescription>{t(`builtIn.${theme.id}Desc`)}</CardDescription>
               </CardHeader>
               <CardContent>
                 <div
@@ -84,10 +74,7 @@ export default function ThemesPage() {
       <div className="mb-12">
         <h2 className="text-xl font-semibold mb-4">{t('codeThemes.title')}</h2>
         <div className="max-w-md">
-          <Select
-            value={codeTheme}
-            onValueChange={(value) => setCodeTheme(value as CodeTheme)}
-          >
+          <Select value={codeTheme} onValueChange={(value) => setCodeTheme(value as CodeTheme)}>
             <SelectTrigger>
               <SelectValue />
             </SelectTrigger>
@@ -98,7 +85,10 @@ export default function ThemesPage() {
                 return (
                   <SelectItem key={id} value={id}>
                     {t(`codeThemes.${translationKey}` as 'codeThemes.title') ||
-                      id.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')}
+                      id
+                        .split('-')
+                        .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+                        .join(' ')}
                   </SelectItem>
                 );
               })}

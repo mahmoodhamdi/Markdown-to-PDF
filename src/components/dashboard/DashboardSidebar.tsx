@@ -74,9 +74,7 @@ export function DashboardSidebar() {
                 <Icon className="h-5 w-5" />
                 {t(item.labelKey)}
               </Link>
-              {item.dividerAfter && (
-                <div className="my-3 border-t" />
-              )}
+              {item.dividerAfter && <div className="my-3 border-t" />}
             </div>
           );
         })}

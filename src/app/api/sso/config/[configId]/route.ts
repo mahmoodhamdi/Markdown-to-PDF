@@ -38,10 +38,7 @@ export async function GET(
     // Check authentication
     const session = await getServerSession(authOptions);
     if (!session?.user?.id) {
-      return NextResponse.json(
-        { error: 'Authentication required' },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
     }
 
     // Only enterprise users can access SSO
@@ -67,10 +64,7 @@ export async function GET(
     const config = await getSSOConfig(configId);
 
     if (!config) {
-      return NextResponse.json(
-        { error: 'SSO configuration not found' },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: 'SSO configuration not found' }, { status: 404 });
     }
 
     return NextResponse.json({
@@ -79,10 +73,7 @@ export async function GET(
     });
   } catch (error) {
     console.error('SSO config GET error:', error);
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
 
@@ -96,10 +87,7 @@ export async function PATCH(
     // Check authentication
     const session = await getServerSession(authOptions);
     if (!session?.user?.id) {
-      return NextResponse.json(
-        { error: 'Authentication required' },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
     }
 
     // Only enterprise users can configure SSO
@@ -135,10 +123,7 @@ export async function PATCH(
     // Check if config exists
     const existingConfig = await getSSOConfig(configId);
     if (!existingConfig) {
-      return NextResponse.json(
-        { error: 'SSO configuration not found' },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: 'SSO configuration not found' }, { status: 404 });
     }
 
     // Handle status change specially
@@ -151,15 +136,17 @@ export async function PATCH(
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { status, ...updateData } = validation.data;
       // Cast config to the expected type since it's validated by the schema
-      const typedUpdateData = updateData as Partial<Pick<SSOConfiguration, 'config' | 'enforceSSO' | 'allowBypass' | 'jitProvisioning' | 'defaultRole'>>;
+      const typedUpdateData = updateData as Partial<
+        Pick<
+          SSOConfiguration,
+          'config' | 'enforceSSO' | 'allowBypass' | 'jitProvisioning' | 'defaultRole'
+        >
+      >;
       updatedConfig = await updateSSOConfig(configId, typedUpdateData);
     }
 
     if (!updatedConfig) {
-      return NextResponse.json(
-        { error: 'Failed to update SSO configuration' },
-        { status: 500 }
-      );
+      return NextResponse.json({ error: 'Failed to update SSO configuration' }, { status: 500 });
     }
 
     return NextResponse.json({
@@ -169,10 +156,7 @@ export async function PATCH(
     });
   } catch (error) {
     console.error('SSO config PATCH error:', error);
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
 
@@ -186,10 +170,7 @@ export async function DELETE(
     // Check authentication
     const session = await getServerSession(authOptions);
     if (!session?.user?.id) {
-      return NextResponse.json(
-        { error: 'Authentication required' },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
     }
 
     // Only enterprise users can configure SSO
@@ -214,20 +195,14 @@ export async function DELETE(
     // Check if config exists
     const existingConfig = await getSSOConfig(configId);
     if (!existingConfig) {
-      return NextResponse.json(
-        { error: 'SSO configuration not found' },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: 'SSO configuration not found' }, { status: 404 });
     }
 
     // Delete SSO configuration
     const deleted = await deleteSSOConfig(configId);
 
     if (!deleted) {
-      return NextResponse.json(
-        { error: 'Failed to delete SSO configuration' },
-        { status: 500 }
-      );
+      return NextResponse.json({ error: 'Failed to delete SSO configuration' }, { status: 500 });
     }
 
     return NextResponse.json({
@@ -236,9 +211,6 @@ export async function DELETE(
     });
   } catch (error) {
     console.error('SSO config DELETE error:', error);
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

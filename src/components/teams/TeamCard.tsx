@@ -107,9 +107,7 @@ export function TeamCard({ team, currentUserId: _currentUserId }: TeamCardProps)
                 {getRoleIcon(team.role)}
                 {t(`role.${team.role}`)}
               </Badge>
-              <Badge className={cn('shrink-0', getPlanBadgeClass(team.plan))}>
-                {team.plan}
-              </Badge>
+              <Badge className={cn('shrink-0', getPlanBadgeClass(team.plan))}>{team.plan}</Badge>
             </div>
 
             <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
@@ -130,7 +128,9 @@ export function TeamCard({ team, currentUserId: _currentUserId }: TeamCardProps)
               {team.lastActivity && (
                 <div className="flex items-center gap-1.5">
                   <Clock className="h-4 w-4" />
-                  <span>{t('lastActive')} {formatRelativeTime(team.lastActivity)}</span>
+                  <span>
+                    {t('lastActive')} {formatRelativeTime(team.lastActivity)}
+                  </span>
                 </div>
               )}
             </div>

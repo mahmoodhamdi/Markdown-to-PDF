@@ -96,9 +96,7 @@ export async function createEmailChangeToken(
  * @param token The plain text token from the email link
  * @returns The token document if valid, null otherwise
  */
-export async function verifyEmailChangeToken(
-  token: string
-): Promise<IEmailChangeToken | null> {
+export async function verifyEmailChangeToken(token: string): Promise<IEmailChangeToken | null> {
   const hashedToken = hashEmailToken(token);
 
   const doc = await EmailChangeToken.findOne({

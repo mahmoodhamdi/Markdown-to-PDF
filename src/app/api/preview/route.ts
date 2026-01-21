@@ -52,7 +52,9 @@ export async function POST(request: NextRequest) {
     // Check if the requested theme is available for the user's plan
     if (body.theme && !planLimits.availableThemes.includes(body.theme)) {
       return NextResponse.json(
-        { error: `Theme "${body.theme}" is not available for your plan. Available themes: ${planLimits.availableThemes.join(', ')}` },
+        {
+          error: `Theme "${body.theme}" is not available for your plan. Available themes: ${planLimits.availableThemes.join(', ')}`,
+        },
         { status: 403, headers: rateLimitHeaders }
       );
     }

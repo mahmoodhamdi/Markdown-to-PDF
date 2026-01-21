@@ -45,7 +45,7 @@ interface PageOptions {
 const BLOCKED_RESOURCE_TYPES = ['image', 'media', 'font'] as const;
 // Allowed CDN domains for essential resources
 const ALLOWED_DOMAINS = [
-  'cdn.jsdelivr.net',    // KaTeX, Mermaid, highlight.js
+  'cdn.jsdelivr.net', // KaTeX, Mermaid, highlight.js
   'cdnjs.cloudflare.com',
   'unpkg.com',
 ];
@@ -221,9 +221,11 @@ class BrowserPool {
       }
 
       // Check if it's a blocked resource type from external URL
-      if (BLOCKED_RESOURCE_TYPES.includes(resourceType as (typeof BLOCKED_RESOURCE_TYPES)[number])) {
+      if (
+        BLOCKED_RESOURCE_TYPES.includes(resourceType as (typeof BLOCKED_RESOURCE_TYPES)[number])
+      ) {
         // Allow resources from known CDNs
-        const isAllowedDomain = ALLOWED_DOMAINS.some(domain => url.includes(domain));
+        const isAllowedDomain = ALLOWED_DOMAINS.some((domain) => url.includes(domain));
         if (!isAllowedDomain && url.startsWith('http')) {
           request.abort();
           return;

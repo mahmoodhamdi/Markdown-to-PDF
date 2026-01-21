@@ -14,10 +14,7 @@ export async function GET(request: NextRequest) {
     // Check authentication
     const session = await getServerSession(authOptions);
     if (!session?.user?.id) {
-      return NextResponse.json(
-        { error: 'Authentication required' },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
     }
 
     // Only enterprise users can access SSO audit logs
@@ -42,10 +39,7 @@ export async function GET(request: NextRequest) {
     // Get organization ID from query params
     const organizationId = request.nextUrl.searchParams.get('organizationId');
     if (!organizationId) {
-      return NextResponse.json(
-        { error: 'Organization ID required' },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'Organization ID required' }, { status: 400 });
     }
 
     // Parse pagination params
@@ -69,11 +63,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Get audit logs
-    const logs = await getSSOAuditLogs(
-      organizationId,
-      limit,
-      skip
-    );
+    const logs = await getSSOAuditLogs(organizationId, limit, skip);
 
     return NextResponse.json({
       success: true,
@@ -87,9 +77,6 @@ export async function GET(request: NextRequest) {
     });
   } catch (error) {
     console.error('SSO audit GET error:', error);
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

@@ -32,10 +32,7 @@ export async function GET(_request: NextRequest) {
     // Get session
     const session = await getServerSession(authOptions);
     if (!session?.user?.email) {
-      return NextResponse.json(
-        { error: 'Unauthorized', code: 'unauthorized' },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: 'Unauthorized', code: 'unauthorized' }, { status: 401 });
     }
 
     const userEmail = session.user.email;
@@ -160,9 +157,7 @@ async function collectUserData(userEmail: string) {
     : null;
 
   // Files
-  const files = await UserFile.find({ userId: userEmail })
-    .select('-__v')
-    .lean();
+  const files = await UserFile.find({ userId: userEmail }).select('-__v').lean();
 
   // Usage events (last 90 days)
   const ninetyDaysAgo = new Date();
@@ -194,9 +189,7 @@ async function collectUserData(userEmail: string) {
     .lean();
 
   // Owned teams
-  const ownedTeams = await Team.find({ ownerId: userEmail })
-    .select('-__v')
-    .lean();
+  const ownedTeams = await Team.find({ ownerId: userEmail }).select('-__v').lean();
 
   // Team activity (user's actions)
   const teamActivity = await TeamActivity.find({ userId: userEmail })
@@ -223,9 +216,7 @@ async function collectUserData(userEmail: string) {
         .lean();
 
   // Sessions
-  const sessions = await Session.find({ userId: userEmail })
-    .select('-__v')
-    .lean();
+  const sessions = await Session.find({ userId: userEmail }).select('-__v').lean();
 
   // Connected accounts
   const accounts = await Account.find({ userId: userEmail })

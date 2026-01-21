@@ -21,9 +21,7 @@ export function UserMenu() {
   const t = useTranslations('auth');
 
   if (status === 'loading') {
-    return (
-      <div className="h-10 w-10 rounded-full bg-muted animate-pulse" />
-    );
+    return <div className="h-10 w-10 rounded-full bg-muted animate-pulse" />;
   }
 
   if (!session) {

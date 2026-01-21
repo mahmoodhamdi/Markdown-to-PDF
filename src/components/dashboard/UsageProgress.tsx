@@ -64,10 +64,7 @@ export function UsageProgress({
       </div>
       <div className="h-2 bg-secondary rounded-full overflow-hidden">
         <div
-          className={cn(
-            'h-full rounded-full transition-all duration-300',
-            progressColors[scheme]
-          )}
+          className={cn('h-full rounded-full transition-all duration-300', progressColors[scheme])}
           style={{ width: isUnlimited ? '100%' : `${percentage}%` }}
         />
       </div>

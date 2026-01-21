@@ -144,7 +144,14 @@ export interface SSOLoginSession {
 export interface SSOAuditLog {
   id: string;
   organizationId: string;
-  action: 'login' | 'logout' | 'config_created' | 'config_updated' | 'config_deleted' | 'test_success' | 'test_failure';
+  action:
+    | 'login'
+    | 'logout'
+    | 'config_created'
+    | 'config_updated'
+    | 'config_deleted'
+    | 'test_success'
+    | 'test_failure';
   userId?: string;
   userEmail?: string;
   ssoConfigId?: string;

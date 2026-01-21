@@ -48,9 +48,7 @@ function LoginContent() {
         <CardContent className="space-y-4">
           {error && (
             <div className="p-3 text-sm text-red-500 bg-red-50 dark:bg-red-950 rounded-md">
-              {error === 'CredentialsSignin'
-                ? t('invalidCredentials')
-                : t('authError')}
+              {error === 'CredentialsSignin' ? t('invalidCredentials') : t('authError')}
             </div>
           )}
 
@@ -136,11 +134,7 @@ function LoginContent() {
                 required
               />
             </div>
-            <Button
-              type="submit"
-              className="w-full"
-              disabled={isLoading !== null}
-            >
+            <Button type="submit" className="w-full" disabled={isLoading !== null}>
               {isLoading === 'credentials' ? (
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
               ) : (

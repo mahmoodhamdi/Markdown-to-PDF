@@ -4,12 +4,7 @@
  */
 
 // Configuration exports
-export {
-  RATE_LIMITS,
-  getRateLimitConfig,
-  isRedisConfigured,
-  type RateLimitConfig,
-} from './config';
+export { RATE_LIMITS, getRateLimitConfig, isRedisConfigured, type RateLimitConfig } from './config';
 
 // Core rate limiting exports
 export {

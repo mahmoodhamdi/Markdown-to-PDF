@@ -19,10 +19,7 @@ export async function POST(
     // Check authentication
     const session = await getServerSession(authOptions);
     if (!session?.user?.id) {
-      return NextResponse.json(
-        { error: 'Authentication required' },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
     }
 
     // Only enterprise users can test SSO
@@ -48,10 +45,7 @@ export async function POST(
     // Check if config exists
     const existingConfig = await getSSOConfig(configId);
     if (!existingConfig) {
-      return NextResponse.json(
-        { error: 'SSO configuration not found' },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: 'SSO configuration not found' }, { status: 404 });
     }
 
     // Test SSO configuration
@@ -66,9 +60,6 @@ export async function POST(
     });
   } catch (error) {
     console.error('SSO config test error:', error);
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

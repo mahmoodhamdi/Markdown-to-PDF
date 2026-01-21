@@ -11,9 +11,7 @@ export function Footer() {
     <footer className="border-t bg-background">
       <div className="container py-8">
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-          <p className="text-sm text-muted-foreground">
-            {t('copyright', { year: currentYear })}
-          </p>
+          <p className="text-sm text-muted-foreground">{t('copyright', { year: currentYear })}</p>
 
           <div className="flex items-center gap-4">
             <a
@@ -27,8 +25,7 @@ export function Footer() {
             </a>
 
             <span className="text-sm text-muted-foreground flex items-center gap-1">
-              {t('madeWith')}{' '}
-              <Heart className="h-4 w-4 text-red-500 fill-red-500" />
+              {t('madeWith')} <Heart className="h-4 w-4 text-red-500 fill-red-500" />
             </span>
           </div>
         </div>

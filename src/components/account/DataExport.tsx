@@ -5,7 +5,16 @@ import { useTranslations } from 'next-intl';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
-import { Download, Loader2, CheckCircle, AlertCircle, FileText, FolderOpen, BarChart3, Archive } from 'lucide-react';
+import {
+  Download,
+  Loader2,
+  CheckCircle,
+  AlertCircle,
+  FileText,
+  FolderOpen,
+  BarChart3,
+  Archive,
+} from 'lucide-react';
 
 type ExportStatus = 'idle' | 'exporting' | 'success' | 'error';
 type ExportPhase = 'profile' | 'files' | 'analytics' | 'packaging';
@@ -187,9 +196,11 @@ export function DataExport() {
                     {isComplete ? (
                       <CheckCircle className="h-3 w-3" />
                     ) : (
-                      <span className={`w-3 h-3 rounded-full border ${
-                        isCurrent ? 'border-primary bg-primary/20' : 'border-muted-foreground'
-                      }`} />
+                      <span
+                        className={`w-3 h-3 rounded-full border ${
+                          isCurrent ? 'border-primary bg-primary/20' : 'border-muted-foreground'
+                        }`}
+                      />
                     )}
                     <span className="hidden sm:inline">{t(`phase.${phase}`)}</span>
                   </div>

@@ -7,10 +7,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth/config';
-import {
-  createSSOConfig,
-  getSSOConfigByOrganization,
-} from '@/lib/sso/service';
+import { createSSOConfig, getSSOConfigByOrganization } from '@/lib/sso/service';
 import { checkRateLimit, getRateLimitHeaders } from '@/lib/rate-limit';
 import { z } from 'zod';
 
@@ -22,13 +19,15 @@ const samlConfigSchema = z.object({
   signatureAlgorithm: z.enum(['sha256', 'sha512']).optional(),
   wantAssertionsSigned: z.boolean().optional(),
   wantAuthnResponseSigned: z.boolean().optional(),
-  attributeMapping: z.object({
-    email: z.string().optional(),
-    firstName: z.string().optional(),
-    lastName: z.string().optional(),
-    displayName: z.string().optional(),
-    groups: z.string().optional(),
-  }).optional(),
+  attributeMapping: z
+    .object({
+      email: z.string().optional(),
+      firstName: z.string().optional(),
+      lastName: z.string().optional(),
+      displayName: z.string().optional(),
+      groups: z.string().optional(),
+    })
+    .optional(),
 });
 
 const oidcConfigSchema = z.object({
@@ -66,7 +65,10 @@ const googleWorkspaceConfigSchema = z.object({
 const createSSOConfigSchema = z.object({
   organizationId: z.string().min(1),
   provider: z.enum(['saml', 'oidc', 'azure_ad', 'okta', 'google_workspace']),
-  domain: z.string().min(3).regex(/^[a-z0-9.-]+\.[a-z]{2,}$/i, 'Invalid domain format'),
+  domain: z
+    .string()
+    .min(3)
+    .regex(/^[a-z0-9.-]+\.[a-z]{2,}$/i, 'Invalid domain format'),
   config: z.union([
     samlConfigSchema,
     oidcConfigSchema,
@@ -74,12 +76,14 @@ const createSSOConfigSchema = z.object({
     oktaConfigSchema,
     googleWorkspaceConfigSchema,
   ]),
-  options: z.object({
-    enforceSSO: z.boolean().optional(),
-    allowBypass: z.boolean().optional(),
-    jitProvisioning: z.boolean().optional(),
-    defaultRole: z.enum(['member', 'admin']).optional(),
-  }).optional(),
+  options: z
+    .object({
+      enforceSSO: z.boolean().optional(),
+      allowBypass: z.boolean().optional(),
+      jitProvisioning: z.boolean().optional(),
+      defaultRole: z.enum(['member', 'admin']).optional(),
+    })
+    .optional(),
 });
 
 export async function GET(request: NextRequest) {
@@ -87,10 +91,7 @@ export async function GET(request: NextRequest) {
     // Check authentication
     const session = await getServerSession(authOptions);
     if (!session?.user?.id) {
-      return NextResponse.json(
-        { error: 'Authentication required' },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
     }
 
     // Only enterprise users can access SSO
@@ -115,10 +116,7 @@ export async function GET(request: NextRequest) {
     // Get organization ID from query params
     const organizationId = request.nextUrl.searchParams.get('organizationId');
     if (!organizationId) {
-      return NextResponse.json(
-        { error: 'Organization ID required' },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'Organization ID required' }, { status: 400 });
     }
 
     // Get SSO configuration
@@ -130,10 +128,7 @@ export async function GET(request: NextRequest) {
     });
   } catch (error) {
     console.error('SSO config GET error:', error);
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
 
@@ -142,10 +137,7 @@ export async function POST(request: NextRequest) {
     // Check authentication
     const session = await getServerSession(authOptions);
     if (!session?.user?.id) {
-      return NextResponse.json(
-        { error: 'Authentication required' },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
     }
 
     // Only enterprise users can configure SSO
@@ -190,13 +182,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Create SSO configuration
-    const ssoConfig = await createSSOConfig(
-      organizationId,
-      provider,
-      config,
-      domain,
-      options
-    );
+    const ssoConfig = await createSSOConfig(organizationId, provider, config, domain, options);
 
     return NextResponse.json({
       success: true,
@@ -205,9 +191,6 @@ export async function POST(request: NextRequest) {
     });
   } catch (error) {
     console.error('SSO config POST error:', error);
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

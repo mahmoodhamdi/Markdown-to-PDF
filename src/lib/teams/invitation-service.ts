@@ -5,7 +5,11 @@
 
 import { connectDB } from '@/lib/db/mongodb';
 import { Team, TeamMemberLookup, type ITeamMember, type TeamRole } from '@/lib/db/models/Team';
-import { TeamInvitation, type ITeamInvitation, type InvitationRole } from '@/lib/db/models/TeamInvitation';
+import {
+  TeamInvitation,
+  type ITeamInvitation,
+  type InvitationRole,
+} from '@/lib/db/models/TeamInvitation';
 import { getPlanLimits } from '@/lib/plans/config';
 import { emailService } from '@/lib/email/service';
 import {
@@ -103,9 +107,14 @@ export async function createInvitation(input: CreateInvitationInput): Promise<In
       expiresAt: { $gt: new Date() },
     });
 
-    if (limits.teamMembersAllowed !== Infinity &&
-        currentMemberCount + pendingInvitations >= limits.teamMembersAllowed) {
-      return { success: false, error: `Team member limit reached (${limits.teamMembersAllowed} members)` };
+    if (
+      limits.teamMembersAllowed !== Infinity &&
+      currentMemberCount + pendingInvitations >= limits.teamMembersAllowed
+    ) {
+      return {
+        success: false,
+        error: `Team member limit reached (${limits.teamMembersAllowed} members)`,
+      };
     }
 
     // Check if already a member
@@ -129,7 +138,8 @@ export async function createInvitation(input: CreateInvitationInput): Promise<In
     }
 
     // Determine role (only owner can invite as admin)
-    const role = input.role === 'admin' && inviter.role !== 'owner' ? 'member' : (input.role || 'member');
+    const role =
+      input.role === 'admin' && inviter.role !== 'owner' ? 'member' : input.role || 'member';
 
     // Create invitation
     const token = crypto.randomBytes(32).toString('hex');
@@ -263,7 +273,10 @@ export async function acceptInvitation(
 
     // Check member limit
     const limits = getPlanLimits(team.plan);
-    if (limits.teamMembersAllowed !== Infinity && team.members.length >= limits.teamMembersAllowed) {
+    if (
+      limits.teamMembersAllowed !== Infinity &&
+      team.members.length >= limits.teamMembersAllowed
+    ) {
       return { success: false, error: 'Team member limit reached' };
     }
 
@@ -300,13 +313,7 @@ export async function acceptInvitation(
     });
 
     // Log activity
-    await logMemberJoined(
-      invitation.teamId,
-      invitation.teamName,
-      userId,
-      userEmail,
-      userName
-    );
+    await logMemberJoined(invitation.teamId, invitation.teamName, userId, userEmail, userName);
 
     return { success: true, teamId: invitation.teamId };
   } catch (error) {
@@ -321,7 +328,9 @@ export async function acceptInvitation(
 /**
  * Decline an invitation
  */
-export async function declineInvitation(token: string): Promise<{ success: boolean; error?: string }> {
+export async function declineInvitation(
+  token: string
+): Promise<{ success: boolean; error?: string }> {
   try {
     await connectDB();
 
@@ -446,9 +455,7 @@ export async function cancelInvitation(
     }
 
     const canCancel =
-      member.role === 'owner' ||
-      member.role === 'admin' ||
-      invitation.invitedBy === userId;
+      member.role === 'owner' || member.role === 'admin' || invitation.invitedBy === userId;
 
     if (!canCancel) {
       return { success: false, error: 'You do not have permission to cancel this invitation' };
@@ -507,9 +514,7 @@ export async function resendInvitation(
     }
 
     const canResend =
-      member.role === 'owner' ||
-      member.role === 'admin' ||
-      invitation.invitedBy === userId;
+      member.role === 'owner' || member.role === 'admin' || invitation.invitedBy === userId;
 
     if (!canResend) {
       return { success: false, error: 'You do not have permission to resend this invitation' };

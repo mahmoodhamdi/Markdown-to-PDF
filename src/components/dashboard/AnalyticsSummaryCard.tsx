@@ -91,7 +91,9 @@ export function AnalyticsSummaryCard({ data, mostUsedTheme, loading }: Analytics
       icon: Calendar,
       label: t('peakDay'),
       value: peakDayFormatted,
-      sublabel: peakDay?.conversions ? `${peakDay.conversions} ${t('conversions').toLowerCase()}` : undefined,
+      sublabel: peakDay?.conversions
+        ? `${peakDay.conversions} ${t('conversions').toLowerCase()}`
+        : undefined,
       color: 'text-blue-600 dark:text-blue-400',
       bgColor: 'bg-blue-500/10',
     },

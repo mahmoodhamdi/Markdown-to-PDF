@@ -81,9 +81,33 @@ export function selectGateway(options: GatewaySelectionOptions = {}): PaymentGat
 
     // Check for EU countries - prefer Paddle for tax handling
     const euCountries = [
-      'AT', 'BE', 'BG', 'HR', 'CY', 'CZ', 'DK', 'EE', 'FI', 'FR',
-      'DE', 'GR', 'HU', 'IE', 'IT', 'LV', 'LT', 'LU', 'MT', 'NL',
-      'PL', 'PT', 'RO', 'SK', 'SI', 'ES', 'SE',
+      'AT',
+      'BE',
+      'BG',
+      'HR',
+      'CY',
+      'CZ',
+      'DK',
+      'EE',
+      'FI',
+      'FR',
+      'DE',
+      'GR',
+      'HU',
+      'IE',
+      'IT',
+      'LV',
+      'LT',
+      'LU',
+      'MT',
+      'NL',
+      'PL',
+      'PT',
+      'RO',
+      'SK',
+      'SI',
+      'ES',
+      'SE',
     ];
 
     if (euCountries.includes(upperCode) && isGatewayConfigured('paddle')) {
@@ -117,7 +141,9 @@ export function selectGateway(options: GatewaySelectionOptions = {}): PaymentGat
     }
   }
 
-  throw new Error('No payment gateway is configured. Please configure at least one payment provider.');
+  throw new Error(
+    'No payment gateway is configured. Please configure at least one payment provider.'
+  );
 }
 
 /**
@@ -139,9 +165,33 @@ export function getRecommendedGateway(countryCode: string): PaymentGatewayType |
 
   // EU -> Paddle (MoR handles VAT)
   const euCountries = [
-    'AT', 'BE', 'BG', 'HR', 'CY', 'CZ', 'DK', 'EE', 'FI', 'FR',
-    'DE', 'GR', 'HU', 'IE', 'IT', 'LV', 'LT', 'LU', 'MT', 'NL',
-    'PL', 'PT', 'RO', 'SK', 'SI', 'ES', 'SE',
+    'AT',
+    'BE',
+    'BG',
+    'HR',
+    'CY',
+    'CZ',
+    'DK',
+    'EE',
+    'FI',
+    'FR',
+    'DE',
+    'GR',
+    'HU',
+    'IE',
+    'IT',
+    'LV',
+    'LT',
+    'LU',
+    'MT',
+    'NL',
+    'PL',
+    'PT',
+    'RO',
+    'SK',
+    'SI',
+    'ES',
+    'SE',
   ];
   if (euCountries.includes(upperCode)) {
     return isGatewayConfigured('paddle') ? 'paddle' : null;
@@ -171,7 +221,7 @@ export function getGatewayInfo(type: PaymentGatewayType): {
     },
     paymob: {
       name: 'Paymob',
-      description: 'Egypt\'s leading payment gateway for local payments',
+      description: "Egypt's leading payment gateway for local payments",
       supportedCountries: ['EG'],
       supportedCurrencies: ['EGP'],
       paymentMethods: ['Credit/Debit Cards', 'Meeza', 'Vodafone Cash', 'Orange Money', 'Fawry'],

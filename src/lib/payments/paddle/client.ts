@@ -31,9 +31,7 @@ function getPaddleInstance(): Paddle {
   if (!paddleInstance) {
     paddleInstance = new Paddle(PADDLE_CONFIG.apiKey, {
       environment:
-        PADDLE_CONFIG.environment === 'production'
-          ? Environment.production
-          : Environment.sandbox,
+        PADDLE_CONFIG.environment === 'production' ? Environment.production : Environment.sandbox,
     });
   }
 
@@ -286,7 +284,12 @@ export class PaddleClient {
       priceId?: string;
       quantity?: number;
       customData?: Record<string, string>;
-      prorationBillingMode?: 'prorated_immediately' | 'prorated_next_billing_period' | 'full_immediately' | 'full_next_billing_period' | 'do_not_bill';
+      prorationBillingMode?:
+        | 'prorated_immediately'
+        | 'prorated_next_billing_period'
+        | 'full_immediately'
+        | 'full_next_billing_period'
+        | 'do_not_bill';
     }
   ): Promise<Subscription> {
     const subscription = await this.paddle.subscriptions.update(subscriptionId, {
@@ -310,10 +313,7 @@ export class PaddleClient {
   /**
    * Verify webhook signature
    */
-  verifyWebhookSignature(
-    rawBody: string,
-    signature: string
-  ): boolean {
+  verifyWebhookSignature(rawBody: string, signature: string): boolean {
     if (!PADDLE_CONFIG.webhookSecret) {
       console.warn('PADDLE_WEBHOOK_SECRET not configured');
       return false;
@@ -322,8 +322,14 @@ export class PaddleClient {
     try {
       // Paddle SDK handles verification internally
       // We'll use crypto to verify manually for more control
-      const ts = signature.split(';').find((s: string) => s.startsWith('ts='))?.split('=')[1];
-      const h1 = signature.split(';').find((s: string) => s.startsWith('h1='))?.split('=')[1];
+      const ts = signature
+        .split(';')
+        .find((s: string) => s.startsWith('ts='))
+        ?.split('=')[1];
+      const h1 = signature
+        .split(';')
+        .find((s: string) => s.startsWith('h1='))
+        ?.split('=')[1];
 
       if (!ts || !h1) {
         return false;
@@ -335,10 +341,7 @@ export class PaddleClient {
         .update(signedPayload)
         .digest('hex');
 
-      return crypto.timingSafeEqual(
-        Buffer.from(h1),
-        Buffer.from(expectedSignature)
-      );
+      return crypto.timingSafeEqual(Buffer.from(h1), Buffer.from(expectedSignature));
     } catch (error) {
       console.error('Webhook signature verification error:', error);
       return false;

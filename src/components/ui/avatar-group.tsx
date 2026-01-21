@@ -1,12 +1,7 @@
 'use client';
 
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from '@/components/ui/tooltip';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { cn } from '@/lib/utils';
 
 interface AvatarGroupMember {
@@ -104,14 +99,10 @@ export function AvatarGroup({
         <TooltipContent side="bottom" className="max-w-xs">
           <div className="text-sm">
             {visibleMembers.map((member, index) => (
-              <div key={member.id || member.email || index}>
-                {getDisplayName(member)}
-              </div>
+              <div key={member.id || member.email || index}>{getDisplayName(member)}</div>
             ))}
             {remainingCount > 0 && (
-              <div className="text-muted-foreground">
-                +{remainingCount} more
-              </div>
+              <div className="text-muted-foreground">+{remainingCount} more</div>
             )}
           </div>
         </TooltipContent>

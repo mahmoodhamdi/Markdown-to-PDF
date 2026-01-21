@@ -21,10 +21,7 @@ export async function GET(_request: NextRequest) {
     // Check authentication
     const session = await getServerSession(authOptions);
     if (!session?.user?.id) {
-      return NextResponse.json(
-        { error: 'Authentication required' },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
     }
 
     const userId = session.user.id;
@@ -42,10 +39,7 @@ export async function GET(_request: NextRequest) {
     const result = await getTeamsForUser(userId);
 
     if (!result.success || !result.teams) {
-      return NextResponse.json(
-        { error: result.error || 'Failed to get teams' },
-        { status: 500 }
-      );
+      return NextResponse.json({ error: result.error || 'Failed to get teams' }, { status: 500 });
     }
 
     return NextResponse.json({
@@ -62,10 +56,7 @@ export async function GET(_request: NextRequest) {
     });
   } catch (error) {
     console.error('List teams API error:', error);
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
 
@@ -74,10 +65,7 @@ export async function POST(request: NextRequest) {
     // Check authentication
     const session = await getServerSession(authOptions);
     if (!session?.user?.id || !session.user.email) {
-      return NextResponse.json(
-        { error: 'Authentication required' },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
     }
 
     const userId = session.user.id;
@@ -98,7 +86,10 @@ export async function POST(request: NextRequest) {
     const limits = getPlanLimits(userPlan);
     if (limits.teamMembersAllowed === 0) {
       return NextResponse.json(
-        { error: 'Team features are not available on your plan. Please upgrade to Team or Enterprise.' },
+        {
+          error:
+            'Team features are not available on your plan. Please upgrade to Team or Enterprise.',
+        },
         { status: 403 }
       );
     }
@@ -124,10 +115,7 @@ export async function POST(request: NextRequest) {
     });
 
     if (!result.success || !result.team) {
-      return NextResponse.json(
-        { error: result.error || 'Failed to create team' },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: result.error || 'Failed to create team' }, { status: 400 });
     }
 
     return NextResponse.json({
@@ -144,9 +132,6 @@ export async function POST(request: NextRequest) {
     });
   } catch (error) {
     console.error('Create team API error:', error);
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

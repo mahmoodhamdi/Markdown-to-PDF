@@ -64,10 +64,7 @@ const webhookEventSchema = new Schema<IWebhookEvent>(
 webhookEventSchema.index({ eventId: 1, gateway: 1 }, { unique: true });
 
 // TTL index - auto-delete after 30 days
-webhookEventSchema.index(
-  { processedAt: 1 },
-  { expireAfterSeconds: 30 * 24 * 60 * 60 }
-);
+webhookEventSchema.index({ processedAt: 1 }, { expireAfterSeconds: 30 * 24 * 60 * 60 });
 
 // Index for querying by gateway and status
 webhookEventSchema.index({ gateway: 1, status: 1 });
@@ -76,5 +73,4 @@ webhookEventSchema.index({ gateway: 1, status: 1 });
 webhookEventSchema.index({ createdAt: -1 });
 
 export const WebhookEvent =
-  mongoose.models.WebhookEvent ||
-  mongoose.model<IWebhookEvent>('WebhookEvent', webhookEventSchema);
+  mongoose.models.WebhookEvent || mongoose.model<IWebhookEvent>('WebhookEvent', webhookEventSchema);

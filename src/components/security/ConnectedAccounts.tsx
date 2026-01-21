@@ -176,9 +176,7 @@ export function ConnectedAccounts({ hasPassword }: ConnectedAccountsProps) {
                   {account.providerName || account.providerEmail || t('accounts.connected')}
                 </div>
               ) : (
-                <div className="text-sm text-muted-foreground">
-                  {t('accounts.notConnected')}
-                </div>
+                <div className="text-sm text-muted-foreground">{t('accounts.notConnected')}</div>
               )}
             </div>
 
@@ -186,11 +184,7 @@ export function ConnectedAccounts({ hasPassword }: ConnectedAccountsProps) {
               canDisconnect(account) ? (
                 <AlertDialog>
                   <AlertDialogTrigger asChild>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      disabled={disconnecting === account.id}
-                    >
+                    <Button variant="outline" size="sm" disabled={disconnecting === account.id}>
                       {disconnecting === account.id ? (
                         <Loader2 className="h-4 w-4 animate-spin" />
                       ) : (

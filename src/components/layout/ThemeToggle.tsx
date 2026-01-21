@@ -67,12 +67,7 @@ export function ThemeToggle() {
   };
 
   return (
-    <Button
-      variant="ghost"
-      size="icon"
-      onClick={cycleTheme}
-      title={t(`themes.${mode}`)}
-    >
+    <Button variant="ghost" size="icon" onClick={cycleTheme} title={t(`themes.${mode}`)}>
       {getIcon()}
       <span className="sr-only">{t('theme')}</span>
     </Button>

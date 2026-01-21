@@ -322,9 +322,9 @@ export function validateFilePath(path: string, allowedBasePath?: string): string
 
   // Check for suspicious patterns
   const suspiciousPatterns = [
-    /\/\//,           // Double slashes
-    /^\s|\s$/,        // Leading/trailing whitespace
-    /%[0-9a-f]{2}/i,  // URL encoded characters
+    /\/\//, // Double slashes
+    /^\s|\s$/, // Leading/trailing whitespace
+    /%[0-9a-f]{2}/i, // URL encoded characters
   ];
 
   for (const pattern of suspiciousPatterns) {

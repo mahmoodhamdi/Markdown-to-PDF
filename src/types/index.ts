@@ -2,7 +2,15 @@ export type Locale = 'en' | 'ar';
 
 export type ThemeMode = 'light' | 'dark' | 'system';
 
-export type DocumentTheme = 'github' | 'academic' | 'minimal' | 'dark' | 'professional' | 'elegant' | 'modern' | 'newsletter';
+export type DocumentTheme =
+  | 'github'
+  | 'academic'
+  | 'minimal'
+  | 'dark'
+  | 'professional'
+  | 'elegant'
+  | 'modern'
+  | 'newsletter';
 
 export type CodeTheme =
   | 'github-dark'

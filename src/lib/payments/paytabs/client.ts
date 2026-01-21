@@ -187,10 +187,7 @@ export class PayTabsClient {
   /**
    * Make an authenticated API request
    */
-  private async request<T, D = Record<string, unknown>>(
-    endpoint: string,
-    data: D
-  ): Promise<T> {
+  private async request<T, D = Record<string, unknown>>(endpoint: string, data: D): Promise<T> {
     const url = `${this.baseUrl}${endpoint}`;
 
     const response = await fetch(url, {
@@ -255,7 +252,10 @@ export class PayTabsClient {
         : undefined,
     };
 
-    return this.request<PayTabsPaymentResponse>('/payment/request', payload as unknown as Record<string, unknown>);
+    return this.request<PayTabsPaymentResponse>(
+      '/payment/request',
+      payload as unknown as Record<string, unknown>
+    );
   }
 
   /**
@@ -354,10 +354,7 @@ export class PayTabsClient {
       callback.payment_result.response_status,
     ].join('');
 
-    const calculatedSignature = crypto
-      .createHash('sha256')
-      .update(dataToHash)
-      .digest('hex');
+    const calculatedSignature = crypto.createHash('sha256').update(dataToHash).digest('hex');
 
     return calculatedSignature.toLowerCase() === callback.signature.toLowerCase();
   }

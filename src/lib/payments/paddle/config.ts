@@ -60,12 +60,7 @@ export const PADDLE_PRICES: GatewayPrices = {
 };
 
 // Paddle subscription statuses
-export type PaddleSubscriptionStatus =
-  | 'active'
-  | 'canceled'
-  | 'past_due'
-  | 'paused'
-  | 'trialing';
+export type PaddleSubscriptionStatus = 'active' | 'canceled' | 'past_due' | 'paused' | 'trialing';
 
 // Paddle transaction statuses
 export type PaddleTransactionStatus =

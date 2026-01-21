@@ -83,10 +83,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Create password reset token
-    const { token } = await createPasswordResetToken(
-      normalizedEmail,
-      RESET_TOKEN_EXPIRY_MINUTES
-    );
+    const { token } = await createPasswordResetToken(normalizedEmail, RESET_TOKEN_EXPIRY_MINUTES);
 
     // Send password reset email
     if (emailService.isConfigured()) {

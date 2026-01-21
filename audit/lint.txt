@@ -1,0 +1,41 @@
+
+> markdown-to-pdf@1.0.0 lint
+> next lint
+
+
+./src/app/api/sso/domains/[domain]/verify/route.ts
+76:63  Warning: Forbidden non-null assertion.  @typescript-eslint/no-non-null-assertion
+
+./src/lib/auth/api-key-auth.ts
+212:69  Warning: Forbidden non-null assertion.  @typescript-eslint/no-non-null-assertion
+
+./src/lib/db/mongodb.ts
+132:9  Warning: Unexpected console statement.  no-console
+156:5  Warning: Unexpected console statement.  no-console
+
+./src/lib/payments/paddle/gateway.ts
+180:15  Warning: Unexpected console statement.  no-console
+234:13  Warning: Unexpected console statement.  no-console
+
+./src/lib/payments/paytabs/gateway.ts
+126:11  Warning: Unexpected console statement.  no-console
+
+./src/lib/payments/stripe/gateway.ts
+153:12  Warning: Forbidden non-null assertion.  @typescript-eslint/no-non-null-assertion
+
+./src/lib/pdf/browser-pool.ts
+122:7  Warning: Unexpected console statement.  no-console
+137:9  Warning: Unexpected console statement.  no-console
+
+./src/lib/pdf/generator.ts
+63:5  Warning: Unexpected console statement.  no-console
+502:5  Warning: Unexpected console statement.  no-console
+
+./src/lib/rate-limit/redis.ts
+61:12  Warning: Forbidden non-null assertion.  @typescript-eslint/no-non-null-assertion
+62:14  Warning: Forbidden non-null assertion.  @typescript-eslint/no-non-null-assertion
+
+./src/lib/webhooks/service.ts
+216:7  Warning: Unexpected console statement.  no-console
+
+info  - Need to disable some ESLint rules? Learn more here: https://nextjs.org/docs/basic-features/eslint#disabling-rules

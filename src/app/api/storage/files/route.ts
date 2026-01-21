@@ -15,10 +15,7 @@ export async function GET(_request: NextRequest) {
     // Check authentication
     const session = await getServerSession(authOptions);
     if (!session?.user?.id) {
-      return NextResponse.json(
-        { error: 'Authentication required' },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
     }
 
     const userId = session.user.id;
@@ -53,10 +50,7 @@ export async function GET(_request: NextRequest) {
     const result = await listFiles(userId, userPlan);
 
     if (!result.success || !result.files) {
-      return NextResponse.json(
-        { error: result.error || 'Failed to list files' },
-        { status: 500 }
-      );
+      return NextResponse.json({ error: result.error || 'Failed to list files' }, { status: 500 });
     }
 
     return NextResponse.json({
@@ -73,9 +67,6 @@ export async function GET(_request: NextRequest) {
     });
   } catch (error) {
     console.error('List files API error:', error);
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

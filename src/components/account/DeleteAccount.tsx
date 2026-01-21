@@ -122,9 +122,7 @@ export function DeleteAccount() {
                   placeholder="DELETE"
                   disabled={isDeleting}
                   className={
-                    confirmation.length > 0 && !isConfirmationValid
-                      ? 'border-destructive'
-                      : ''
+                    confirmation.length > 0 && !isConfirmationValid ? 'border-destructive' : ''
                   }
                 />
                 {confirmation.length > 0 && !isConfirmationValid && (
