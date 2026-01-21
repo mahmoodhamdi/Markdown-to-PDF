@@ -32,25 +32,25 @@ describe('Password Validation', () => {
       expect(result.success).toBe(false);
     });
 
-    it('should accept valid passwords', () => {
+    it('should reject passwords without special characters', () => {
       const result = passwordSchema.safeParse('ValidPass1');
-      expect(result.success).toBe(true);
+      expect(result.success).toBe(false);
     });
 
-    it('should accept passwords with special characters', () => {
+    it('should accept valid passwords with all requirements', () => {
       const result = passwordSchema.safeParse('Valid@Pass1');
       expect(result.success).toBe(true);
     });
 
-    it('should accept long passwords', () => {
-      const result = passwordSchema.safeParse('ThisIsAVeryLongPassword123');
+    it('should accept long passwords with special characters', () => {
+      const result = passwordSchema.safeParse('ThisIsAVeryLongPassword123!');
       expect(result.success).toBe(true);
     });
   });
 
   describe('validatePassword', () => {
     it('should return valid for correct passwords', () => {
-      const result = validatePassword('ValidPass1');
+      const result = validatePassword('ValidPass1!');
       expect(result.valid).toBe(true);
       expect(result.errors).toHaveLength(0);
     });
@@ -61,13 +61,15 @@ describe('Password Validation', () => {
       expect(result.errors).toContain('Password must be at least 8 characters');
       expect(result.errors).toContain('Password must contain at least one uppercase letter');
       expect(result.errors).toContain('Password must contain at least one number');
+      expect(result.errors).toContain('Password must contain at least one special character');
     });
 
     it('should return specific errors for missing requirements', () => {
-      const result = validatePassword('lowercase1');
+      const result = validatePassword('lowercase1!');
       expect(result.valid).toBe(false);
       expect(result.errors).toContain('Password must contain at least one uppercase letter');
       expect(result.errors).not.toContain('Password must contain at least one lowercase letter');
+      expect(result.errors).not.toContain('Password must contain at least one special character');
     });
   });
 
@@ -101,8 +103,8 @@ describe('Password Validation', () => {
   });
 
   describe('BCRYPT_ROUNDS', () => {
-    it('should be 12', () => {
-      expect(BCRYPT_ROUNDS).toBe(12);
+    it('should be 14 for enhanced security', () => {
+      expect(BCRYPT_ROUNDS).toBe(14);
     });
   });
 });

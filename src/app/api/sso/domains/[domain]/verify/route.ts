@@ -73,7 +73,7 @@ export async function POST(
       const flatRecords = txtRecords.flat();
 
       // Check if any TXT record contains our verification token
-      verified = flatRecords.some((record) => record.includes(mapping.verificationToken!));
+      verified = flatRecords.some((record) => mapping.verificationToken && record.includes(mapping.verificationToken));
 
       if (!verified) {
         verificationError = 'Verification token not found in DNS TXT records';

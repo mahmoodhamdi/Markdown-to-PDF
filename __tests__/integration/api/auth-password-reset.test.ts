@@ -186,7 +186,7 @@ describe('POST /api/auth/reset-password', () => {
       method: 'POST',
       body: JSON.stringify({
         token: 'valid-reset-token',
-        password: 'NewPassword123', // Must meet password requirements: uppercase, lowercase, number
+        password: 'NewPassword123!', // Must meet password requirements: uppercase, lowercase, number
       }),
     });
 
@@ -206,7 +206,7 @@ describe('POST /api/auth/reset-password', () => {
       method: 'POST',
       body: JSON.stringify({
         token: 'invalid-token',
-        password: 'NewPassword123', // Must meet password requirements
+        password: 'NewPassword123!', // Must meet password requirements
       }),
     });
 
@@ -237,7 +237,7 @@ describe('POST /api/auth/reset-password', () => {
     const request = new NextRequest('http://localhost:3000/api/auth/reset-password', {
       method: 'POST',
       body: JSON.stringify({
-        password: 'NewPassword123',
+        password: 'NewPassword123!',
       }),
     });
 
@@ -254,7 +254,7 @@ describe('POST /api/auth/reset-password', () => {
       method: 'POST',
       body: JSON.stringify({
         token: 'valid-token',
-        password: 'NewPassword123',
+        password: 'NewPassword123!',
       }),
     });
 

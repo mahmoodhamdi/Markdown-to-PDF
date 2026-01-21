@@ -213,7 +213,7 @@ export function webhookLog(
       console.warn(prefix, message, logData);
       break;
     default:
-      console.log(prefix, message, logData);
+      console.info(prefix, message, logData);
   }
 }
 

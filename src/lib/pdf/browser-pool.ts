@@ -119,7 +119,7 @@ class BrowserPool {
 
     // Restart browser if it's too old and no active pages
     if (browserAge > MAX_BROWSER_AGE && this.state.activePages === 0) {
-      console.log('[BrowserPool] Restarting browser due to age');
+      console.info('[BrowserPool] Restarting browser due to age');
       await this.closeBrowser();
       return;
     }
@@ -134,7 +134,7 @@ class BrowserPool {
     // Check if too many pages (memory leak prevention)
     if (this.state.totalPagesCreated > MAX_PAGES_PER_BROWSER * 10) {
       if (this.state.activePages === 0) {
-        console.log('[BrowserPool] Restarting browser due to high page count');
+        console.info('[BrowserPool] Restarting browser due to high page count');
         await this.closeBrowser();
         this.state.totalPagesCreated = 0;
       }

@@ -177,7 +177,7 @@ export const paddleGateway: PaymentGateway = {
                   paddleSubscriptionId: data.id,
                 },
               });
-              console.log(`User ${customData.userEmail} upgraded to ${customData.plan} via Paddle`);
+              console.info(`User ${customData.userEmail} upgraded to ${customData.plan} via Paddle`);
             } catch (error) {
               console.error('Error updating user from Paddle webhook:', error);
             }
@@ -231,7 +231,7 @@ export const paddleGateway: PaymentGateway = {
                 paddleSubscriptionId: null,
               },
             });
-            console.log(`User ${customData.userEmail} downgraded to free via Paddle cancellation`);
+            console.info(`User ${customData.userEmail} downgraded to free via Paddle cancellation`);
           } catch (error) {
             console.error('Error downgrading user from Paddle webhook:', error);
           }

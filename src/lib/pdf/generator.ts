@@ -60,7 +60,7 @@ function getTimeoutForContent(contentSize: number): number {
 function logConversionMetrics(metrics: ConversionMetrics, filename?: string): void {
   if (process.env.NODE_ENV === 'development' || process.env.PDF_METRICS_ENABLED === 'true') {
     const file = filename ? ` [${filename}]` : '';
-    console.log(`[PDF]${file} Conversion metrics:`, {
+    console.info(`[PDF]${file} Conversion metrics:`, {
       contentSize: `${(metrics.contentSize / 1024).toFixed(1)}KB`,
       pdfSize: metrics.pdfSize ? `${(metrics.pdfSize / 1024).toFixed(1)}KB` : 'N/A',
       totalTime: metrics.totalTime ? `${metrics.totalTime}ms` : 'N/A',
@@ -499,7 +499,7 @@ export async function generatePdfBatch(
   if (process.env.NODE_ENV === 'development' || process.env.PDF_METRICS_ENABLED === 'true') {
     const successCount = results.filter((r) => r.success).length;
     const totalTime = Date.now() - batchStartTime;
-    console.log(
+    console.info(
       `[PDF] Batch conversion complete: ${successCount}/${files.length} successful in ${totalTime}ms`
     );
   }

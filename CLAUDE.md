@@ -35,6 +35,9 @@ npm run db:start          # Start MongoDB container
 npm run db:stop           # Stop MongoDB container
 npm run db:seed           # Seed database with sample data
 
+# Bundle Analysis
+npm run analyze           # Generate bundle size analysis
+
 # Docker
 docker-compose -f docker/docker-compose.yml up          # Start app with Docker
 docker-compose -f docker/docker-compose.prod.yml up     # Production mode
@@ -113,6 +116,7 @@ Multi-gateway payment system (`src/lib/payments/`):
 
 ### State Management (Zustand)
 
+Stores in `src/stores/`:
 - `editor-store.ts`: Editor content, view mode (editor/preview/split), fullscreen state
 - `theme-store.ts`: Document theme, code theme, UI theme mode
 - `settings-store.ts`: Page settings (size, orientation, margins, watermark, headers/footers)
@@ -124,8 +128,15 @@ All stores use `persist` middleware to save to localStorage.
 Uses NextAuth.js (`src/lib/auth/config.ts`) with JWT session strategy:
 - GitHub OAuth provider
 - Google OAuth provider
-- Email/password credentials (bcrypt)
+- Email/password credentials (bcrypt with 14 rounds)
 - MongoDB for user storage (not Firebase Adapter)
+
+Password requirements (`src/lib/auth/password-validation.ts`):
+- Minimum 8 characters
+- At least one uppercase letter
+- At least one lowercase letter
+- At least one number
+- At least one special character
 
 ### Internationalization
 
@@ -220,7 +231,7 @@ Plan types in `src/lib/plans/config.ts`:
 - E2E tests: `__tests__/e2e/` - Playwright browser tests (Chromium, Firefox, WebKit)
 - Test setup: `src/test/setup.ts` - jsdom environment with testing-library
 - Vitest globals enabled (`describe`, `it`, `expect` available without imports)
-- E2E tests require dev server running at localhost:3000 (auto-started in CI)
+- E2E tests: Playwright auto-starts server (build + start) unless one is already running at localhost:3000
 
 ## Key Database Models
 

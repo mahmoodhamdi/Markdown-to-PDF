@@ -85,7 +85,7 @@ test.describe('Authentication Flow', () => {
 
       // Fill valid-looking credentials
       await page.fill('#email', 'test@example.com');
-      await page.fill('#password', 'password123');
+      await page.fill('#password', 'password123!');
 
       // Click submit and check for loading state
       const submitButton = page.locator('button[type="submit"]');
@@ -120,8 +120,8 @@ test.describe('Authentication Flow', () => {
       // Fill form with mismatched passwords
       await page.fill('#name', 'Test User');
       await page.fill('#email', generateTestEmail());
-      await page.fill('#password', 'Password123');
-      await page.fill('#confirmPassword', 'Different123');
+      await page.fill('#password', 'Password123!');
+      await page.fill('#confirmPassword', 'Different123!');
 
       await page.click('button[type="submit"]');
 
@@ -172,8 +172,8 @@ test.describe('Authentication Flow', () => {
       // Fill form with invalid email
       await page.fill('#name', 'Test User');
       await page.fill('#email', 'invalid-email');
-      await page.fill('#password', 'password123');
-      await page.fill('#confirmPassword', 'password123');
+      await page.fill('#password', 'password123!');
+      await page.fill('#confirmPassword', 'password123!');
 
       await page.click('button[type="submit"]');
 
@@ -188,8 +188,8 @@ test.describe('Authentication Flow', () => {
       // Try to register with an email that might exist
       await page.fill('#name', 'Test User');
       await page.fill('#email', 'test@example.com'); // Likely existing email
-      await page.fill('#password', 'password123');
-      await page.fill('#confirmPassword', 'password123');
+      await page.fill('#password', 'password123!');
+      await page.fill('#confirmPassword', 'password123!');
 
       await page.click('button[type="submit"]');
 

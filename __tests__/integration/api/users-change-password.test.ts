@@ -78,7 +78,7 @@ describe('/api/users/change-password', () => {
       method: 'POST',
       body: JSON.stringify({
         currentPassword: 'current123',
-        newPassword: 'NewPassword123',
+        newPassword: 'NewPassword123!',
       }),
     });
     const response = await POST(request);
@@ -95,7 +95,7 @@ describe('/api/users/change-password', () => {
       method: 'POST',
       body: JSON.stringify({
         currentPassword: 'current123',
-        newPassword: 'NewPassword123',
+        newPassword: 'NewPassword123!',
       }),
     });
     const response = await POST(request);
@@ -104,7 +104,7 @@ describe('/api/users/change-password', () => {
     expect(response.status).toBe(200);
     expect(data.success).toBe(true);
     expect(data.message).toContain('changed successfully');
-    expect(mockBcryptHash).toHaveBeenCalledWith('NewPassword123', 12);
+    expect(mockBcryptHash).toHaveBeenCalledWith('NewPassword123!', 14);
     expect(mockFindByIdAndUpdate).toHaveBeenCalled();
   });
 
@@ -115,7 +115,7 @@ describe('/api/users/change-password', () => {
       method: 'POST',
       body: JSON.stringify({
         currentPassword: 'wrong-password',
-        newPassword: 'NewPassword123',
+        newPassword: 'NewPassword123!',
       }),
     });
     const response = await POST(request);
@@ -133,8 +133,8 @@ describe('/api/users/change-password', () => {
     const request = new NextRequest('http://localhost:3000/api/users/change-password', {
       method: 'POST',
       body: JSON.stringify({
-        currentPassword: 'SamePassword1',
-        newPassword: 'SamePassword1',
+        currentPassword: 'SamePassword1!',
+        newPassword: 'SamePassword1!',
       }),
     });
     const response = await POST(request);
@@ -169,7 +169,7 @@ describe('/api/users/change-password', () => {
       method: 'POST',
       body: JSON.stringify({
         currentPassword: 'current123',
-        newPassword: 'NewPassword123',
+        newPassword: 'NewPassword123!',
       }),
     });
     const response = await POST(request);
@@ -186,7 +186,7 @@ describe('/api/users/change-password', () => {
       method: 'POST',
       body: JSON.stringify({
         currentPassword: 'current123',
-        newPassword: 'NewPassword123',
+        newPassword: 'NewPassword123!',
       }),
     });
     const response = await POST(request);
