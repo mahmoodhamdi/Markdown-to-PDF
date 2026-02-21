@@ -2,7 +2,7 @@
 
 import { useSession } from 'next-auth/react';
 import { redirect } from 'next/navigation';
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
 import { usePathname } from 'next/navigation';
 import { Link } from '@/i18n/routing';
 import { LayoutDashboard, Users, BarChart3, Webhook, Shield } from 'lucide-react';
@@ -104,19 +104,20 @@ function AdminLayoutSkeleton() {
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const { data: session, status } = useSession();
+  const locale = useLocale();
 
   if (status === 'loading') {
     return <AdminLayoutSkeleton />;
   }
 
   if (status === 'unauthenticated') {
-    redirect('/auth/login');
+    redirect(`/${locale}/auth/login`);
   }
 
   // Role check: only allow admins
   const role = (session?.user as { role?: string })?.role;
   if (role !== 'admin') {
-    redirect('/dashboard');
+    redirect(`/${locale}/dashboard`);
   }
 
   return <AdminLayoutContent>{children}</AdminLayoutContent>;
