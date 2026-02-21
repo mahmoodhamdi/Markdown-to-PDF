@@ -1,8 +1,9 @@
 'use client';
 
 import { useTranslations } from 'next-intl';
+import { useSession } from 'next-auth/react';
 import { Link } from '@/i18n/routing';
-import { FileText, Menu, X } from 'lucide-react';
+import { FileText, Menu, X, LayoutDashboard } from 'lucide-react';
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { ThemeToggle } from './ThemeToggle';
@@ -13,6 +14,7 @@ import { cn } from '@/lib/utils';
 export function Header() {
   const t = useTranslations('nav');
   const tCommon = useTranslations('common');
+  const { data: session } = useSession();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const tPricing = useTranslations('pricing');
@@ -82,11 +84,21 @@ export function Header() {
         id="mobile-navigation"
         className={cn(
           'md:hidden border-t bg-background overflow-hidden transition-all duration-200',
-          mobileMenuOpen ? 'max-h-64' : 'max-h-0'
+          mobileMenuOpen ? 'max-h-96' : 'max-h-0'
         )}
         aria-hidden={!mobileMenuOpen}
       >
-        <nav className="container py-4 space-y-2" aria-label="Mobile navigation">
+        <nav className="container py-4 space-y-1" aria-label="Mobile navigation">
+          {session && (
+            <Link
+              href="/dashboard"
+              className="flex items-center gap-2 py-2 px-4 rounded-md hover:bg-accent transition-colors font-medium text-foreground"
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              <LayoutDashboard className="h-4 w-4" />
+              {t('dashboard')}
+            </Link>
+          )}
           {navItems.map((item) => (
             <Link
               key={item.href}

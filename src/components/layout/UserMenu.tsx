@@ -13,7 +13,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { User, LogOut, Settings, CreditCard } from 'lucide-react';
+import { User, LogOut, Settings, CreditCard, LayoutDashboard, Shield } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 export function UserMenu() {
@@ -40,6 +40,8 @@ export function UserMenu() {
     team: 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200',
     enterprise: 'bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-200',
   };
+
+  const isAdmin = (session.user as { role?: string })?.role === 'admin';
 
   return (
     <DropdownMenu>
@@ -74,9 +76,21 @@ export function UserMenu() {
               >
                 {t(session.user?.plan || 'free')}
               </span>
+              {isAdmin && (
+                <span className="px-2 py-0.5 text-xs font-medium rounded-full bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200">
+                  Admin
+                </span>
+              )}
             </div>
           </div>
         </DropdownMenuLabel>
+        <DropdownMenuSeparator />
+        <Link href="/dashboard">
+          <DropdownMenuItem>
+            <LayoutDashboard className="mr-2 h-4 w-4" />
+            {t('dashboard')}
+          </DropdownMenuItem>
+        </Link>
         <DropdownMenuSeparator />
         <DropdownMenuLabel className="text-xs text-muted-foreground">
           {t('usage')}
@@ -104,6 +118,17 @@ export function UserMenu() {
             {t('upgrade')}
           </DropdownMenuItem>
         </Link>
+        {isAdmin && (
+          <>
+            <DropdownMenuSeparator />
+            <Link href="/admin">
+              <DropdownMenuItem className="text-red-600 dark:text-red-400 focus:text-red-600 dark:focus:text-red-400">
+                <Shield className="mr-2 h-4 w-4" />
+                {t('adminPanel')}
+              </DropdownMenuItem>
+            </Link>
+          </>
+        )}
         <DropdownMenuSeparator />
         <DropdownMenuItem
           onClick={() => signOut({ callbackUrl: '/' })}

@@ -80,7 +80,8 @@ export async function authenticateApiKey(request: NextRequest): Promise<ApiKeyAu
     }
 
     // Get the user to check their plan
-    const user = await User.findById(apiKey.userId);
+    // apiKey.userId stores the user's email, which is also the User _id
+    const user = await User.findOne({ email: apiKey.userId });
 
     if (!user) {
       return {

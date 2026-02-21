@@ -4,6 +4,8 @@ import { useSession } from 'next-auth/react';
 import { redirect } from 'next/navigation';
 import { DashboardOverview } from '@/components/dashboard';
 import { Skeleton } from '@/components/ui/skeleton';
+import { getPlanLimits, formatFileSize } from '@/lib/plans/config';
+import type { PlanType } from '@/lib/plans/config';
 
 export default function DashboardPage() {
   const { data: session, status } = useSession();
@@ -20,30 +22,27 @@ export default function DashboardPage() {
 
   const user = session?.user;
 
-  // Get plan limits
-  const conversionsLimit = getPlanConversionsLimit(user?.plan || 'free');
+  // Get plan limits from canonical config
+  const plan = (user?.plan || 'free') as PlanType;
+  const limits = getPlanLimits(plan);
+  const conversionsLimit = limits.conversionsPerDay;
+
+  // Derive storage strings from plan limits
+  const storageUsedBytes = (user?.usage as Record<string, number> | undefined)?.storageUsed ?? 0;
+  const storageUsed = formatFileSize(storageUsedBytes);
+  const storageLimit = formatFileSize(limits.cloudStorageBytes);
 
   return (
     <DashboardOverview
       userName={user?.name || undefined}
       conversionsToday={user?.usage?.conversions || 0}
       conversionsLimit={conversionsLimit}
-      storageUsed="0 MB"
-      storageLimit="100 MB"
-      plan={user?.plan || 'free'}
+      storageUsed={storageUsed}
+      storageLimit={storageLimit}
+      plan={plan}
       emailVerified={user?.emailVerified ?? true}
     />
   );
-}
-
-function getPlanConversionsLimit(plan: string): number {
-  const limits: Record<string, number> = {
-    free: 20,
-    pro: 500,
-    team: Infinity,
-    enterprise: Infinity,
-  };
-  return limits[plan] || 20;
 }
 
 function DashboardSkeleton() {

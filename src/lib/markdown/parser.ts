@@ -149,115 +149,141 @@ export function processMermaid(html: string): string {
   return html;
 }
 
+// Module-level emoji map — defined once, not recreated on every call.
+const emojiMap: Record<string, string> = {
+  ':smile:': '😊',
+  ':laughing:': '😂',
+  ':heart:': '❤️',
+  ':thumbsup:': '👍',
+  ':thumbsdown:': '👎',
+  ':star:': '⭐',
+  ':fire:': '🔥',
+  ':rocket:': '🚀',
+  ':warning:': '⚠️',
+  ':check:': '✅',
+  ':x:': '❌',
+  ':info:': 'ℹ️',
+  ':bulb:': '💡',
+  ':memo:': '📝',
+  ':calendar:': '📅',
+  ':clock:': '🕐',
+  ':email:': '📧',
+  ':phone:': '📞',
+  ':link:': '🔗',
+  ':lock:': '🔒',
+  ':unlock:': '🔓',
+  ':key:': '🔑',
+  ':gear:': '⚙️',
+  ':wrench:': '🔧',
+  ':hammer:': '🔨',
+  ':package:': '📦',
+  ':folder:': '📁',
+  ':file:': '📄',
+  ':book:': '📖',
+  ':bookmark:': '🔖',
+  ':tag:': '🏷️',
+  ':bug:': '🐛',
+  ':zap:': '⚡',
+  ':sparkles:': '✨',
+  ':tada:': '🎉',
+  ':trophy:': '🏆',
+  ':medal:': '🏅',
+  ':100:': '💯',
+  ':thinking:': '🤔',
+  ':eyes:': '👀',
+  ':wave:': '👋',
+  ':clap:': '👏',
+  ':muscle:': '💪',
+  ':pray:': '🙏',
+  ':coffee:': '☕',
+  ':pizza:': '🍕',
+  ':cake:': '🎂',
+  ':gift:': '🎁',
+  ':balloon:': '🎈',
+  ':art:': '🎨',
+  ':music:': '🎵',
+  ':video:': '📹',
+  ':camera:': '📷',
+  ':computer:': '💻',
+  ':keyboard:': '⌨️',
+  ':mouse:': '🖱️',
+  ':printer:': '🖨️',
+  ':cloud:': '☁️',
+  ':sun:': '☀️',
+  ':moon:': '🌙',
+  ':rainbow:': '🌈',
+  ':umbrella:': '☔',
+  ':snowflake:': '❄️',
+  ':earth:': '🌍',
+  ':tree:': '🌳',
+  ':flower:': '🌸',
+  ':cat:': '🐱',
+  ':dog:': '🐕',
+  ':bird:': '🐦',
+  ':fish:': '🐟',
+  ':butterfly:': '🦋',
+  ':bee:': '🐝',
+  ':car:': '🚗',
+  ':airplane:': '✈️',
+  ':ship:': '🚢',
+  ':house:': '🏠',
+  ':office:': '🏢',
+  ':hospital:': '🏥',
+  ':school:': '🏫',
+  ':bank:': '🏦',
+};
+
+// Module-level: pre-compile all emoji RegExp patterns once at startup.
+// Using the 'g' flag requires resetting lastIndex before each use because
+// stateful global RegExps retain their position across calls.
+const compiledEmojiPatterns: Array<[RegExp, string]> = Object.entries(emojiMap).map(
+  ([code, emoji]) => [
+    new RegExp(code.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g'),
+    emoji,
+  ]
+);
+
 /**
  * Converts emoji shortcodes to Unicode emoji characters.
  * @param html - HTML string with emoji shortcodes (e.g., :smile:)
  * @returns HTML with Unicode emoji characters
  */
 export function processEmoji(html: string): string {
-  const emojiMap: Record<string, string> = {
-    ':smile:': '😊',
-    ':laughing:': '😂',
-    ':heart:': '❤️',
-    ':thumbsup:': '👍',
-    ':thumbsdown:': '👎',
-    ':star:': '⭐',
-    ':fire:': '🔥',
-    ':rocket:': '🚀',
-    ':warning:': '⚠️',
-    ':check:': '✅',
-    ':x:': '❌',
-    ':info:': 'ℹ️',
-    ':bulb:': '💡',
-    ':memo:': '📝',
-    ':calendar:': '📅',
-    ':clock:': '🕐',
-    ':email:': '📧',
-    ':phone:': '📞',
-    ':link:': '🔗',
-    ':lock:': '🔒',
-    ':unlock:': '🔓',
-    ':key:': '🔑',
-    ':gear:': '⚙️',
-    ':wrench:': '🔧',
-    ':hammer:': '🔨',
-    ':package:': '📦',
-    ':folder:': '📁',
-    ':file:': '📄',
-    ':book:': '📖',
-    ':bookmark:': '🔖',
-    ':tag:': '🏷️',
-    ':bug:': '🐛',
-    ':zap:': '⚡',
-    ':sparkles:': '✨',
-    ':tada:': '🎉',
-    ':trophy:': '🏆',
-    ':medal:': '🏅',
-    ':100:': '💯',
-    ':thinking:': '🤔',
-    ':eyes:': '👀',
-    ':wave:': '👋',
-    ':clap:': '👏',
-    ':muscle:': '💪',
-    ':pray:': '🙏',
-    ':coffee:': '☕',
-    ':pizza:': '🍕',
-    ':cake:': '🎂',
-    ':gift:': '🎁',
-    ':balloon:': '🎈',
-    ':art:': '🎨',
-    ':music:': '🎵',
-    ':video:': '📹',
-    ':camera:': '📷',
-    ':computer:': '💻',
-    ':keyboard:': '⌨️',
-    ':mouse:': '🖱️',
-    ':printer:': '🖨️',
-    ':cloud:': '☁️',
-    ':sun:': '☀️',
-    ':moon:': '🌙',
-    ':rainbow:': '🌈',
-    ':umbrella:': '☔',
-    ':snowflake:': '❄️',
-    ':earth:': '🌍',
-    ':tree:': '🌳',
-    ':flower:': '🌸',
-    ':cat:': '🐱',
-    ':dog:': '🐕',
-    ':bird:': '🐦',
-    ':fish:': '🐟',
-    ':butterfly:': '🦋',
-    ':bee:': '🐝',
-    ':car:': '🚗',
-    ':airplane:': '✈️',
-    ':ship:': '🚢',
-    ':house:': '🏠',
-    ':office:': '🏢',
-    ':hospital:': '🏥',
-    ':school:': '🏫',
-    ':bank:': '🏦',
-  };
-
-  Object.entries(emojiMap).forEach(([code, emoji]) => {
-    html = html.replace(new RegExp(code.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g'), emoji);
-  });
-
-  return html;
+  let result = html;
+  for (const [pattern, emoji] of compiledEmojiPatterns) {
+    // Reset lastIndex so the stateful global RegExp always starts from
+    // the beginning of the string, regardless of prior calls.
+    pattern.lastIndex = 0;
+    result = result.replace(pattern, emoji);
+  }
+  return result;
 }
 
 /**
  * Parses markdown with all features enabled (math, mermaid, emoji).
  * This is the main entry point for full markdown processing.
+ * A final server-side sanitization pass is applied after all post-processing
+ * so that any HTML introduced by processMath, processMermaid, or processEmoji
+ * is also sanitized before the result is returned.
  * @param markdown - The markdown string to parse
+ * @param options - Parsing options (sanitize, extractToc)
  * @returns ParseResult containing HTML and table of contents
  */
-export function parseMarkdownFull(markdown: string): ParseResult {
-  const result = parseMarkdown(markdown);
+export function parseMarkdownFull(markdown: string, options: ParseOptions = {}): ParseResult {
+  const { sanitize = true } = options;
+  const result = parseMarkdown(markdown, options);
 
   // Process additional features
   result.html = processMath(result.html);
   result.html = processMermaid(result.html);
   result.html = processEmoji(result.html);
+
+  // Apply a final server-side sanitization pass after all post-processing so
+  // that HTML injected by processMath / processMermaid / processEmoji is also
+  // cleaned before the result leaves this function.
+  if (sanitize) {
+    result.html = serverSanitize(result.html);
+  }
 
   return result;
 }

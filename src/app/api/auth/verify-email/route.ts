@@ -48,7 +48,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Check if user exists
-    const user = await User.findById(tokenDoc.userId);
+    const user = await User.findOne({ email: tokenDoc.userId });
 
     if (!user) {
       return NextResponse.json(

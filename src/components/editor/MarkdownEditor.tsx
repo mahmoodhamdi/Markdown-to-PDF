@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import Editor, { OnMount } from '@monaco-editor/react';
 import { useEditorStore, MonacoEditor } from '@/stores/editor-store';
@@ -47,7 +47,9 @@ export function MarkdownEditor({ className }: MarkdownEditorProps) {
     [setContent]
   );
 
-  const getEditorTheme = () => {
+  // Memoize the Monaco theme string so it is only recomputed when `mode`
+  // changes, rather than being recalculated on every render.
+  const editorTheme = useMemo(() => {
     if (mode === 'system') {
       return typeof window !== 'undefined' &&
         window.matchMedia('(prefers-color-scheme: dark)').matches
@@ -55,7 +57,7 @@ export function MarkdownEditor({ className }: MarkdownEditorProps) {
         : 'light';
     }
     return mode === 'dark' ? 'vs-dark' : 'light';
-  };
+  }, [mode]);
 
   if (!mounted) {
     return (
@@ -75,7 +77,7 @@ export function MarkdownEditor({ className }: MarkdownEditorProps) {
         value={content}
         onChange={handleEditorChange}
         onMount={handleEditorMount}
-        theme={getEditorTheme()}
+        theme={editorTheme}
         options={{
           fontSize: editorSettings.fontSize,
           fontFamily: editorSettings.fontFamily,

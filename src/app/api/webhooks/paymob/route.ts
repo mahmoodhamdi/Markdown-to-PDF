@@ -189,7 +189,7 @@ export async function POST(request: NextRequest) {
       // Send email notifications based on webhook result
       if (emailService.isConfigured() && result.userEmail) {
         await connectDB();
-        const user = await User.findById(result.userEmail);
+        const user = await User.findOne({ email: result.userEmail });
 
         if (result.event === 'payment.success' && result.status === 'succeeded') {
           // Get plan from order metadata

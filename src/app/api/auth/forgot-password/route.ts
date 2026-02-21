@@ -63,7 +63,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Look up user
-    const user = await User.findById(normalizedEmail);
+    const user = await User.findOne({ email: normalizedEmail });
 
     // Always return success to prevent email enumeration
     if (!user) {
