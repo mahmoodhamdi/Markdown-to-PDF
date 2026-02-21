@@ -60,7 +60,8 @@ export async function unlinkAccount(
   await connectDB();
 
   // Check if user has a password set (can't unlink last login method)
-  const user = await User.findById(userId);
+  // userId is the user's email, which is used as the User _id
+  const user = await User.findOne({ email: userId });
   if (!user) {
     return { success: false, error: 'User not found' };
   }

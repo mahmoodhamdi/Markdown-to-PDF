@@ -9,6 +9,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Loader2, UserPlus, Check } from 'lucide-react';
 import { signIn } from 'next-auth/react';
+import { validatePassword } from '@/lib/auth/password-validation';
 
 export default function RegisterPage() {
   const t = useTranslations('auth');
@@ -30,8 +31,10 @@ export default function RegisterPage() {
       return;
     }
 
-    if (password.length < 6) {
-      setError(t('passwordTooShort'));
+    // Validate password against the same rules enforced by the server
+    const { valid, errors: passwordErrors } = validatePassword(password);
+    if (!valid) {
+      setError(passwordErrors[0]);
       return;
     }
 
@@ -141,7 +144,7 @@ export default function RegisterPage() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
-                minLength={6}
+                minLength={8}
               />
             </div>
             <div className="space-y-2">

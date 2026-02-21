@@ -17,13 +17,29 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
+    const defaultReturnUrl = `${process.env.NEXT_PUBLIC_APP_URL}/dashboard/subscription`;
+
     const { searchParams } = new URL(request.url);
-    const returnUrl =
-      searchParams.get('returnUrl') || `${process.env.NEXT_PUBLIC_APP_URL}/dashboard/subscription`;
+    const rawReturnUrl = searchParams.get('returnUrl');
+
+    // Validate returnUrl against the app's own origin to prevent open redirect attacks.
+    let returnUrl = defaultReturnUrl;
+    if (rawReturnUrl) {
+      try {
+        const appOrigin = new URL(process.env.NEXT_PUBLIC_APP_URL || '').hostname;
+        const candidateHostname = new URL(rawReturnUrl).hostname;
+        if (candidateHostname === appOrigin) {
+          returnUrl = rawReturnUrl;
+        }
+        // If hostnames don't match, silently fall back to the default URL.
+      } catch {
+        // Malformed URL — fall back to the default URL.
+      }
+    }
 
     await connectDB();
 
-    const user = await User.findById(session.user.email);
+    const user = await User.findOne({ email: session.user.email });
 
     if (!user) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 });

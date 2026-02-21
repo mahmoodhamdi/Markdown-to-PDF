@@ -60,7 +60,7 @@ export async function GET(_request: NextRequest) {
     await connectDB();
 
     // Fetch user from database
-    const user = await User.findById(session.user.email);
+    const user = await User.findOne({ email: session.user.email });
     if (!user) {
       return NextResponse.json({ error: 'User not found', code: 'not_found' }, { status: 404 });
     }
@@ -225,7 +225,7 @@ export async function DELETE(request: NextRequest) {
     await connectDB();
 
     // Find user first to check if they exist
-    const user = await User.findById(userEmail);
+    const user = await User.findOne({ email: userEmail });
     if (!user) {
       return NextResponse.json({ error: 'User not found', code: 'not_found' }, { status: 404 });
     }
@@ -240,11 +240,13 @@ export async function DELETE(request: NextRequest) {
         );
       }
     } else {
-      // User signed up with OAuth, check if they provided their email as password (simple verification)
-      if (password !== userEmail) {
+      // OAuth user — require the literal string "DELETE" as confirmation.
+      // The previous check used the user's email address, which is publicly
+      // known and therefore not a meaningful secret.
+      if (password !== 'DELETE') {
         return NextResponse.json(
           {
-            error: 'For OAuth accounts, please enter your email address to confirm deletion',
+            error: 'For OAuth accounts, please type DELETE to confirm account deletion',
             code: 'invalid_confirmation',
           },
           { status: 401 }

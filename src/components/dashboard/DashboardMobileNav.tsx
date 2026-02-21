@@ -1,0 +1,87 @@
+'use client';
+
+import { useTranslations } from 'next-intl';
+import { usePathname } from 'next/navigation';
+import { Link } from '@/i18n/routing';
+import {
+  LayoutDashboard,
+  BarChart3,
+  CreditCard,
+  FolderOpen,
+  LineChart,
+  Settings,
+  User,
+  Shield,
+  UserCog,
+  Users,
+  Key,
+} from 'lucide-react';
+import { cn } from '@/lib/utils';
+
+interface NavItem {
+  href: string;
+  labelKey: string;
+  icon: React.ComponentType<{ className?: string }>;
+  dividerAfter?: boolean;
+}
+
+const navItems: NavItem[] = [
+  { href: '/dashboard', labelKey: 'overview', icon: LayoutDashboard },
+  { href: '/dashboard/usage', labelKey: 'usage', icon: BarChart3 },
+  { href: '/dashboard/subscription', labelKey: 'subscription', icon: CreditCard },
+  { href: '/dashboard/files', labelKey: 'files', icon: FolderOpen },
+  { href: '/dashboard/analytics', labelKey: 'analytics', icon: LineChart },
+  { href: '/dashboard/teams', labelKey: 'teams', icon: Users, dividerAfter: true },
+  { href: '/dashboard/profile', labelKey: 'profile', icon: User },
+  { href: '/dashboard/security', labelKey: 'security', icon: Shield },
+  { href: '/dashboard/api-keys', labelKey: 'apiKeys', icon: Key },
+  { href: '/dashboard/account', labelKey: 'account', icon: UserCog, dividerAfter: true },
+  { href: '/settings', labelKey: 'settings', icon: Settings },
+];
+
+interface DashboardMobileNavProps {
+  onNavigate: () => void;
+}
+
+export function DashboardMobileNav({ onNavigate }: DashboardMobileNavProps) {
+  const t = useTranslations('dashboard.nav');
+  const pathname = usePathname();
+
+  // Remove locale prefix for comparison
+  const currentPath = pathname.replace(/^\/(en|ar)/, '');
+
+  const isActive = (href: string) => {
+    if (href === '/dashboard') {
+      return currentPath === '/dashboard';
+    }
+    return currentPath.startsWith(href);
+  };
+
+  return (
+    <nav aria-label="Dashboard mobile navigation">
+      {navItems.map((item) => {
+        const Icon = item.icon;
+        const active = isActive(item.href);
+
+        return (
+          <div key={item.href}>
+            <Link
+              href={item.href}
+              onClick={onNavigate}
+              className={cn(
+                'flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors',
+                active
+                  ? 'bg-primary text-primary-foreground'
+                  : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground'
+              )}
+            >
+              <Icon className="h-5 w-5 shrink-0" />
+              {t(item.labelKey)}
+            </Link>
+            {item.dividerAfter && <div className="my-2 border-t mx-4" />}
+          </div>
+        );
+      })}
+    </nav>
+  );
+}

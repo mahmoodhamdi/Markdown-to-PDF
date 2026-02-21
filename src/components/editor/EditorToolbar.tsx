@@ -35,6 +35,7 @@ import { useAutoSave } from '@/hooks/useAutoSave';
 import { cn } from '@/lib/utils';
 
 interface ToolbarAction {
+  id?: string;
   icon: React.ReactNode;
   label: string;
   action: () => void;
@@ -202,21 +203,25 @@ export function EditorToolbar() {
 
   const viewActions: ToolbarAction[] = [
     {
+      id: 'preview',
       icon: <Eye className="h-4 w-4" />,
       label: t('preview'),
       action: () => setViewMode(viewMode === 'preview' ? 'editor' : 'preview'),
     },
     {
+      id: 'split',
       icon: <Columns className="h-4 w-4" />,
       label: t('split'),
       action: () => setViewMode(viewMode === 'split' ? 'editor' : 'split'),
     },
     {
+      id: 'toc',
       icon: <ListTree className="h-4 w-4" />,
       label: t('toc'),
       action: () => toggleToc(),
     },
     {
+      id: 'fullscreen',
       icon: isFullscreen ? <Minimize2 className="h-4 w-4" /> : <Maximize2 className="h-4 w-4" />,
       label: isFullscreen ? t('exitFullscreen') : t('fullscreen'),
       action: () => toggleFullscreen(),
@@ -262,10 +267,10 @@ export function EditorToolbar() {
                   size="icon"
                   className={cn(
                     'h-8 w-8',
-                    (action.label === t('preview') && viewMode === 'preview') ||
-                      (action.label === t('split') && viewMode === 'split') ||
-                      (action.label === t('toc') && showToc) ||
-                      (action.label === t('exitFullscreen') && isFullscreen)
+                    (action.id === 'preview' && viewMode === 'preview') ||
+                      (action.id === 'split' && viewMode === 'split') ||
+                      (action.id === 'toc' && showToc) ||
+                      (action.id === 'fullscreen' && isFullscreen)
                       ? 'bg-accent'
                       : ''
                   )}

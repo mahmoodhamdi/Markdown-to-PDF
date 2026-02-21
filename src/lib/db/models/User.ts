@@ -6,6 +6,8 @@
 import mongoose, { Schema, Model } from 'mongoose';
 import { PlanType } from '@/lib/plans/config';
 
+export type UserRole = 'user' | 'admin';
+
 export interface IUser {
   _id: string;
   email: string;
@@ -13,6 +15,7 @@ export interface IUser {
   image: string;
   password?: string; // Hashed password for email/password auth
   plan: PlanType;
+  role: UserRole;
   usage: {
     conversions: number;
     apiCalls: number;
@@ -38,6 +41,11 @@ const UserSchema = new Schema<IUser>(
       enum: ['free', 'pro', 'team', 'enterprise'],
       default: 'free',
     },
+    role: {
+      type: String,
+      enum: ['user', 'admin'],
+      default: 'user',
+    },
     usage: {
       conversions: { type: Number, default: 0 },
       apiCalls: { type: Number, default: 0 },
@@ -56,6 +64,7 @@ const UserSchema = new Schema<IUser>(
 UserSchema.index({ plan: 1 });
 UserSchema.index({ createdAt: -1 });
 UserSchema.index({ plan: 1, createdAt: -1 }); // For admin queries by plan
+UserSchema.index({ role: 1 }); // For admin role lookups
 UserSchema.index({ stripeCustomerId: 1 }, { sparse: true }); // For webhook lookups
 
 // Prevent model recompilation in development

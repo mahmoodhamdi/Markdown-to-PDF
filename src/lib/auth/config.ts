@@ -76,7 +76,7 @@ async function getOrCreateUser(email: string, name?: string | null, image?: stri
   try {
     await connectDB();
 
-    let user = await User.findById(email);
+    let user = await User.findOne({ email });
 
     if (user) {
       // Reset usage if it's a new day
@@ -160,7 +160,7 @@ export const authOptions: NextAuthOptions = {
           }
 
           // Find user by email
-          const user = await User.findById(email);
+          const user = await User.findOne({ email });
 
           if (!user) {
             // Record failed attempt but use generic error
@@ -228,7 +228,7 @@ export const authOptions: NextAuthOptions = {
       if (trigger === 'update' && token.id) {
         try {
           await connectDB();
-          const userData = await User.findById(token.id);
+          const userData = await User.findOne({ email: token.id });
           if (userData) {
             token.emailVerified = !!userData.emailVerified;
           }

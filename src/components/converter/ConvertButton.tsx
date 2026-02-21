@@ -27,7 +27,7 @@ export function ConvertButton() {
   const { documentTheme, codeTheme, customCss } = useThemeStore();
   const { pageSettings } = useSettingsStore();
 
-  const handleConvert = async () => {
+  const handleConvert = useCallback(async () => {
     if (!content.trim()) {
       toast.error(tErrors('emptyContent'));
       return;
@@ -118,7 +118,7 @@ export function ConvertButton() {
     } finally {
       setIsConverting(false);
     }
-  };
+  }, [content, format, documentTheme, codeTheme, customCss, pageSettings, t, tErrors]);
 
   const handlePrint = useCallback(async () => {
     if (!content.trim()) {

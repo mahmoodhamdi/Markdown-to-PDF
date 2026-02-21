@@ -65,7 +65,7 @@ export async function POST(request: NextRequest) {
     const { userId, oldEmail, newEmail } = tokenDoc;
 
     // Check if old user still exists
-    const oldUser = await User.findById(userId);
+    const oldUser = await User.findOne({ email: userId });
     if (!oldUser) {
       // Mark token as used even if user doesn't exist
       await markEmailTokenAsUsed(token);
@@ -76,7 +76,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Check if new email is already taken (by another user since token was created)
-    const existingNewUser = await User.findById(newEmail);
+    const existingNewUser = await User.findOne({ email: newEmail });
     if (existingNewUser) {
       await markEmailTokenAsUsed(token);
       return NextResponse.json(

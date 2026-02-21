@@ -30,10 +30,19 @@ export async function POST(request: NextRequest) {
 
     // Get the raw body for signature verification
     const rawBody = await request.text();
-    const signature = request.headers.get('paddle-signature') || '';
+    const signature = request.headers.get('paddle-signature');
 
-    // Verify signature if webhook secret is configured
-    if (PADDLE_CONFIG.webhookSecret && signature) {
+    // When the webhook secret is configured, a signature is mandatory
+    if (PADDLE_CONFIG.webhookSecret) {
+      if (!signature) {
+        webhookLog('warn', 'Missing paddle-signature header', {
+          gateway: 'paddle',
+          eventId: 'unknown',
+          eventType: 'unknown',
+        });
+        return NextResponse.json({ error: 'Missing signature' }, { status: 400 });
+      }
+
       const isValid = paddleClient.verifyWebhookSignature(rawBody, signature);
       if (!isValid) {
         webhookLog('error', 'Invalid webhook signature', {
@@ -177,7 +186,7 @@ async function handleSubscriptionActivated(event: Record<string, unknown>, event
   }
 
   await connectDB();
-  const user = await User.findById(userEmail.toLowerCase());
+  const user = await User.findOne({ email: userEmail.toLowerCase() });
 
   await User.findByIdAndUpdate(userEmail.toLowerCase(), {
     $set: {
@@ -272,7 +281,7 @@ async function handleSubscriptionCanceled(event: Record<string, unknown>, eventI
   }
 
   await connectDB();
-  const user = await User.findById(userEmail.toLowerCase());
+  const user = await User.findOne({ email: userEmail.toLowerCase() });
   const previousPlan = plan || user?.plan || 'pro';
 
   await User.findByIdAndUpdate(userEmail.toLowerCase(), {

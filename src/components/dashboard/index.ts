@@ -1,4 +1,5 @@
 export { DashboardSidebar } from './DashboardSidebar';
+export { DashboardMobileNav } from './DashboardMobileNav';
 export { DashboardOverview } from './DashboardOverview';
 export { QuickStats } from './QuickStats';
 export { UsageProgress } from './UsageProgress';

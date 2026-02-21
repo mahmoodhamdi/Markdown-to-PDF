@@ -62,7 +62,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Get user
-    const user = await User.findById(tokenDoc.userId);
+    const user = await User.findOne({ email: tokenDoc.userId });
 
     if (!user) {
       // Mark token as used even if user doesn't exist

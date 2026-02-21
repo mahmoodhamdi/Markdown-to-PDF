@@ -467,7 +467,7 @@ describe('PayTabs Gateway', () => {
         name: 'PayTabs Customer',
         createdAt: new Date('2024-01-01'),
       };
-      mockFindById.mockResolvedValue(mockUser);
+      mockFindOne.mockResolvedValue(mockUser);
 
       const result = await paytabsGateway.getCustomer('user-123');
 
@@ -480,7 +480,7 @@ describe('PayTabs Gateway', () => {
     it('should return null for non-existent customer', async () => {
       const { paytabsGateway } = await import('@/lib/payments/paytabs/gateway');
 
-      mockFindById.mockResolvedValue(null);
+      mockFindOne.mockResolvedValue(null);
 
       const result = await paytabsGateway.getCustomer('nonexistent');
 
@@ -490,7 +490,7 @@ describe('PayTabs Gateway', () => {
     it('should return null on database error', async () => {
       const { paytabsGateway } = await import('@/lib/payments/paytabs/gateway');
 
-      mockFindById.mockRejectedValue(new Error('Database error'));
+      mockFindOne.mockRejectedValue(new Error('Database error'));
 
       const result = await paytabsGateway.getCustomer('error');
 

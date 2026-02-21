@@ -50,16 +50,28 @@ export function PageSettingsForm() {
             <Label>Width (mm)</Label>
             <Input
               type="number"
+              min={10}
+              max={5000}
               value={pageSettings.customWidth || 210}
-              onChange={(e) => setPageSettings({ customWidth: parseInt(e.target.value) || 210 })}
+              onChange={(e) =>
+                setPageSettings({
+                  customWidth: Math.max(10, Math.min(5000, parseInt(e.target.value) || 210)),
+                })
+              }
             />
           </div>
           <div className="space-y-2">
             <Label>Height (mm)</Label>
             <Input
               type="number"
+              min={10}
+              max={5000}
               value={pageSettings.customHeight || 297}
-              onChange={(e) => setPageSettings({ customHeight: parseInt(e.target.value) || 297 })}
+              onChange={(e) =>
+                setPageSettings({
+                  customHeight: Math.max(10, Math.min(5000, parseInt(e.target.value) || 297)),
+                })
+              }
             />
           </div>
         </div>
@@ -91,10 +103,15 @@ export function PageSettingsForm() {
             <div className="flex items-center gap-2">
               <Input
                 type="number"
+                min={0}
+                max={100}
                 value={pageSettings.margins.top}
                 onChange={(e) =>
                   setPageSettings({
-                    margins: { ...pageSettings.margins, top: parseInt(e.target.value) || 0 },
+                    margins: {
+                      ...pageSettings.margins,
+                      top: Math.max(0, Math.min(100, parseInt(e.target.value) || 0)),
+                    },
                   })
                 }
                 className="w-20"
@@ -107,10 +124,15 @@ export function PageSettingsForm() {
             <div className="flex items-center gap-2">
               <Input
                 type="number"
+                min={0}
+                max={100}
                 value={pageSettings.margins.bottom}
                 onChange={(e) =>
                   setPageSettings({
-                    margins: { ...pageSettings.margins, bottom: parseInt(e.target.value) || 0 },
+                    margins: {
+                      ...pageSettings.margins,
+                      bottom: Math.max(0, Math.min(100, parseInt(e.target.value) || 0)),
+                    },
                   })
                 }
                 className="w-20"
@@ -123,10 +145,15 @@ export function PageSettingsForm() {
             <div className="flex items-center gap-2">
               <Input
                 type="number"
+                min={0}
+                max={100}
                 value={pageSettings.margins.left}
                 onChange={(e) =>
                   setPageSettings({
-                    margins: { ...pageSettings.margins, left: parseInt(e.target.value) || 0 },
+                    margins: {
+                      ...pageSettings.margins,
+                      left: Math.max(0, Math.min(100, parseInt(e.target.value) || 0)),
+                    },
                   })
                 }
                 className="w-20"
@@ -139,10 +166,15 @@ export function PageSettingsForm() {
             <div className="flex items-center gap-2">
               <Input
                 type="number"
+                min={0}
+                max={100}
                 value={pageSettings.margins.right}
                 onChange={(e) =>
                   setPageSettings({
-                    margins: { ...pageSettings.margins, right: parseInt(e.target.value) || 0 },
+                    margins: {
+                      ...pageSettings.margins,
+                      right: Math.max(0, Math.min(100, parseInt(e.target.value) || 0)),
+                    },
                   })
                 }
                 className="w-20"

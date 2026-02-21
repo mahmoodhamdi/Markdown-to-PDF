@@ -8,7 +8,7 @@ vi.mock('@/lib/db/mongodb', () => ({
 }));
 
 const mockVerifyKey = vi.fn();
-const mockFindById = vi.fn();
+const mockFindOne = vi.fn();
 
 vi.mock('@/lib/db/models/ApiKey', () => ({
   ApiKey: {
@@ -18,7 +18,7 @@ vi.mock('@/lib/db/models/ApiKey', () => ({
 
 vi.mock('@/lib/db/models/User', () => ({
   User: {
-    findById: mockFindById,
+    findOne: mockFindOne,
   },
 }));
 
@@ -139,7 +139,7 @@ describe('API Key Authentication', () => {
         rateLimit: { limit: 100, window: 60 },
       });
 
-      mockFindById.mockResolvedValue({
+      mockFindOne.mockResolvedValue({
         _id: 'user123',
         email: 'test@example.com',
         plan: 'pro',
@@ -181,7 +181,7 @@ describe('API Key Authentication', () => {
         rateLimit: { limit: 100, window: 60 },
       });
 
-      mockFindById.mockResolvedValue(null);
+      mockFindOne.mockResolvedValue(null);
 
       const { authenticateApiKey } = await import('@/lib/auth/api-key-auth');
 

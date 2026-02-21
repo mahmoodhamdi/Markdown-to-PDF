@@ -65,7 +65,7 @@ export async function POST(request: NextRequest) {
     await connectDB();
 
     // Fetch user with password
-    const user = await User.findById(session.user.email);
+    const user = await User.findOne({ email: session.user.email });
     if (!user) {
       return NextResponse.json({ error: 'User not found', code: 'not_found' }, { status: 404 });
     }

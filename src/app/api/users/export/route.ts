@@ -140,7 +140,7 @@ For questions about your data, contact support.
  */
 async function collectUserData(userEmail: string) {
   // Fetch user profile
-  const user = await User.findById(userEmail).lean();
+  const user = await User.findOne({ email: userEmail }).lean();
 
   // Profile data (sanitized - no password)
   const profile = user

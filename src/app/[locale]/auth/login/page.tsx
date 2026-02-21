@@ -125,7 +125,15 @@ function LoginContent() {
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="password">{t('password')}</Label>
+              <div className="flex items-center justify-between">
+                <Label htmlFor="password">{t('password')}</Label>
+                <Link
+                  href="/auth/forgot-password"
+                  className="text-sm text-muted-foreground hover:text-primary hover:underline"
+                >
+                  {t('forgotPassword')}
+                </Link>
+              </div>
               <Input
                 id="password"
                 type="password"
@@ -176,7 +184,10 @@ function LoginLoading() {
               <Skeleton className="h-10 w-full" />
             </div>
             <div className="space-y-2">
-              <Skeleton className="h-4 w-16" />
+              <div className="flex items-center justify-between">
+                <Skeleton className="h-4 w-16" />
+                <Skeleton className="h-4 w-28" />
+              </div>
               <Skeleton className="h-10 w-full" />
             </div>
             <Skeleton className="h-10 w-full" />

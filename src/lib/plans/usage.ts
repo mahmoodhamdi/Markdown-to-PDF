@@ -56,7 +56,7 @@ export async function getUserUsage(email: string): Promise<UsageData> {
   try {
     await connectDB();
 
-    const user = await User.findById(email);
+    const user = await User.findOne({ email });
 
     if (!user) {
       return getDefaultUsage();

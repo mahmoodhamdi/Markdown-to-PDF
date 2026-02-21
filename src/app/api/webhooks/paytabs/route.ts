@@ -45,17 +45,25 @@ export async function POST(request: NextRequest) {
       cartId: callback.cart_id,
     });
 
-    // Verify signature if present
-    if (callback.signature) {
-      const isValid = paytabsClient.verifyCallbackSignature(callback);
-      if (!isValid) {
-        webhookLog('error', 'Invalid callback signature', {
-          gateway: 'paytabs',
-          eventId,
-          eventType,
-        });
-        return NextResponse.json({ error: 'Invalid signature' }, { status: 400 });
-      }
+    // Reject requests that are missing a signature
+    if (!callback.signature) {
+      webhookLog('warn', 'Missing callback signature', {
+        gateway: 'paytabs',
+        eventId,
+        eventType,
+      });
+      return NextResponse.json({ error: 'Missing signature' }, { status: 400 });
+    }
+
+    // Verify signature
+    const isValid = paytabsClient.verifyCallbackSignature(callback);
+    if (!isValid) {
+      webhookLog('error', 'Invalid callback signature', {
+        gateway: 'paytabs',
+        eventId,
+        eventType,
+      });
+      return NextResponse.json({ error: 'Invalid signature' }, { status: 400 });
     }
 
     // Check idempotency - skip if already processed
@@ -71,7 +79,7 @@ export async function POST(request: NextRequest) {
 
     try {
       // Use the gateway's handleWebhook method which includes subscription management
-      const result = await paytabsGateway.handleWebhook(callback, callback.signature || '');
+      const result = await paytabsGateway.handleWebhook(callback, callback.signature);
 
       webhookLog('info', 'Webhook processed', {
         gateway: 'paytabs',
@@ -86,7 +94,7 @@ export async function POST(request: NextRequest) {
       // Send email notifications based on webhook result
       if (emailService.isConfigured() && result.userEmail) {
         await connectDB();
-        const user = await User.findById(result.userEmail);
+        const user = await User.findOne({ email: result.userEmail });
 
         if (result.status === 'succeeded') {
           // Get plan from cart description/metadata

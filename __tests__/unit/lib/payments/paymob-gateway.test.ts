@@ -421,7 +421,7 @@ describe('Paymob Gateway', () => {
         name: 'Test Customer',
         createdAt: new Date('2024-01-01'),
       };
-      mockFindById.mockResolvedValue(mockUser);
+      mockFindOne.mockResolvedValue(mockUser);
 
       const result = await paymobGateway.getCustomer('user-123');
 
@@ -434,7 +434,7 @@ describe('Paymob Gateway', () => {
     it('should return null for non-existent customer', async () => {
       const { paymobGateway } = await import('@/lib/payments/paymob/gateway');
 
-      mockFindById.mockResolvedValue(null);
+      mockFindOne.mockResolvedValue(null);
 
       const result = await paymobGateway.getCustomer('nonexistent');
 
@@ -444,7 +444,7 @@ describe('Paymob Gateway', () => {
     it('should return null on database error', async () => {
       const { paymobGateway } = await import('@/lib/payments/paymob/gateway');
 
-      mockFindById.mockRejectedValue(new Error('Database error'));
+      mockFindOne.mockRejectedValue(new Error('Database error'));
 
       const result = await paymobGateway.getCustomer('error');
 

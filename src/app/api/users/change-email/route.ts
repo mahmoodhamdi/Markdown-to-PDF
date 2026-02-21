@@ -80,7 +80,7 @@ export async function POST(request: NextRequest) {
     await connectDB();
 
     // Fetch user
-    const user = await User.findById(currentEmail);
+    const user = await User.findOne({ email: currentEmail });
     if (!user) {
       return NextResponse.json({ error: 'User not found', code: 'not_found' }, { status: 404 });
     }
@@ -106,7 +106,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Check if new email already exists
-    const existingUser = await User.findById(normalizedNewEmail);
+    const existingUser = await User.findOne({ email: normalizedNewEmail });
     if (existingUser) {
       return NextResponse.json(
         { error: 'An account with this email already exists', code: 'email_exists' },

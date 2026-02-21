@@ -3,6 +3,7 @@ import { stripe, isStripeConfigured } from '@/lib/stripe/config';
 import { connectDB } from '@/lib/db/mongodb';
 import { User } from '@/lib/db/models/User';
 import { emailService } from '@/lib/email/service';
+import { baseStyles, wrapInBaseTemplate } from '@/lib/email/templates/base';
 import { PlanType } from '@/lib/plans/config';
 import {
   checkAndMarkProcessing,
@@ -188,7 +189,7 @@ async function handleCheckoutComplete(session: Stripe.Checkout.Session, eventId:
   await connectDB();
 
   // Get user for name
-  const user = await User.findById(userEmail);
+  const user = await User.findOne({ email: userEmail });
 
   // Update user's plan in MongoDB
   await User.findByIdAndUpdate(userEmail, {
@@ -283,7 +284,7 @@ async function handleSubscriptionCanceled(subscription: Stripe.Subscription, eve
   await connectDB();
 
   // Get user for name and current plan
-  const user = await User.findById(userEmail);
+  const user = await User.findOne({ email: userEmail });
   const previousPlan = plan || user?.plan || 'pro';
 
   // Downgrade user to free plan
@@ -362,7 +363,89 @@ async function handlePaymentActionRequired(invoice: Stripe.Invoice, eventId: str
     invoiceId: invoice.id,
   });
 
-  // TODO: Could send email to customer about required action
+  if (!customerEmail || !emailService.isConfigured()) {
+    return;
+  }
+
+  await connectDB();
+  const user = await User.findOne({ email: customerEmail });
+  const displayName = user?.name || customerEmail.split('@')[0];
+
+  // Use Stripe's hosted invoice URL when available so the customer can complete
+  // 3D Secure authentication directly. Fall back to the subscription dashboard.
+  const actionUrl =
+    invoice.hosted_invoice_url ??
+    `${process.env.NEXT_PUBLIC_APP_URL}/dashboard/subscription`;
+
+  const html = wrapInBaseTemplate(`
+    <h1 style="${baseStyles.heading}">Action Required: Complete Your Payment</h1>
+
+    <p style="${baseStyles.paragraph}">
+      Hello ${displayName},
+    </p>
+
+    <p style="${baseStyles.paragraph}">
+      Your recent payment requires additional authentication (3D Secure) to be completed.
+      This is a security step required by your bank to verify the transaction.
+    </p>
+
+    <p style="${baseStyles.paragraph}">
+      Please click the button below to complete the authentication and process your payment.
+      This link will expire, so we recommend acting promptly to avoid any interruption to
+      your subscription.
+    </p>
+
+    <div style="text-align: center;">
+      <a href="${actionUrl}" style="${baseStyles.button}">
+        Complete Payment
+      </a>
+    </div>
+
+    <div style="${baseStyles.divider}"></div>
+
+    <p style="${baseStyles.paragraph}; ${baseStyles.muted}">
+      If you did not expect this email or believe this is an error, please reply to this
+      email and we'll be happy to help.
+    </p>
+  `);
+
+  const text = `
+Action Required: Complete Your Payment
+
+Hello ${displayName},
+
+Your recent payment requires additional authentication (3D Secure) to be completed.
+This is a security step required by your bank to verify the transaction.
+
+Please visit the link below to complete the authentication and process your payment:
+
+${actionUrl}
+
+This link will expire, so we recommend acting promptly to avoid any interruption to
+your subscription.
+
+If you did not expect this email or believe this is an error, please reply to this
+email and we'll be happy to help.
+
+Best regards,
+The Markdown to PDF Team
+  `.trim();
+
+  emailService
+    .sendEmail({
+      to: customerEmail,
+      subject: 'Action required: Complete your payment - Markdown to PDF',
+      html,
+      text,
+    })
+    .catch((err) => {
+      webhookLog('error', 'Failed to send payment action required email', {
+        gateway: 'stripe',
+        eventId,
+        eventType: 'invoice.payment_action_required',
+        error: err instanceof Error ? err.message : 'Unknown error',
+      });
+    });
 }
 
 async function handleChargeRefunded(charge: Stripe.Charge, eventId: string) {

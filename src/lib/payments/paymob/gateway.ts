@@ -263,7 +263,7 @@ export const paymobGateway: PaymentGateway = {
     // We use our database
     try {
       await connectDB();
-      const user = await User.findById(customerId);
+      const user = await User.findOne({ email: customerId });
 
       if (!user) {
         return null;
