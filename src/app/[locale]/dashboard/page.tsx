@@ -2,6 +2,7 @@
 
 import { useSession } from 'next-auth/react';
 import { redirect } from 'next/navigation';
+import { useLocale } from 'next-intl';
 import { DashboardOverview } from '@/components/dashboard';
 import { Skeleton } from '@/components/ui/skeleton';
 import { getPlanLimits, formatFileSize } from '@/lib/plans/config';
@@ -9,10 +10,11 @@ import type { PlanType } from '@/lib/plans/config';
 
 export default function DashboardPage() {
   const { data: session, status } = useSession();
+  const locale = useLocale();
 
   // Redirect to login if not authenticated
   if (status === 'unauthenticated') {
-    redirect('/auth/login');
+    redirect(`/${locale}/auth/login`);
   }
 
   // Loading state
