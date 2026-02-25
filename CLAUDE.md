@@ -10,6 +10,7 @@ npm run dev              # Start dev server at localhost:3000
 
 # Build
 npm run build            # Production build (standalone output)
+npm run analyze          # Bundle analysis (opens report in browser)
 
 # Lint & Format
 npm run lint             # ESLint check
@@ -38,17 +39,44 @@ docker-compose -f docker/docker-compose.yml up          # Start app with Docker
 docker-compose -f docker/docker-compose.prod.yml up     # Production mode
 ```
 
+## Code Style Conventions
+
+**Prettier**: Single quotes, 2-space indent, 100 char line width, trailing commas (ES5), double quotes in JSX, always parens on arrow functions.
+
+**ESLint rules to know**:
+
+- Prefix unused variables/parameters with `_` (e.g., `_req`, `_unused`) — the `@typescript-eslint/no-unused-vars` rule allows this pattern
+- `no-console`: Only `console.info`, `console.warn`, `console.error` are allowed — `console.log` and `console.debug` trigger warnings
+- `@typescript-eslint/no-explicit-any` is a warning, not an error
+- `eqeqeq` enforced (use `===`), except for null checks
+
+**Class names**: Use the `cn()` utility from `src/lib/utils.ts` (wraps `clsx` + `tailwind-merge`) for conditional/merged Tailwind classes.
+
 ## Architecture Overview
 
 **Next.js 14 App Router** application that converts Markdown to PDF. Uses `next-intl` for i18n with locale-prefixed routes (`/en/`, `/ar/` with RTL support). Middleware at `src/middleware.ts` handles locale routing.
+
+### Locale Routing and i18n
+
+All pages live under `src/app/[locale]/` — there is no root `layout.tsx` at `src/app/`. The locale layout (`src/app/[locale]/layout.tsx`) sets `<html lang>` and `dir` (ltr/rtl), and wraps the app in `NextIntlClientProvider`.
+
+- **Supported locales**: `en` (English, LTR), `ar` (Arabic, RTL) — defined in `src/i18n/config.ts`
+- **Translation messages**: `src/messages/en.json` and `src/messages/ar.json`
+- **Routing config**: `src/i18n/routing.ts` — uses `next-intl/routing` with shared pathnames
+- **Middleware matcher**: `['/', '/(en|ar)/:path*']`
+- When adding a new page, create it under `src/app/[locale]/`. When adding new UI strings, add keys to both `en.json` and `ar.json`.
 
 ### Core Processing Pipeline
 
 1. **Markdown Parser** (`src/lib/markdown/parser.ts`): Converts markdown to HTML using `marked` with extensions for GFM, syntax highlighting (highlight.js), KaTeX math, Mermaid diagrams, and emoji shortcodes. All parsing flows through `parseMarkdownFull()`.
 
-2. **PDF Generator** (`src/lib/pdf/generator.ts`): Uses Puppeteer to render HTML and generate PDFs. `generateHtmlDocument()` creates the full HTML with theme CSS, KaTeX/Mermaid scripts. `generatePdf()` launches headless Chrome for conversion. Puppeteer is listed in `serverComponentsExternalPackages` in `next.config.js`.
+2. **PDF Generator** (`src/lib/pdf/generator.ts`): Uses Puppeteer to render HTML and generate PDFs. `generateHtmlDocument()` creates the full HTML with theme CSS, KaTeX/Mermaid scripts. `generatePdf()` launches headless Chrome for conversion. Puppeteer is listed in `serverComponentsExternalPackages` in `next.config.js`. In Docker, Chromium is installed at `/usr/bin/chromium-browser` via `PUPPETEER_EXECUTABLE_PATH`.
 
-3. **Theme Manager** (`src/lib/themes/manager.ts`): Manages 8 document themes (github, academic, minimal, dark, professional, elegant, modern, newsletter) and code themes. CSS is embedded directly in the file to avoid import issues.
+3. **Theme Manager** (`src/lib/themes/manager.ts`): Manages 8 document themes (github, academic, minimal, dark, professional, elegant, modern, newsletter) and 7 code themes. CSS is embedded directly in the file to avoid import issues.
+
+### UI Components
+
+Components in `src/components/ui/` are Radix UI primitives styled with Tailwind CSS (shadcn/ui pattern). The editor uses Monaco Editor (`@monaco-editor/react`). Dark mode uses Tailwind's `class` strategy with CSS custom properties defined in `src/app/globals.css`.
 
 ### Freemium Plan System
 
@@ -83,13 +111,15 @@ Multi-gateway payment system (`src/lib/payments/`):
 ### State Management (Zustand)
 
 Stores in `src/stores/` with `persist` middleware (localStorage):
-- `editor-store.ts`: Editor content, view mode (editor/preview/split), fullscreen state
-- `theme-store.ts`: Document theme, code theme, UI theme mode
-- `settings-store.ts`: Page settings (size, orientation, margins, watermark, headers/footers)
+
+- `editor-store.ts`: Editor content, view mode (editor/preview/split), fullscreen state, Monaco instance
+- `theme-store.ts`: Document theme, code theme, UI theme mode, custom CSS
+- `settings-store.ts`: Editor settings (fontSize, fontFamily, tabSize, wordWrap) and page settings (size, orientation, margins, watermark, headers/footers)
 
 ### Authentication
 
 Uses NextAuth.js (`src/lib/auth/config.ts`) with JWT session strategy:
+
 - GitHub OAuth, Google OAuth, and email/password credentials (bcrypt with 14 rounds)
 - MongoDB for user storage (not Firebase Adapter)
 - Password requirements in `src/lib/auth/password-validation.ts`: min 8 chars, uppercase, lowercase, number, special character
@@ -97,6 +127,7 @@ Uses NextAuth.js (`src/lib/auth/config.ts`) with JWT session strategy:
 ### API Routes
 
 Core routes in `src/app/api/`:
+
 - `POST /api/convert` - PDF conversion (60 req/min)
 - `POST /api/convert/batch` - Batch conversion (10 req/min)
 - `POST /api/preview` - HTML preview (120 req/min)
@@ -122,6 +153,7 @@ Plan types in `src/lib/plans/config.ts`: `PlanType`, `PlanLimits`, `Plan`.
 ## TypeScript Strictness
 
 The `tsconfig.json` enforces strict rules beyond the default `strict: true`:
+
 - `noUnusedLocals` and `noUnusedParameters` - no dead variables/params
 - `noImplicitReturns` - all code paths must return
 - `noFallthroughCasesInSwitch` - switch cases must break/return
@@ -141,6 +173,7 @@ The `tsconfig.json` enforces strict rules beyond the default `strict: true`:
 ### Test Setup Mocks
 
 The test setup (`src/test/setup.ts`) pre-mocks:
+
 - `next/navigation` (useRouter, usePathname, useSearchParams)
 - `next-intl` (useTranslations returns key passthrough, useLocale returns `'en'`)
 - `window.matchMedia`, `ResizeObserver`
