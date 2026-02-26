@@ -58,6 +58,13 @@ const nextConfig = {
   experimental: {
     serverComponentsExternalPackages: ['puppeteer'],
   },
+  images: {
+    remotePatterns: [
+      { hostname: 'api.dicebear.com' },
+      { hostname: 'avatars.githubusercontent.com' },
+      { hostname: 'lh3.googleusercontent.com' },
+    ],
+  },
   // Add security headers to all routes
   async headers() {
     return [

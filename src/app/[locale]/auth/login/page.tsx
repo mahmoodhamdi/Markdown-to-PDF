@@ -16,11 +16,12 @@ function LoginContent() {
   const t = useTranslations('auth');
   const searchParams = useSearchParams();
   const callbackUrl = searchParams.get('callbackUrl') || '/';
-  const error = searchParams.get('error');
+  const urlError = searchParams.get('error');
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(urlError);
 
   const handleOAuthSignIn = async (provider: string) => {
     setIsLoading(provider);
@@ -30,12 +31,22 @@ function LoginContent() {
   const handleCredentialsSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading('credentials');
-    await signIn('credentials', {
+    setError(null);
+
+    const result = await signIn('credentials', {
       email,
       password,
-      callbackUrl,
+      redirect: false,
     });
-    setIsLoading(null);
+
+    if (result?.error) {
+      setError(result.error);
+      setIsLoading(null);
+    } else if (result?.ok) {
+      window.location.href = callbackUrl;
+    } else {
+      setIsLoading(null);
+    }
   };
 
   return (
@@ -48,7 +59,11 @@ function LoginContent() {
         <CardContent className="space-y-4">
           {error && (
             <div className="p-3 text-sm text-red-500 bg-red-50 dark:bg-red-950 rounded-md">
-              {error === 'CredentialsSignin' ? t('invalidCredentials') : t('authError')}
+              {error === 'CredentialsSignin' || error === 'Invalid credentials'
+                ? t('invalidCredentials')
+                : error.startsWith('Too many')
+                  ? error
+                  : t('authError')}
             </div>
           )}
 

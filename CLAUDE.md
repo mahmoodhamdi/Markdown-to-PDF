@@ -64,6 +64,8 @@ All pages live under `src/app/[locale]/` — there is no root `layout.tsx` at `s
 - **Translation messages**: `src/messages/en.json` and `src/messages/ar.json`
 - **Routing config**: `src/i18n/routing.ts` — uses `next-intl/routing` with shared pathnames
 - **Middleware matcher**: `['/', '/(en|ar)/:path*']`
+- **i18n request config**: `src/i18n/request.ts` — used by `next-intl/plugin` in `next.config.js`
+- **Navigation helpers**: `src/i18n/routing.ts` exports locale-aware `Link`, `redirect`, `usePathname`, `useRouter` from `next-intl/navigation` — use these instead of `next/link` and `next/navigation` for locale-prefixed links
 - When adding a new page, create it under `src/app/[locale]/`. When adding new UI strings, add keys to both `en.json` and `ar.json`.
 
 ### Core Processing Pipeline
@@ -124,6 +126,18 @@ Uses NextAuth.js (`src/lib/auth/config.ts`) with JWT session strategy:
 - MongoDB for user storage (not Firebase Adapter)
 - Password requirements in `src/lib/auth/password-validation.ts`: min 8 chars, uppercase, lowercase, number, special character
 
+### Page Routes
+
+Pages under `src/app/[locale]/`:
+
+- `/` — Main editor page
+- `/themes`, `/templates`, `/batch` — Theme selection, document templates, batch conversion
+- `/pricing`, `/settings`, `/api-docs` (+ `/api-docs/swagger`) — Public pages
+- `/auth/login`, `/auth/register`, `/auth/forgot-password`, `/auth/reset-password/[token]` — Auth flows
+- `/dashboard` — User dashboard with sub-pages: `profile`, `security`, `account`, `api-keys`, `files`, `analytics`, `usage`, `subscription`, `teams`, `teams/[teamId]`
+- `/admin` — Admin panel with sub-pages: `users`, `analytics`, `webhooks`
+- `/invitation/[token]`, `/verify-email/[token]` — Token-based flows
+
 ### API Routes
 
 Core routes in `src/app/api/`:
@@ -131,15 +145,19 @@ Core routes in `src/app/api/`:
 - `POST /api/convert` - PDF conversion (60 req/min)
 - `POST /api/convert/batch` - Batch conversion (10 req/min)
 - `POST /api/preview` - HTML preview (120 req/min)
-- `GET /api/themes`, `GET /api/templates`, `GET /api/health`
-- `/api/storage/` - File upload, management, quota
+- `GET /api/themes`, `GET /api/templates`, `GET /api/health`, `GET /api/openapi`
+- `/api/auth/` - Register, forgot-password, reset-password, verify-email, resend-verification
+- `/api/users/` - Profile, change-password, change-email, verify-email-change, data export, sessions, linked accounts
+- `/api/storage/` - File upload, management, quota, avatar
 - `/api/api-keys/` - API key CRUD
-- `/api/teams/` - Team management CRUD
+- `/api/teams/` - Team management, members, invitations, activity
+- `/api/invitations/` - Accept/decline team invitations
 - `/api/analytics/` - Event tracking, summaries, history
-- `/api/sso/` - SSO config, domain verification, audit logs
+- `/api/sso/` - SSO config, domain verification, metadata, audit logs
 - `/api/checkout` - Payment checkout (auto-selects gateway)
 - `/api/webhooks/{stripe,paymob,paytabs,paddle}` - Payment webhooks
-- `/api/subscriptions/` - Invoices, pause/resume, portal, promo codes, payment methods
+- `/api/subscriptions/` - Invoices, pause/resume/cancel, portal, promo codes, payment methods
+- `/api/admin/` - Admin: user management, stats, analytics, webhooks
 
 ### Type Definitions
 
@@ -178,6 +196,10 @@ The test setup (`src/test/setup.ts`) pre-mocks:
 - `next-intl` (useTranslations returns key passthrough, useLocale returns `'en'`)
 - `window.matchMedia`, `ResizeObserver`
 - Radix UI pointer capture methods (`hasPointerCapture`, `setPointerCapture`, `releasePointerCapture`, `scrollIntoView`)
+
+## Security Headers
+
+`next.config.js` applies strict security headers (CSP, HSTS, X-Frame-Options, etc.) to all routes. When adding external script/style/font sources, update the `Content-Security-Policy` directives in `next.config.js`. Current CSP allows CDN resources from `cdnjs.cloudflare.com`, `cdn.jsdelivr.net`, and Google Fonts.
 
 ## Environment Variables
 

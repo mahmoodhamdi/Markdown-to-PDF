@@ -135,7 +135,7 @@ export default function HomePage() {
     >
       {/* Exit fullscreen overlay button */}
       {isFullscreen && (
-        <div className="fixed top-4 right-4 z-[60] opacity-0 hover:opacity-100 transition-opacity duration-200">
+        <div className="fixed top-4 end-4 z-[60] opacity-0 hover:opacity-100 transition-opacity duration-200">
           <Button
             variant="outline"
             size="sm"
@@ -153,11 +153,11 @@ export default function HomePage() {
         <ConvertButton />
       </div>
 
-      <div className="flex-1 flex overflow-hidden">
+      <div className="flex-1 flex flex-row overflow-hidden">
         {/* Editor Panel */}
         <div
           className={cn(
-            'flex flex-col overflow-hidden transition-all duration-200',
+            'flex flex-col min-w-0 overflow-hidden transition-all duration-200',
             viewMode === 'preview' ? 'w-0' : viewMode === 'split' ? 'w-1/2' : 'w-full'
           )}
         >
@@ -168,12 +168,12 @@ export default function HomePage() {
         </div>
 
         {/* Divider */}
-        {viewMode === 'split' && <div className="w-px bg-border" />}
+        {viewMode === 'split' && <div className="w-px bg-border shrink-0" />}
 
         {/* Preview Panel */}
         <div
           className={cn(
-            'overflow-hidden transition-all duration-200 flex',
+            'min-w-0 overflow-hidden transition-all duration-200 flex',
             viewMode === 'editor' ? 'w-0' : viewMode === 'split' ? 'w-1/2' : 'w-full'
           )}
         >
