@@ -151,10 +151,6 @@
   text-align: right;
 }
 
-[dir="rtl"] .markdown-preview blockquote {
-  @apply border-s-0 border-e-4 ps-0 pe-4;
-}
-
 /* Mobile responsive */
 @media (max-width: 640px) {
   .markdown-preview {

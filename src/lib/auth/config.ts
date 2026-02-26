@@ -203,7 +203,7 @@ export const authOptions: NextAuthOptions = {
   pages: {
     signIn: '/auth/login',
     signOut: '/auth/logout',
-    error: '/auth/error',
+    error: '/auth/login',
     newUser: '/auth/register',
   },
   callbacks: {

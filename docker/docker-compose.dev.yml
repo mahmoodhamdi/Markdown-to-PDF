@@ -6,7 +6,7 @@ services:
     container_name: md2pdf-mongodb
     restart: unless-stopped
     ports:
-      - "27017:27017"
+      - "27018:27017"
     environment:
       MONGO_INITDB_ROOT_USERNAME: admin
       MONGO_INITDB_ROOT_PASSWORD: password123
@@ -25,7 +25,7 @@ services:
     container_name: md2pdf-mongo-admin
     restart: unless-stopped
     ports:
-      - "8081:8081"
+      - "8083:8081"
     environment:
       ME_CONFIG_MONGODB_ADMINUSERNAME: admin
       ME_CONFIG_MONGODB_ADMINPASSWORD: password123

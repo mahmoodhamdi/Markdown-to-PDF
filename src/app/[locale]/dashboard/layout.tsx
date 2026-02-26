@@ -40,7 +40,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             aria-hidden="true"
           />
           {/* Drawer panel */}
-          <div className="fixed inset-y-0 left-0 z-50 w-72 bg-background shadow-xl md:hidden flex flex-col">
+          <div className="fixed inset-y-0 start-0 z-50 w-72 bg-background shadow-xl md:hidden flex flex-col">
             <div className="flex items-center justify-between px-4 py-4 border-b">
               <div className="flex items-center gap-2">
                 <LayoutDashboard className="h-5 w-5 text-primary" />

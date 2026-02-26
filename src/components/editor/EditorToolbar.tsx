@@ -230,7 +230,7 @@ export function EditorToolbar() {
 
   return (
     <TooltipProvider>
-      <div className="flex items-center justify-between border-b p-2 bg-background overflow-x-auto">
+      <div className="flex items-center justify-between overflow-x-auto w-full">
         <div className="flex items-center gap-1">
           {toolbarGroups.map((group, groupIndex) => (
             <div key={groupIndex} className="flex items-center">
